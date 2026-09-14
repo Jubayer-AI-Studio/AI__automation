@@ -6,9 +6,9 @@ from PIL import Image, ImageDraw, ImageFont
 from src.config import BGM_PATH, FONT_PATH, OUTPUT_DIR, TEMP_DIR, BASE_DIR
 
 PRESENTER_IMG_PATH = BASE_DIR / "assets" / "presenter.jpg"
+REAL_TECH_CLIP = BASE_DIR / "assets" / "tech_clip_1.mp4"
 
 def prepare_circular_presenter_badge() -> Path:
-    """Creates a sleek floating circular presenter badge with glowing cyan ring and name tag."""
     badge_path = TEMP_DIR / "presenter_badge.png"
     if badge_path.exists():
         return badge_path
@@ -38,7 +38,6 @@ def prepare_circular_presenter_badge() -> Path:
     ring_draw.ellipse((2, 2, 402, 402), outline="#00F0FF", width=6)
     ring_img.paste(circular_fg, (12, 12), circular_fg)
 
-    # Name tag
     font_path = "C:/Windows/Fonts/Nirmala.ttc" if os.path.exists("C:/Windows/Fonts/Nirmala.ttc") else str(FONT_PATH)
     font_tag = ImageFont.truetype(font_path, 22)
     draw_badge = ImageDraw.Draw(ring_img)
@@ -50,35 +49,44 @@ def prepare_circular_presenter_badge() -> Path:
     return badge_path
 
 def generate_dynamic_tech_bg(duration: float, output_path: Path):
-    """Generates an evolving, moving cyber-tech visual background using fast FFmpeg gradients."""
-    cmd = [
-        "ffmpeg", "-y",
-        "-f", "lavfi",
-        "-i", f"gradients=s=1080x1920:d={duration}:c0=0x081128:c1=0x1a0928:speed=0.005",
-        "-vf", "vignette=PI/4",
-        "-t", str(duration),
-        "-c:v", "libx264",
-        "-preset", "ultrafast",
-        str(output_path)
-    ]
-    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    """Prepares real moving 1080x1920 tech video background."""
+    if REAL_TECH_CLIP.exists():
+        # Scale & crop 16:9 clip to 9:16 vertical 1080x1920 with high contrast
+        vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.15:brightness=-0.05"
+        cmd = [
+            "ffmpeg", "-y",
+            "-stream_loop", "-1", "-i", str(REAL_TECH_CLIP),
+            "-vf", vf,
+            "-t", str(duration),
+            "-c:v", "libx264",
+            "-preset", "fast",
+            "-an",
+            str(output_path)
+        ]
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    else:
+        # Fallback fast gradients
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", f"gradients=s=1080x1920:d={duration}:c0=0x081128:c1=0x1a0928:speed=0.005",
+            "-vf", "vignette=PI/4",
+            "-t", str(duration),
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            str(output_path)
+        ]
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def render_final_reel(scene_timings: list, narration_path: Path, total_duration: float, title: str) -> Path:
-    """
-    Renders the complete presentation:
-    1. Dynamic moving tech video background.
-    2. Circular glowing presenter badge in bottom-right corner.
-    3. Flawless Bengali text shaping via FFmpeg drawtext with HarfBuzz (zero broken conjuncts).
-    4. Narration + ambient BGM.
-    """
-    # 1. Background moving video
+    # 1. Real moving video background
     bg_video_path = TEMP_DIR / "dynamic_bg.mp4"
     generate_dynamic_tech_bg(total_duration, bg_video_path)
 
     # 2. Presenter badge
     badge_path = prepare_circular_presenter_badge()
 
-    # 3. Audio mix (Narration + BGM)
+    # 3. Audio mix
     mixed_audio_path = TEMP_DIR / "final_mixed_audio.mp3"
     if BGM_PATH.exists():
         cmd_audio = [
@@ -94,7 +102,7 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
     else:
         mixed_audio_path = narration_path
 
-    # 4. Prepare short, punchy Bengali subtitle text files for each scene
+    # 4. Bengali subtitle text with HarfBuzz
     font_file = "assets/fonts/HindSiliguri-Bold.ttf"
     filter_chains = [
         "[0:v]scale=1080:1920[bg]",
@@ -104,7 +112,6 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
     last_v = "v_base"
     for i, scene in enumerate(scene_timings, start=1):
         wrapped = "\n".join(textwrap.wrap(scene["text"], width=24))
-        # RELATIVE PATH TO AVOID WINDOWS DRIVE COLON PARSE ERROR
         scene_rel_path = f"temp/sub_txt_{i}.txt"
         scene_full_path = TEMP_DIR / f"sub_txt_{i}.txt"
         with open(scene_full_path, "w", encoding="utf-8") as f:
@@ -114,7 +121,6 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
         et = scene["end"]
         next_v = f"v_sub_{i}"
 
-        # High-visibility viral typography: bright yellow, black border, dark translucent pill box, centered
         dt_filter = (
             f"drawtext=fontfile='{font_file}':textfile='{scene_rel_path}':"
             "fontsize=52:fontcolor=yellow:borderw=4:bordercolor=black:"
@@ -149,7 +155,7 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
         str(output_path)
     ]
 
-    print("[VideoEngine] Rendering dynamic tech presentation reel...")
+    print("[VideoEngine] Rendering real video background presenter reel...")
     subprocess.run(cmd_final, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print(f"[VideoEngine] Render complete! Video saved to: {output_path}")
     return output_path
