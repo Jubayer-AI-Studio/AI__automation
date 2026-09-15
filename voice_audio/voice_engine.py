@@ -81,14 +81,29 @@ def get_audio_duration(file_path: Path) -> float:
     res = subprocess.run(cmd, capture_output=True, text=True, check=True)
     return float(res.stdout.strip())
 
-def apply_studio_mastering(raw_path: Path, output_path: Path):
+def apply_smooth_news_mastering(raw_path: Path, output_path: Path, is_cloned: bool = False):
     """
-    ভয়েসকে রেডিও/পডকাস্ট স্টুডিও কোয়ালিটি করার জন্য অডিও মাস্টারিং ফিল্টার:
-    - bass boost (+4dB @ 115Hz): কণ্ঠকে ভারী ও গভীর করে।
-    - treble presence (+2dB @ 3500Hz): বাংলা প্রতিটা অক্ষরের উচ্চারণ ক্রিস্প ও পরিষ্কার রাখে।
-    - broadcast loudnorm: সাউন্ডের ভলিউম লাউড ও মোবাইল স্পিকারে শোনার জন্য সেরা করে তোলে।
+    টিভি সংবাদ উপস্থাপকের স্টাইলে রেশমি ও মসৃণ (Smooth) অডিও মাস্টারিং:
+    - highpass=f=80: অপ্রয়োজনীয় বাতাস বা ঘরোয়া মাইক্রোফোনের হাম দূর করে।
+    - lowpass=f=11000: কর্কশ ও খসখসে শব্দ দূর করে কণ্ঠকে রেশমি ও তৃপ্তিদায়ক করে।
+    - equalizer: ২০০Hz-এ ৩.৫dB উষ্ণ গভীরতা যোগ করে যাতে কণ্ঠ ভারী ও মসৃণ শোনায়।
+    - dynaudnorm: নিখুঁত ডায়নামিক লেভেলিং যাতে প্রতিটি শব্দ সমান মসৃণ ও স্পষ্ট থাকে।
+    - loudnorm: আন্তর্জাতিক সম্প্রচার মানদণ্ড (Broadcast Standard Loudness)।
     """
-    filter_chain = "bass=g=4:f=115:w=0.5,treble=g=2:f=3500:w=0.6,loudnorm=I=-15:TP=-1.5:LRA=7"
+    if is_cloned:
+        pitch_filter = "asetrate=44100*0.95,aresample=44100,atempo=1.05,"
+    else:
+        pitch_filter = ""
+
+    filter_chain = (
+        f"{pitch_filter}"
+        "highpass=f=80,"
+        "lowpass=f=11000,"
+        "equalizer=f=200:width_type=q:width=1.2:g=3.5,"
+        "equalizer=f=2600:width_type=q:width=1.5:g=2.0,"
+        "dynaudnorm=f=120:g=15:p=0.95:m=8.0,"
+        "loudnorm=I=-16:TP=-1.5:LRA=7"
+    )
     cmd = [
         "ffmpeg", "-y",
         "-i", str(raw_path),
@@ -175,19 +190,22 @@ def generate_voiceover_and_subtitles(scenes: list):
         mastered_audio_path = TEMP_DIR / f"scene_{i}.mp3"
 
         generated = False
-        # ১. যদি ক্লোন মোড অন থাকে
-        if VOICE_MODE == "cloned":
-            generated = generate_fish_audio_voice(scene["text"], raw_audio_path)
-            if not generated:
-                generated = generate_elevenlabs_voice(scene["text"], raw_audio_path)
+        is_cloned = False
 
-        # ২. ডিফল্ট বা ফলব্যাক: প্রফেশনাল প্রেজেন্টার ভয়েস (১০০% ক্লিন ও ভারী)
+        # ১. ক্লোন মোড (জুবায়ের ভাইয়ের কণ্ঠ)
+        if VOICE_MODE in ("cloned", "auto") and FISH_API_KEY and FISH_VOICE_ID:
+            generated = generate_fish_audio_voice(scene["text"], raw_audio_path)
+            if generated and raw_audio_path.exists() and raw_audio_path.stat().st_size > 1000:
+                is_cloned = True
+
+        # ২. ফলব্যাক বা প্রফেশনাল প্রেজেন্টার মোড
         if not generated or not raw_audio_path.exists() or raw_audio_path.stat().st_size == 0:
+            is_cloned = False
             asyncio.run(generate_edge_tts(scene["text"], raw_audio_path))
 
-        # ৩. স্টুডিও মাস্টারিং (ডিপ বেস + ক্রিস্প ক্লিয়ারিটি + লাউডনর্ম কম্প্রেসর)
+        # ৩. টিভি সংবাদ উপস্থাপকের স্টাইলে রেশমি মসৃণ মাস্টারিং
         try:
-            apply_studio_mastering(raw_audio_path, mastered_audio_path)
+            apply_smooth_news_mastering(raw_audio_path, mastered_audio_path, is_cloned=is_cloned)
             final_audio = mastered_audio_path
         except Exception:
             final_audio = raw_audio_path
