@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-🎬 VIDEO PRODUCTION ENGINE (JUBAYER.DEV DEVELOPER EDITION)
+🎬 VIDEO PRODUCTION ENGINE (JUBAYER.DEV DEVELOPER EDITION - FINAL)
 =============================================================================
-এই ইঞ্জিনে ফেসবুক রিলসের ১০০% সিনেমাটিক ও ডেভেলপার ব্র্যান্ডেড ভিজ্যুয়াল তৈরি হয়:
-  ১. শুরুতে ১.৮ সেকেন্ডের টার্মিনাল বুট ইন্ট্রো:
-     `> python jubayer_ai_pipeline.py` [200 OK — Launching Reel]
-  ২. পুরো ভিডিও জুড়ে টপ কর্নারে গ্লোয়িং কোড ওয়াটারমার্ক: `</> JUBAYER.DEV`
-  ৩. ভিডিওর ভেতরে খাঁটি ডার্ক-মোড VS Code পাইথন কোডিং ও টার্মিনাল এক্সিকিউশন সিন
+এই ইঞ্জিনে ফেসবুক রিলসের নিখুঁত সিনেমাটিক ও ডেভেলপার ব্র্যান্ডেড ভিজ্যুয়াল তৈরি হয়:
+  ১. শুরুতে সরাসরি হাই-টেক ভিজ্যুয়াল ও ভয়েস দিয়ে ভিডিও শুরু (কোনো টার্মিনাল ইন্ট্রো নেই)
+  ২. পুরো ভিডিও জুড়ে টপ-রাইট কর্নারে স্টাইলিশ কোড ওয়াটারমার্ক: `</> JUBAYER.DEV`
+  ৩. ভিডিওর ৩ নম্বর সিনে মাঝখানে মাত্র ১.৫ সেকেন্ডের জন্য দ্রুত পাইথন কোড এডিটর ঝলক
   ৪. ফিউচারিস্টিক রোবোটিক্স, সাই-ফাই হলোগ্রাম ও ৩ডি ব্রেইন স্ক্যান
-  ৫. শেষ ২.৫ সেকেন্ডে সিনেমাটিক আউটরো কার্ড:
-     জুবায়েরের স্টুডিও পোর্ট্রেট (HUD সাইবার রিং) + "ENGINEERED BY JUBAYER.DEV"
-  ৬. কোনো পুতুলনাচ বা মুখ নাড়াচাড়া নেই—১০০% প্রেস্টিজিয়াস পোর্ট্রেট ও রোবোটিক্স
+  ৫. ভিডিওর শেষে ২.৮ সেকেন্ডের সিনেমাটিক ডেভেলপার আউটরো কার্ড:
+     ল্যাপটপে কোড করা জুবায়েরের আত্মবিশ্বাসী স্টুডিও ফটো (HUD সাইবার রিং) +
+     "ENGINEERED BY JUBAYER.DEV | AI & AUTOMATION LAB"
+  ৬. ব্যাকগ্রাউন্ড মিউজিক আউটরো কার্ড শেষ হওয়া পর্যন্ত বাজবে এবং মসৃণভাবে ফেইড হবে
 =============================================================================
 """
 
@@ -38,14 +38,11 @@ from src.config import BGM_PATH, OUTPUT_DIR, TEMP_DIR
 
 ASSETS_DIR = BASE_DIR / "assets"
 TECH_CLIPS_DIR = ASSETS_DIR / "tech_clips"
-POSES_DIR = ASSETS_DIR / "presenter_poses"
-PRESENTER_IMG_PATH = ASSETS_DIR / "presenter.jpg"
 
 font_mono_path = "C:/Windows/Fonts/consola.ttf"
 font_bold_path = "C:/Windows/Fonts/consolab.ttf"
 font_sans_path = "C:/Windows/Fonts/arialbd.ttf"
 
-# ফিউচারিস্টিক রয়্যালটি-ফ্রি হাই-টেক ও রোবোটিক্স ক্লিপের ভান্ডার
 CURATED_TECH_CLIPS = {
     "sci_fi_hand_gestures.mp4": "https://assets.mixkit.co/videos/51209/51209-720.mp4",
     "humanoid_robot.mp4": "https://assets.mixkit.co/videos/49042/49042-720.mp4",
@@ -79,75 +76,9 @@ def ensure_tech_clips_available():
                 pass
 
 
-def create_terminal_intro_image() -> Path:
-    """Creates a high-tech dark mode terminal execution screen."""
-    out_path = TEMP_DIR / "terminal_intro.png"
-    if out_path.exists():
-        return out_path
-
-    w, h = 1080, 1920
-    img = Image.new("RGBA", (w, h), "#080B14")
-    draw = ImageDraw.Draw(img)
-
-    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    gdraw = ImageDraw.Draw(glow)
-    gdraw.ellipse((w//2 - 350, h//2 - 350, w//2 + 350, h//2 + 350), fill=(0, 240, 255, 35))
-    glow = glow.filter(ImageFilter.GaussianBlur(120))
-    img.paste(glow, (0, 0), glow)
-
-    tx1, ty1 = 60, 420
-    tx2, ty2 = w - 60, 1500
-    draw.rounded_rectangle((tx1 + 8, ty1 + 12, tx2 + 8, ty2 + 12), radius=20, fill="#020408CC")
-    draw.rounded_rectangle((tx1, ty1, tx2, ty2), radius=20, fill="#0D1322", outline="#1E293B", width=2)
-
-    draw.rounded_rectangle((tx1, ty1, tx2, ty1 + 64), radius=20, fill="#161F36")
-    draw.rectangle((tx1, ty1 + 40, tx2, ty1 + 64), fill="#161F36")
-    draw.line([(tx1, ty1 + 64), (tx2, ty1 + 64)], fill="#2A3756", width=2)
-
-    draw.ellipse((tx1 + 24, ty1 + 24, tx1 + 40, ty1 + 40), fill="#EF4444")
-    draw.ellipse((tx1 + 52, ty1 + 24, tx1 + 68, ty1 + 40), fill="#F59E0B")
-    draw.ellipse((tx1 + 80, ty1 + 24, tx1 + 96, ty1 + 40), fill="#10B981")
-
-    font_title = ImageFont.truetype(font_mono_path, 22)
-    draw.text((w//2 - 130, ty1 + 22), "bash - jubayer@ai-lab", fill="#94A3B8", font=font_title)
-
-    font_code = ImageFont.truetype(font_mono_path, 28)
-    font_code_b = ImageFont.truetype(font_bold_path, 28)
-
-    lines = [
-        ("root@jubayer.dev:~$ ", "#00F0FF", "python jubayer_ai_pipeline.py", "#38BDF8"),
-        ("[INIT] ", "#F59E0B", "Loading Neural Speech Engine v2.6 ... [DONE]", "#E2E8F0"),
-        ("[INIT] ", "#F59E0B", "Rendering 1080x1920 Robotics Visuals ... [DONE]", "#E2E8F0"),
-        ("[SYNC] ", "#A855F7", "Calibrating High-Tech Visual Layers ... [DONE]", "#E2E8F0"),
-        ("[STATUS] ", "#10B981", "200 OK — Pipeline Compiled by Jubayer", "#10B981"),
-        ("", "#000", "", "#000"),
-        (">>> ", "#00F0FF", "Launching Production Reel...", "#FFFFFF")
-    ]
-
-    curr_y = ty1 + 110
-    for prefix, pcolor, text, tcolor in lines:
-        if not prefix and not text:
-            curr_y += 30
-            continue
-        draw.text((tx1 + 36, curr_y), prefix, fill=pcolor, font=font_code_b)
-        pw = draw.textlength(prefix, font=font_code_b)
-        draw.text((tx1 + 36 + pw, curr_y), text, fill=tcolor, font=font_code)
-        curr_y += 58
-
-    cw = draw.textlength(">>> Launching Production Reel...", font=font_code)
-    draw.rectangle((tx1 + 42 + cw, curr_y - 58 + 4, tx1 + 58 + cw, curr_y - 58 + 32), fill="#00F0FF")
-
-    font_brand = ImageFont.truetype(font_bold_path, 32)
-    draw.text((w//2 - 170, 1620), "</> JUBAYER.DEV", fill="#00F0FF", font=font_brand)
-    font_sub = ImageFont.truetype(font_mono_path, 22)
-    draw.text((w//2 - 150, 1670), "AI & AUTOMATION LAB", fill="#64748B", font=font_sub)
-
-    img.save(out_path, format="PNG")
-    return out_path
-
-
 def create_watermark_badge() -> Path:
     """Creates a sleek, semi-transparent HUD watermark for the top-right corner."""
+    TEMP_DIR.mkdir(parents=True, exist_ok=True)
     out_path = TEMP_DIR / "watermark_badge.png"
     if out_path.exists():
         return out_path
@@ -167,6 +98,7 @@ def create_watermark_badge() -> Path:
 
 def create_code_ide_image() -> Path:
     """Creates a full 1080x1920 Dark Mode VS Code IDE showing genuine Python automation code."""
+    TEMP_DIR.mkdir(parents=True, exist_ok=True)
     out_path = TEMP_DIR / "code_ide_screen.png"
     if out_path.exists():
         return out_path
@@ -245,82 +177,87 @@ def create_code_ide_image() -> Path:
 
 
 def create_outro_slate_image() -> Path:
-    """Creates a prestigious 1080x1920 developer end-slate with Jubayer's portrait and branding."""
+    """
+    Creates the prestigious 1080x1920 developer end-slate with Jubayer's laptop photo,
+    glowing cyan/gold HUD rings, and 'ENGINEERED BY JUBAYER.DEV'.
+    """
+    TEMP_DIR.mkdir(parents=True, exist_ok=True)
     out_path = TEMP_DIR / "outro_slate.png"
-    if out_path.exists():
-        return out_path
 
+    # Always generate or update with Jubayer's laptop photo
     w, h = 1080, 1920
     img = Image.new("RGBA", (w, h), "#080B14")
     draw = ImageDraw.Draw(img)
 
     glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glow)
-    gdraw.ellipse((w//2 - 400, 300, w//2 + 400, 1100), fill=(0, 240, 255, 45))
+    gdraw.ellipse((w//2 - 450, 250, w//2 + 450, 1150), fill=(0, 240, 255, 40))
     glow = glow.filter(ImageFilter.GaussianBlur(140))
     img.paste(glow, (0, 0), glow)
 
-    presenter_img_path = POSES_DIR / "pose_closed.jpg"
-    if not presenter_img_path.exists():
-        presenter_img_path = PRESENTER_IMG_PATH
+    # Use Jubayer's uploaded laptop developer photo
+    p_img_path = ASSETS_DIR / "jubayer_dev_laptop.jpg"
+    if not p_img_path.exists():
+        p_img_path = ASSETS_DIR / "presenter_poses/pose_closed.jpg"
+    if not p_img_path.exists():
+        p_img_path = ASSETS_DIR / "presenter.jpg"
 
-    p_img = Image.open(presenter_img_path).convert("RGBA")
-    pw, ph = p_img.size
-    face_size = int(ph * 0.46)
-    cx = pw // 2
-    cy = int(ph * 0.40)
-    cropped = p_img.crop((cx - face_size//2, cy - face_size//2, cx + face_size//2, cy + face_size//2)).resize((440, 440), Image.Resampling.LANCZOS)
+    p_img = Image.open(p_img_path).convert("RGBA")
+    face_size = 540
+    cropped = p_img.resize((face_size, face_size), Image.Resampling.LANCZOS)
 
-    mask = Image.new("L", (440, 440), 0)
+    mask = Image.new("L", (face_size, face_size), 0)
     mdraw = ImageDraw.Draw(mask)
-    mdraw.ellipse((0, 0, 440, 440), fill=255)
+    mdraw.ellipse((0, 0, face_size, face_size), fill=255)
 
-    circular = Image.new("RGBA", (440, 440), (0, 0, 0, 0))
+    circular = Image.new("RGBA", (face_size, face_size), (0, 0, 0, 0))
     circular.paste(cropped, (0, 0), mask)
 
-    ccx, ccy = w // 2, 620
+    ccx, ccy = w // 2, 600
+    r_base = face_size // 2
 
-    for r_offset, alpha in [(12, 40), (8, 90), (4, 160)]:
-        r = 232 + r_offset
+    # HUD Rings
+    for r_offset, alpha in [(14, 40), (10, 80), (6, 150), (2, 220)]:
+        r = r_base + 6 + r_offset
         draw.ellipse((ccx - r, ccy - r, ccx + r, ccy + r), outline=(0, 240, 255, alpha), width=3)
 
-    draw.ellipse((ccx - 230, ccy - 230, ccx + 230, ccy + 230), outline="#00F0FF", width=5)
-    draw.ellipse((ccx - 220, ccy - 220, ccx + 220, ccy + 220), outline="#FFD700", width=3)
+    draw.ellipse((ccx - r_base - 6, ccy - r_base - 6, ccx + r_base + 6, ccy + r_base + 6), outline="#00F0FF", width=5)
+    draw.ellipse((ccx - r_base - 14, ccy - r_base - 14, ccx + r_base + 14, ccy + r_base + 14), outline="#FFD700", width=2)
 
     for i in range(36):
         if i % 9 == 0:
             continue
         angle = (2 * math.pi / 36) * i
-        r1 = 232
-        r2 = 242 if i % 3 == 0 else 238
+        r1 = r_base + 8
+        r2 = r_base + 18 if i % 3 == 0 else r_base + 14
         x1 = ccx + r1 * math.cos(angle)
         y1 = ccy + r1 * math.sin(angle)
         x2 = ccx + r2 * math.cos(angle)
         y2 = ccy + r2 * math.sin(angle)
         draw.line([(x1, y1), (x2, y2)], fill="#38BDF8", width=2)
 
-    img.paste(circular, (ccx - 220, ccy - 220), circular)
-    draw.ellipse((ccx - 220, ccy - 220, ccx + 220, ccy + 220), outline=(255, 255, 255, 180), width=2)
+    img.paste(circular, (ccx - r_base, ccy - r_base), circular)
+    draw.ellipse((ccx - r_base, ccy - r_base, ccx + r_base, ccy + r_base), outline=(255, 255, 255, 180), width=2)
 
     font_sub = ImageFont.truetype(font_mono_path, 28)
-    font_hero = ImageFont.truetype(font_sans_path, 60)
+    font_hero = ImageFont.truetype(font_sans_path, 62)
     font_lab = ImageFont.truetype(font_mono_path, 32)
     font_cta = ImageFont.truetype(font_bold_path, 30)
 
     sub_text = "ENGINEERED & PRODUCED BY"
     sw = draw.textlength(sub_text, font=font_sub)
-    draw.text((w//2 - sw//2, 980), sub_text, fill="#94A3B8", font=font_sub)
+    draw.text((w//2 - sw//2, 940), sub_text, fill="#94A3B8", font=font_sub)
 
     hero_text = "JUBAYER.DEV"
     hw = draw.textlength(hero_text, font=font_hero)
-    draw.text((w//2 - hw//2, 1030), hero_text, fill="#00F0FF", font=font_hero)
+    draw.text((w//2 - hw//2, 990), hero_text, fill="#00F0FF", font=font_hero)
 
     lab_text = "AI & AUTOMATION LAB"
     lw = draw.textlength(lab_text, font=font_lab)
-    draw.text((w//2 - lw//2, 1115), lab_text, fill="#F8FAFC", font=font_lab)
+    draw.text((w//2 - lw//2, 1075), lab_text, fill="#F8FAFC", font=font_lab)
 
-    badge_y = 1200
-    badges = ["PYTHON AUTOMATION", "AI VISION", "ROBOTICS"]
+    badge_y = 1160
+    badges = ["SOFTWARE ENGINEER", "AI AUTOMATION", "PYTHON"]
     total_w = sum(draw.textlength(b, font=font_sub) + 40 for b in badges) + 20 * (len(badges) - 1)
     bx = w // 2 - total_w // 2
 
@@ -330,7 +267,7 @@ def create_outro_slate_image() -> Path:
         draw.text((bx + 20, badge_y + 12), b, fill="#38BDF8", font=font_sub)
         bx += bw + 20
 
-    cta_y = 1380
+    cta_y = 1320
     cta_w = 480
     draw.rounded_rectangle((w//2 - cta_w//2, cta_y, w//2 + cta_w//2, cta_y + 70), radius=16, fill="#00F0FF")
     cta_text = "FOLLOW FOR FUTURE TECH"
@@ -344,7 +281,7 @@ def create_outro_slate_image() -> Path:
 def render_still_with_zoom(img_path: Path, duration: float, out_path: Path, fps: int = 30):
     """Renders a static image with smooth subtle cinematic camera push-in."""
     vf = (
-        f"zoompan=z='min(zoom+0.0003,1.04)':d={int(duration*fps)}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps={fps},"
+        f"zoompan=z='min(zoom+0.0004,1.05)':d={int(duration*fps)}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps={fps},"
         "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,"
         "eq=contrast=1.06:saturation=1.10"
     )
@@ -383,15 +320,43 @@ def render_broll_scene_with_watermark(clip_path: Path, duration: float, out_path
     subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+def render_split_code_scene(broll_clip: Path, total_dur: float, out_path: Path, fps: int = 30):
+    """
+    সিন ৩-এ মাঝখানে মাত্র ১.৫ সেকেন্ডের জন্য দ্রুত পাইথন কোড এডিটর ঝলক দেখাবে,
+    এরপর বাকি সময়ে হাই-টেক B-roll ফুটেজ চলবে।
+    """
+    code_img = create_code_ide_image()
+    part_code = TEMP_DIR / "split_code_1_5s.mp4"
+    part_broll = TEMP_DIR / "split_broll_rest.mp4"
+
+    code_dur = 1.5
+    broll_dur = max(1.0, total_dur - code_dur)
+
+    # ১.৫ সে. কোড
+    render_still_with_zoom(code_img, code_dur, part_code, fps=fps)
+    # বাকি সময়ে রোবোটিক্স ফুটেজ + ওয়াটারমার্ক
+    render_broll_scene_with_watermark(broll_clip, broll_dur, part_broll, fps=fps)
+
+    concat_txt = TEMP_DIR / "concat_split_code.txt"
+    with open(concat_txt, "w", encoding="utf-8") as f:
+        f.write(f"file '{part_code.resolve().as_posix()}'\n")
+        f.write(f"file '{part_broll.resolve().as_posix()}'\n")
+
+    cmd_cat = [
+        "ffmpeg", "-y",
+        "-f", "concat", "-safe", "0",
+        "-i", str(concat_txt),
+        "-c", "copy",
+        str(out_path)
+    ]
+    subprocess.run(cmd_cat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 def get_scene_clip(scene_idx: int, scene_text: str = "", used_clips: list = None) -> Path:
     """স্ক্রিপ্টের বিষয়বস্তু অনুযায়ী প্রতিটি সিনের জন্য সম্পূর্ণ ভিন্ন ভিন্ন ফুটেজ নির্বাচন করে।"""
     ensure_tech_clips_available()
     if used_clips is None:
         used_clips = []
-
-    # সিন ৩ সর্বদা ডেডিকেটেড ভিএস কোড (VS Code) এআই ডেভেলপার স্ক্রিন
-    if scene_idx == 3:
-        return create_code_ide_image()
 
     priority_order = [
         "sci_fi_hand_gestures.mp4",
@@ -436,50 +401,44 @@ def get_scene_clip(scene_idx: int, scene_text: str = "", used_clips: list = None
 def render_final_reel(scene_timings: list, narration_path: Path, total_duration: float, title: str) -> Path:
     """
     ১০০% সিনেমাটিক, রোবোটিক্স ও জুবায়েরের ডেভেলপার ব্র্যান্ডেড রিলস ভিডিও রেন্ডার করে।
-      - ১.৮ সে. টার্মিনাল বুট ইন্ট্রো
-      - মূল টেক সিনসমূহ + কোড আইডিই সিন + টপ কর্নার ওয়াটারমার্ক
-      - শেষ ২.৫ সে. সিনেমাটিক আউটরো কার্ড (জুবায়েরের স্টুডিও ছবি ও ব্র্যান্ডিং)
+      - শুরুতে সরাসরি মূল ভিডিও ও ভয়েসওভার (কোনো টার্মিনাল ইন্ট্রো নেই)
+      - টপ কর্নারে </> JUBAYER.DEV ওয়াটারমার্ক
+      - সিন ৩-এর মাঝে মাত্র ১.৫ সেকেন্ড কোড ফ্ল্যাশ
+      - ভিডিওর শেষে নিশ্চিতভাবে ২.৮ সেকেন্ডের সিনেমাটিক আউটরো কার্ড (জুবায়েরের ল্যাপটপ ফটো ও HUD)
     """
     print("[VideoEngine] JUBAYER.DEV সিনেমাটিক ডেভেলপার রিলস তৈরি হচ্ছে...")
     ensure_tech_clips_available()
     rendered_parts = []
     used_clips = []
 
-    # ১. টার্মিনাল বুট ইন্ট্রো (১.৮ সেকেন্ড)
-    intro_img = create_terminal_intro_image()
-    intro_vid = TEMP_DIR / "part_0_terminal_intro.mp4"
-    intro_dur = 1.8
-    print("[VideoEngine] [১/৩] টার্মিনাল বুট ইন্ট্রো (python jubayer_ai_pipeline.py) রেন্ডারিং...")
-    render_still_with_zoom(intro_img, intro_dur, intro_vid)
-    rendered_parts.append(intro_vid)
-
-    # ২. মূল ৫টি রোবোটিক্স ও কোডিং সিন
-    print("[VideoEngine] [২/৩] রোবোটিক্স, সাই-ফাই ও পাইথন কোডিং সিন রেন্ডারিং...")
+    # ১. মূল ৫টি রোবোটিক্স ও কোডিং সিন (শুরুতেই সরাসরি সিন ১ দিয়ে স্টার্ট)
+    total_scenes_dur = 0.0
     for i, sc in enumerate(scene_timings, start=1):
         dur = sc.get("duration", sc.get("end", 0) - sc.get("start", 0))
         if dur <= 0:
             dur = 5.0
+        total_scenes_dur += dur
         text = sc.get("text", "")
-        part_out = TEMP_DIR / f"part_{i}_scene.mp4"
+        part_out = TEMP_DIR / f"final_part_{i}_scene.mp4"
 
-        clip_or_img = get_scene_clip(i, text, used_clips)
-        used_clips.append(clip_or_img.name)
+        clip = get_scene_clip(i, text, used_clips)
+        used_clips.append(clip.name)
 
-        if clip_or_img.suffix.lower() in [".png", ".jpg", ".jpeg"]:
-            # যেমন কোড আইডিই স্ক্রিন
-            print(f"[VideoEngine] সিন {i}: খাঁটি পাইথন কোড এডিটর সিন ({clip_or_img.name}) রেন্ডারিং...")
-            render_still_with_zoom(clip_or_img, dur, part_out)
+        if i == 3:
+            # সিন ৩-এ মাত্র ১.৫ সেকেন্ড কোড ঝলক + বাকিটা রোবোটিক্স ফুটেজ
+            print(f"[VideoEngine] সিন {i}: ১.৫ সেকেন্ড কোড ঝলক + রোবোটিক্স ফুটেজ ({clip.name}) রেন্ডারিং...")
+            render_split_code_scene(clip, dur, part_out)
         else:
-            print(f"[VideoEngine] সিন {i}: সাই-ফাই রোবোটিক্স ফুটেজ ({clip_or_img.name}) + ওয়াটারমার্ক রেন্ডারিং...")
-            render_broll_scene_with_watermark(clip_or_img, dur, part_out)
+            print(f"[VideoEngine] সিন {i}: সাই-ফাই রোবোটিক্স ফুটেজ ({clip.name}) + ওয়াটারমার্ক রেন্ডারিং...")
+            render_broll_scene_with_watermark(clip, dur, part_out)
 
         rendered_parts.append(part_out)
 
-    # ৩. সিনেমাটিক আউটরো কার্ড (২.৫ সেকেন্ড)
+    # ২. সিনেমাটিক আউটরো কার্ড (২.৮ সেকেন্ড - ১০০% দৃশ্যমান)
     outro_img = create_outro_slate_image()
-    outro_vid = TEMP_DIR / "part_6_outro_slate.mp4"
-    outro_dur = 2.5
-    print("[VideoEngine] [৩/৩] সিনেমাটিক ডেভেলপার আউটরো কার্ড (ENGINEERED BY JUBAYER.DEV) রেন্ডারিং...")
+    outro_vid = TEMP_DIR / "final_outro_slate.mp4"
+    outro_dur = 2.8
+    print("[VideoEngine] সিনেমাটিক ডেভেলপার আউটরো কার্ড (জুবায়েরের ল্যাপটপ পোর্ট্রেট) রেন্ডারিং...")
     render_still_with_zoom(outro_img, outro_dur, outro_vid)
     rendered_parts.append(outro_vid)
 
@@ -499,21 +458,22 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
     ]
     subprocess.run(cmd_cat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    # অডিও মিক্সিং:
-    # টার্মিনাল ইন্ট্রো (১.৮ সে.) চলার সময় ব্যাকগ্রাউন্ড মিউজিক শুরু হবে,
-    # ভয়েসওভার ঠিক ১.৮ সেকেন্ড পর শুরু হবে (adelay=1800|1800)
-    delay_ms = int(intro_dur * 1000)
-    total_reel_duration = intro_dur + total_duration + outro_dur
+    # মোট ভিডিও দৈর্ঘ্য (সিনসমূহ + আউটরো কার্ড)
+    total_video_dur = total_scenes_dur + outro_dur
     mixed_audio_path = TEMP_DIR / "final_mixed_audio.mp3"
 
+    # অডিও মিক্সিং:
+    # ভয়েস শুরু হবে ঠিক ০.০ সেকেন্ডে।
+    # ভয়েস শেষ হওয়ার পর আউটরো কার্ডের শেষ পর্যন্ত ব্যাকগ্রাউন্ড মিউজিক বাজবে এবং শেষ ০.৮ সেকেন্ডে ফেইড আউট হবে।
+    fade_start = max(1.0, total_video_dur - 0.8)
     if BGM_PATH.exists():
         cmd_audio = [
             "ffmpeg", "-y",
             "-i", str(narration_path),
             "-stream_loop", "-1", "-i", str(BGM_PATH),
             "-filter_complex",
-            f"[0:a]adelay={delay_ms}|{delay_ms},volume=1.0[narr];[1:a]volume=0.12[bgm];[narr][bgm]amix=inputs=2:duration=first:dropout_transition=2",
-            "-t", f"{total_reel_duration:.3f}",
+            f"[0:a]volume=1.0[narr];[1:a]volume=0.12,afade=t=out:st={fade_start:.2f}:d=0.8[bgm];[narr][bgm]amix=inputs=2:duration=longest:dropout_transition=2",
+            "-t", f"{total_video_dur:.3f}",
             str(mixed_audio_path)
         ]
         subprocess.run(cmd_audio, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -525,6 +485,7 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
         safe_title = "jubayer_dev_ai_reel"
     output_path = OUTPUT_DIR / f"{safe_title}.mp4"
 
+    # আউটরো কার্ড যাতে কখনো কাটা না পড়ে, তাই -t দিয়ে সম্পূর্ণ ভিডিও দৈর্ঘ্য নিশ্চিত করা হয়েছে
     cmd_final = [
         "ffmpeg", "-y",
         "-i", str(bg_video_path),
@@ -532,7 +493,7 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
         "-c:v", "copy",
         "-c:a", "aac",
         "-b:a", "192k",
-        "-shortest",
+        "-t", f"{total_video_dur:.3f}",
         str(output_path)
     ]
 
@@ -570,7 +531,7 @@ if __name__ == "__main__":
         scene_timings=audio_data["scene_timings"],
         narration_path=audio_data["narration_path"],
         total_duration=audio_data["total_duration"],
-        title="jubayer_dev_branding_test"
+        title="jubayer_dev_final_test"
     )
 
     print("=" * 60)
