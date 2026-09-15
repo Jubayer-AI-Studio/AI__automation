@@ -33,32 +33,35 @@ FISH_VOICE_ID = os.getenv("FISH_VOICE_ID", "").strip()
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "").strip()
 
+# ভয়েস মোড: 'pro_presenter' (১০০% প্রফেশনাল, সম্মানজনক ও পরিষ্কার) অথবা 'cloned' (ক্লোন করা কণ্ঠ)
+VOICE_MODE = os.getenv("VOICE_MODE", "pro_presenter").strip().lower()
+
 # আকর্ষণীয় ভয়েস প্রোফাইলসমূহ
 VOICE_PROFILES = {
-    # ১. উদ্যমী ও স্মার্ট টেক পুরুষ কণ্ঠ (দ্রুত ও আকর্ষণীয়)
+    # ১. স্মার্ট ও রুচিশীল টেক পুরুষ কণ্ঠ (ভারী বেস ও রেডিও-কোয়ালিটি পাঞ্চ)
     "male_energetic": {
         "voice": "bn-BD-PradeepNeural",
-        "rate": "+14%",
-        "pitch": "+2Hz",
-        "label": "স্মার্ট ও উদ্যমী পুরুষ কণ্ঠ (প্রদীপ)"
+        "rate": "+10%",
+        "pitch": "-1Hz",
+        "label": "স্মার্ট প্রফেশনাল টেক প্রেজেন্টার (ভারী ও পরিচ্ছন্ন পুরুষ কণ্ঠ)"
     },
     # ২. প্রাণবন্ত ও অত্যন্ত আকর্ষণীয় নারী কণ্ঠ (খুবই মিষ্টি ও চটপটে)
     "female_lively": {
         "voice": "bn-BD-NabanitaNeural",
-        "rate": "+12%",
+        "rate": "+10%",
         "pitch": "+0Hz",
         "label": "প্রাণবন্ত ও মিষ্টি কথক কণ্ঠ (নবনীতা)"
     },
     # ৩. গল্প বলার মতো রোমাঞ্চকর পুরুষ কণ্ঠ
     "male_storyteller": {
         "voice": "bn-IN-BashkarNeural",
-        "rate": "+14%",
-        "pitch": "+1Hz",
+        "rate": "+10%",
+        "pitch": "-1Hz",
         "label": "রোমাঞ্চকর গল্প কথক পুরুষ কণ্ঠ (ভাস্কর)"
     }
 }
 
-# ডিফল্ট সক্রিয় ভয়েস প্রোফাইল (চাইলে 'female_lively' অথবা 'male_storyteller' দিতে পারেন)
+# ডিফল্ট সক্রিয় ভয়েস প্রোফাইল
 CURRENT_PROFILE_KEY = os.getenv("VOICE_PROFILE", "male_energetic")
 
 def format_srt_time(seconds: float) -> str:
@@ -78,6 +81,21 @@ def get_audio_duration(file_path: Path) -> float:
     res = subprocess.run(cmd, capture_output=True, text=True, check=True)
     return float(res.stdout.strip())
 
+def apply_studio_mastering(raw_path: Path, output_path: Path):
+    """
+    ভয়েসকে রেডিও/পডকাস্ট স্টুডিও কোয়ালিটি করার জন্য অডিও মাস্টারিং ফিল্টার:
+    - bass boost (+4dB @ 115Hz): কণ্ঠকে ভারী ও গভীর করে।
+    - treble presence (+2dB @ 3500Hz): বাংলা প্রতিটা অক্ষরের উচ্চারণ ক্রিস্প ও পরিষ্কার রাখে।
+    - broadcast loudnorm: সাউন্ডের ভলিউম লাউড ও মোবাইল স্পিকারে শোনার জন্য সেরা করে তোলে।
+    """
+    filter_chain = "bass=g=4:f=115:w=0.5,treble=g=2:f=3500:w=0.6,loudnorm=I=-15:TP=-1.5:LRA=7"
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", str(raw_path),
+        "-af", filter_chain,
+        str(output_path)
+    ]
+    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
 async def generate_edge_tts(text: str, output_path: Path, profile_key: str = None):
     """Generates lively, fast-paced, high-retention Bengali neural voiceover."""
@@ -100,7 +118,8 @@ def generate_fish_audio_voice(text: str, output_path: Path) -> bool:
         url = "https://api.fish.audio/v1/tts"
         headers = {
             "Authorization": f"Bearer {FISH_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "model": "s2.1-pro-free"
         }
         payload = {
             "text": text,
@@ -152,18 +171,28 @@ def generate_voiceover_and_subtitles(scenes: list):
     scene_timings = []
 
     for i, scene in enumerate(scenes, start=1):
-        scene_audio_path = TEMP_DIR / f"scene_{i}.mp3"
+        raw_audio_path = TEMP_DIR / f"raw_scene_{i}.mp3"
+        mastered_audio_path = TEMP_DIR / f"scene_{i}.mp3"
 
-        # 1. Try Fish Audio (Free Cloned User Voice)
-        cloned = generate_fish_audio_voice(scene["text"], scene_audio_path)
-        # 2. Try ElevenLabs
-        if not cloned or not scene_audio_path.exists() or scene_audio_path.stat().st_size == 0:
-            cloned = generate_elevenlabs_voice(scene["text"], scene_audio_path)
-        # 3. Fallback to lively Edge-TTS
-        if not cloned or not scene_audio_path.exists() or scene_audio_path.stat().st_size == 0:
-            asyncio.run(generate_edge_tts(scene["text"], scene_audio_path))
+        generated = False
+        # ১. যদি ক্লোন মোড অন থাকে
+        if VOICE_MODE == "cloned":
+            generated = generate_fish_audio_voice(scene["text"], raw_audio_path)
+            if not generated:
+                generated = generate_elevenlabs_voice(scene["text"], raw_audio_path)
 
-        duration = get_audio_duration(scene_audio_path)
+        # ২. ডিফল্ট বা ফলব্যাক: প্রফেশনাল প্রেজেন্টার ভয়েস (১০০% ক্লিন ও ভারী)
+        if not generated or not raw_audio_path.exists() or raw_audio_path.stat().st_size == 0:
+            asyncio.run(generate_edge_tts(scene["text"], raw_audio_path))
+
+        # ৩. স্টুডিও মাস্টারিং (ডিপ বেস + ক্রিস্প ক্লিয়ারিটি + লাউডনর্ম কম্প্রেসর)
+        try:
+            apply_studio_mastering(raw_audio_path, mastered_audio_path)
+            final_audio = mastered_audio_path
+        except Exception:
+            final_audio = raw_audio_path
+
+        duration = get_audio_duration(final_audio)
         start_time = current_time
         end_time = current_time + duration
 
@@ -174,13 +203,13 @@ def generate_voiceover_and_subtitles(scenes: list):
             "index": i,
             "text": scene["text"],
             "query": scene["query"],
-            "audio_path": scene_audio_path,
+            "audio_path": final_audio,
             "start": start_time,
             "end": end_time,
             "duration": duration
         })
 
-        scene_audios.append(scene_audio_path)
+        scene_audios.append(final_audio)
         current_time = end_time
 
     full_narration_path = TEMP_DIR / "full_narration.mp3"
@@ -225,15 +254,17 @@ if __name__ == "__main__":
     print("=" * 60)
 
     sample_text = (
-        "আগামী ৫ বছরে কোন কোন পেশা পুরোপুরি বদলে দেবে কৃত্রিম বুদ্ধিমত্তা? "
-        "এই তথ্যটি প্রত্যেকের জানা দরকার। ভিডিওটি শেষ পর্যন্ত দেখুন!"
+        "ভাই, একটু ভেবে দেখেছেন? মাত্র কয়েকটা মাসের মধ্যে এআই কোন কোন পেশা পুরোপুরি শেষ করে দিতে পারে! "
+        "আসল সত্যটা শুনুন।"
     )
 
     for profile_key, p_info in VOICE_PROFILES.items():
         sample_path = TEMP_DIR / f"voice_sample_{profile_key}.mp3"
+        raw_path = TEMP_DIR / f"raw_sample_{profile_key}.mp3"
         print(f"\n🔊 তৈরি হচ্ছে: {p_info['label']} (স্পিড: {p_info['rate']})")
-        asyncio.run(generate_edge_tts(sample_text, sample_path, profile_key=profile_key))
-        print(f"✅ তৈরি হয়েছে: {sample_path}")
+        asyncio.run(generate_edge_tts(sample_text, raw_path, profile_key=profile_key))
+        apply_studio_mastering(raw_path, sample_path)
+        print(f"✅ স্টুডিও মাস্টার্ড ভয়েস তৈরি হয়েছে: {sample_path}")
 
         # Send to Telegram directly so Jubayer can listen on mobile
         if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:

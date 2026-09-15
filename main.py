@@ -44,7 +44,7 @@ def run_pipeline():
     print(f"📄 মোট সিনের সংখ্যা: {len(scenes)}")
 
     # 2. বাংলা ভয়েসওভার ও সাবটাইটেল টাইমিং তৈরি
-    print("\n[২/৫] Edge-TTS দিয়ে প্রাকৃতিক বাংলা ভয়েসওভার তৈরি হচ্ছে...")
+    print("\n[২/৫] ডিপ বেস ও স্টুডিও মাস্টার্ড বাংলা ভয়েসওভার তৈরি হচ্ছে...")
     audio_data = generate_voiceover_and_subtitles(scenes)
     narration_path = audio_data["narration_path"]
     total_duration = audio_data["total_duration"]
