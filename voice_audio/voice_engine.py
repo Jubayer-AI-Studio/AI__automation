@@ -28,6 +28,8 @@ if str(BASE_DIR) not in sys.path:
 import edge_tts
 from src.config import TEMP_DIR, OUTPUT_DIR, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 
+FISH_API_KEY = os.getenv("FISH_API_KEY", "").strip()
+FISH_VOICE_ID = os.getenv("FISH_VOICE_ID", "").strip()
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "").strip()
 
@@ -90,6 +92,33 @@ async def generate_edge_tts(text: str, output_path: Path, profile_key: str = Non
     )
     await communicate.save(str(output_path))
 
+def generate_fish_audio_voice(text: str, output_path: Path) -> bool:
+    """Generate cloned user voice using Fish Audio 100% Free API."""
+    if not FISH_API_KEY or not FISH_VOICE_ID:
+        return False
+    try:
+        url = "https://api.fish.audio/v1/tts"
+        headers = {
+            "Authorization": f"Bearer {FISH_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "text": text,
+            "reference_id": FISH_VOICE_ID,
+            "format": "mp3",
+            "mp3_bitrate": 192
+        }
+        res = requests.post(url, headers=headers, json=payload, timeout=45)
+        if res.status_code == 200:
+            with open(output_path, "wb") as f:
+                f.write(res.content)
+            return True
+        else:
+            print(f"[FishAudio] API error {res.status_code}: {res.text}")
+    except Exception as e:
+        print(f"[FishAudio] Request exception: {e}")
+    return False
+
 def generate_elevenlabs_voice(text: str, output_path: Path) -> bool:
     """Generate cloned user voice using ElevenLabs API."""
     if not ELEVENLABS_API_KEY or not ELEVENLABS_VOICE_ID:
@@ -125,8 +154,12 @@ def generate_voiceover_and_subtitles(scenes: list):
     for i, scene in enumerate(scenes, start=1):
         scene_audio_path = TEMP_DIR / f"scene_{i}.mp3"
 
-        # Try user's cloned voice first, fallback to Edge-TTS
-        cloned = generate_elevenlabs_voice(scene["text"], scene_audio_path)
+        # 1. Try Fish Audio (Free Cloned User Voice)
+        cloned = generate_fish_audio_voice(scene["text"], scene_audio_path)
+        # 2. Try ElevenLabs
+        if not cloned or not scene_audio_path.exists() or scene_audio_path.stat().st_size == 0:
+            cloned = generate_elevenlabs_voice(scene["text"], scene_audio_path)
+        # 3. Fallback to lively Edge-TTS
         if not cloned or not scene_audio_path.exists() or scene_audio_path.stat().st_size == 0:
             asyncio.run(generate_edge_tts(scene["text"], scene_audio_path))
 
