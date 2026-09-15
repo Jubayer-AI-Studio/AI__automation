@@ -1,4 +1,4 @@
-﻿import os
+import os
 import requests
 from pathlib import Path
 from src.config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
@@ -22,19 +22,16 @@ def send_full_creator_kit(video_path: Path, title: str, caption: str, hashtags: 
     # 1. Send Video Reel
     print(f"[Telegram] Sending Video Reel to chat {TELEGRAM_CHAT_ID}...")
     video_msg = (
-        f"🎬 *১. আজকের এআই ও টেক রিলস ভিডিও*\n\n"
-        f"📌 *টপিক:* {title}\n\n"
-        f"📝 *রিলসের ক্যাপশন (কপি করে পেস্ট করুন):*\n"
+        f"ভিডিও শিরোনাম: {title}\n\n"
+        f"ক্যাপশন:\n"
         f"{caption}\n\n"
-        f"🏷️ *হ্যাশট্যাগ:*\n"
-        f"{tags_str}\n\n"
-        f"💡 *টিপ:* ভিডিওটি ফোনে সেভ করে ফেসবুক অ্যাপের 'Create Reel'-এ আপলোড করে দিন।"
+        f"{tags_str}"
     )
     try:
         with open(video_path, "rb") as vf:
             res = requests.post(
                 f"{base_url}/sendVideo",
-                data={"chat_id": TELEGRAM_CHAT_ID, "caption": video_msg, "parse_mode": "Markdown", "supports_streaming": True},
+                data={"chat_id": TELEGRAM_CHAT_ID, "caption": video_msg, "supports_streaming": True},
                 files={"video": vf},
                 timeout=120
             )
@@ -47,40 +44,48 @@ def send_full_creator_kit(video_path: Path, title: str, caption: str, hashtags: 
     if photo_card_path and photo_card_path.exists():
         print(f"[Telegram] Sending Photo Card...")
         photo_msg = (
-            f"🖼️ *২. আজকের ফেসবুক ফটো পোস্ট (ইমেজ কার্ড)*\n\n"
-            f"📌 *পোস্ট ক্যাপশন:*\n"
-            f"{extras['photo_card']['title']} সম্পর্কে গুরুত্বপূর্ণ তথ্যগুলো জেনে নিন। আপনার মতামত কমেন্টে জানান! 👇\n\n"
-            f"#AIFacts #Technology #TechBangladesh #BanglaTech #Infographic"
+            f"{extras['photo_card']['title']} সম্পর্কে বিস্তারিত তথ্য।\n\n"
+            f"#Technology #TechBangladesh #BanglaTech #Infographic"
         )
         try:
             with open(photo_card_path, "rb") as pf:
                 requests.post(
                     f"{base_url}/sendPhoto",
-                    data={"chat_id": TELEGRAM_CHAT_ID, "caption": photo_msg, "parse_mode": "Markdown"},
+                    data={"chat_id": TELEGRAM_CHAT_ID, "caption": photo_msg},
                     files={"photo": pf},
                     timeout=60
                 )
         except Exception as e:
             print(f"[Telegram] Failed to send photo card: {e}")
 
-    # 3. Send Daily Discussion Post & Story Poll
+    # 3. Send Facebook Feed Post (Clean, ready to copy directly)
     print(f"[Telegram] Sending Discussion Post & Story Poll...")
     discussion_text = extras["discussion_post"]["text"]
     story_poll = extras["story_poll"]
-    extra_msg = (
-        f"📝 *৩. আজকের হাই-এনগেজমেন্ট টেক্সট পোস্ট*\n"
-        f"*(এই পোস্টটি দিলে পেজ/আইডিতে প্রচুর কমেন্ট আসবে)*\n\n"
-        f"{discussion_text}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"{story_poll}\n"
-        f"💡 *টিপ:* স্টোরি দিয়ে পোল তৈরি করলে দর্শক সহজে আপনার সাথে যুক্ত হয়।"
-    )
+
     try:
+        # ফেসবুক পোস্ট: সরাসরি কপি করার জন্য একদম নিখুঁত টেক্সট
+        post_bundle = (
+            f"[ফেসবুক পোস্ট - সরাসরি কপি করে আপলোড করুন]\n\n"
+            f"{discussion_text}"
+        )
         requests.post(
             f"{base_url}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": extra_msg, "parse_mode": "Markdown"},
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": post_bundle},
             timeout=30
         )
+
+        # ফেসবুক স্টোরি: সরাসরি কপি করার জন্য আলাদা মেসেজ
+        story_bundle = (
+            f"[ফেসবুক স্টোরি - সরাসরি কপি করার জন্য]\n\n"
+            f"{story_poll}"
+        )
+        requests.post(
+            f"{base_url}/sendMessage",
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": story_bundle},
+            timeout=30
+        )
+
         print("[Telegram] Complete Daily Creator Kit sent successfully to Telegram!")
         return True
     except Exception as e:
