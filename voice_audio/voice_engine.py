@@ -38,25 +38,25 @@ VOICE_MODE = os.getenv("VOICE_MODE", "pro_presenter").strip().lower()
 
 # আকর্ষণীয় ভয়েস প্রোফাইলসমূহ
 VOICE_PROFILES = {
-    # ১. স্মার্ট ও রুচিশীল টেক পুরুষ কণ্ঠ (ভারী বেস ও রেডিও-কোয়ালিটি পাঞ্চ)
+    # ১. টিভি নিউজ বুলেটিন উপস্থাপক (গম্ভীর, ভারী ও রেশমি মসৃণ পুরুষ কণ্ঠ - জুবায়ের ভাইয়ের চূড়ান্ত পছন্দ)
     "male_energetic": {
         "voice": "bn-BD-PradeepNeural",
-        "rate": "+10%",
-        "pitch": "-1Hz",
-        "label": "স্মার্ট প্রফেশনাল টেক প্রেজেন্টার (ভারী ও পরিচ্ছন্ন পুরুষ কণ্ঠ)"
+        "rate": "+3%",
+        "pitch": "-2Hz",
+        "label": "টিভি নিউজ বুলেটিন উপস্থাপক (গম্ভীর ও মসৃণ পুরুষ কণ্ঠ)"
     },
     # ২. প্রাণবন্ত ও অত্যন্ত আকর্ষণীয় নারী কণ্ঠ (খুবই মিষ্টি ও চটপটে)
     "female_lively": {
         "voice": "bn-BD-NabanitaNeural",
-        "rate": "+10%",
+        "rate": "+4%",
         "pitch": "+0Hz",
         "label": "প্রাণবন্ত ও মিষ্টি কথক কণ্ঠ (নবনীতা)"
     },
     # ৩. গল্প বলার মতো রোমাঞ্চকর পুরুষ কণ্ঠ
     "male_storyteller": {
         "voice": "bn-IN-BashkarNeural",
-        "rate": "+10%",
-        "pitch": "-1Hz",
+        "rate": "+3%",
+        "pitch": "-2Hz",
         "label": "রোমাঞ্চকর গল্প কথক পুরুষ কণ্ঠ (ভাস্কর)"
     }
 }
@@ -86,7 +86,7 @@ def apply_smooth_news_mastering(raw_path: Path, output_path: Path, is_cloned: bo
     টিভি সংবাদ উপস্থাপকের স্টাইলে রেশমি ও মসৃণ (Smooth) অডিও মাস্টারিং:
     - highpass=f=80: অপ্রয়োজনীয় বাতাস বা ঘরোয়া মাইক্রোফোনের হাম দূর করে।
     - lowpass=f=11000: কর্কশ ও খসখসে শব্দ দূর করে কণ্ঠকে রেশমি ও তৃপ্তিদায়ক করে।
-    - equalizer: ২০০Hz-এ ৩.৫dB উষ্ণ গভীরতা যোগ করে যাতে কণ্ঠ ভারী ও মসৃণ শোনায়।
+    - equalizer: ১৮০Hz-এ ৪.০dB উষ্ণ গভীরতা যোগ করে যাতে কণ্ঠ ভারী ও মসৃণ শোনায়।
     - dynaudnorm: নিখুঁত ডায়নামিক লেভেলিং যাতে প্রতিটি শব্দ সমান মসৃণ ও স্পষ্ট থাকে।
     - loudnorm: আন্তর্জাতিক সম্প্রচার মানদণ্ড (Broadcast Standard Loudness)।
     """
@@ -99,8 +99,8 @@ def apply_smooth_news_mastering(raw_path: Path, output_path: Path, is_cloned: bo
         f"{pitch_filter}"
         "highpass=f=80,"
         "lowpass=f=11000,"
-        "equalizer=f=200:width_type=q:width=1.2:g=3.5,"
-        "equalizer=f=2600:width_type=q:width=1.5:g=2.0,"
+        "equalizer=f=180:width_type=q:width=1.2:g=4.0,"
+        "equalizer=f=2800:width_type=q:width=1.5:g=1.5,"
         "dynaudnorm=f=120:g=15:p=0.95:m=8.0,"
         "loudnorm=I=-16:TP=-1.5:LRA=7"
     )
