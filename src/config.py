@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,10 +32,10 @@ if env_file.exists():
                 if val:
                     os.environ[key] = val
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip() or "8638569113:AAHwY2Rd9Ueyx9kWKAGv6VYDELKnfRdQtEc"
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip() or "8273323826"
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "").strip()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip() or "AQ.Ab8RN6JDCgqPoakWFdH2q0aaN2eykJm8rTrplZQ1DyJV25z5cg"
 
 # Video specs
 VIDEO_WIDTH = 1080

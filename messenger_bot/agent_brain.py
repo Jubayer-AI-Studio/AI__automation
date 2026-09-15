@@ -93,10 +93,11 @@ def call_gemini_api(user_message: str, sender_id: str = "default_user", sender_n
     }
     headers = {"Content-Type": "application/json"}
 
-    for model in CANDIDATE_MODELS:
+    for idx, model in enumerate(CANDIDATE_MODELS):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        t_limit = 4.0 if idx == 0 else 2.5
         try:
-            res = requests.post(url, headers=headers, json=payload, timeout=12)
+            res = requests.post(url, headers=headers, json=payload, timeout=t_limit)
             if res.status_code == 200:
                 data = res.json()
                 reply = data["candidates"][0]["content"]["parts"][0]["text"].strip()
@@ -107,7 +108,7 @@ def call_gemini_api(user_message: str, sender_id: str = "default_user", sender_n
             else:
                 print(f"[Brain Warning] Model {model} returned status {res.status_code}")
         except Exception as ex:
-            print(f"[Brain Exception] Model {model} failed: {ex}")
+            print(f"[Brain Exception] Model {model} failed ({t_limit}s): {ex}")
 
     # কোনো কারণে এপিআই ডাউন থাকলে স্মার্ট ফলব্যাক
     return (
