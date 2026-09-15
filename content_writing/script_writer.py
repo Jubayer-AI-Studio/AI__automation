@@ -232,12 +232,21 @@ DAILY_PHOTOCARDS = [
 
 def get_reel_content():
     """Returns an AI-focused or high-retention mystery fact reel script."""
-    # Always prioritize cutting-edge AI & Tech reels
-    return random.choice(CURATED_AI_REELS)
+    item = random.choice(CURATED_AI_REELS).copy()
+    sig = "\n\n— Jubayer (AI & Software Developer)"
+    if sig not in item["caption"]:
+        item["caption"] += sig
+    if "#JubayerDev" not in item["hashtags"]:
+        item["hashtags"] = item["hashtags"] + ["#JubayerDev"]
+    return item
 
 def get_daily_extras():
     """Returns complementary creator kit items: text post, story poll, and photo-card info."""
-    discussion = random.choice(DAILY_DISCUSSION_POSTS)
+    discussion = random.choice(DAILY_DISCUSSION_POSTS).copy()
+    sig = "\n\n— Jubayer (AI & Software Developer)\n#JubayerDev"
+    if sig not in discussion["text"]:
+        discussion["text"] += sig
+
     story_poll = random.choice(DAILY_STORY_POLLS)
     card_data = random.choice(DAILY_PHOTOCARDS)
     return {
