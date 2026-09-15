@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-🎬 2. VIDEO PRODUCTION ENGINE (ভিডিও তৈরি ও এডিটিং) - ২০২৬/২০৩০ সাইবার রেড এডিশন
+🎬 2. VIDEO PRODUCTION ENGINE (হাইব্রিড প্রেজেন্টার ও টকিং হেড এডিশন)
 =============================================================================
-এই ফাইলে ফেসবুক রিলসের সম্পূর্ণ হাই-টেক ভিডিও রেন্ডারিংয়ের কাজ সম্পন্ন হয়:
-  - মাল্টি-সিন ডাইনামিক B-roll ফুটেজ (রোবোটিক্স, হাতের উপর ৩ডি হলোগ্রাম, লাল মাইক্রোচিপ, ব্রেইন স্ক্যান, লেজার টানেল)
-  - একদম ঝাকানাকা সাইবার রেড ও নিয়ন ক্রিস্টাল কালার গ্রেডিং
-  - সম্পূর্ণ টেক্সট-মুক্ত (ভিডিওতে কোনো সাবটাইটেল বা ক্যাপশন থাকবে না)
-  - জুবায়েরের নিয়ন রেড ও গোল্ড HUD রিং যুক্ত প্রেজেন্টার ব্যাজ
-  - টিভি নিউজ বুলেটিন ভয়েসওভার এবং ব্যাকগ্রাউন্ড মিস্ট্রি মিউজিকের নিখুঁত সাউন্ড মিক্সিং
+এই ফাইলে ফেসবুক রিলসের আল্ট্রা-প্রফেশনাল হাইব্রিড ভিডিও তৈরি হয়:
+  - একবার জুবায়েরের ফুল স্ক্রিন ভিডিও: মাইকে কথা বলছেন কম্পিউটার ও কোডিং মনিটরের সামনে
+  - আরেকবার রোবোটিক্স, হলোগ্রাম ও মাইক্রোচিপের B-roll ফুটেজ
+  - B-roll চলাকালীন নিচে কর্নারে জুবায়েরের অডিও-রিঅ্যাক্টিভ টকিং ব্যাজ (রিয়েল মুখ নাড়িয়ে কথা বলবে)
+  - ১০০% টেক্সট ও সাবটাইটেল মুক্ত (ক্লিন সিনেমাটিক লুক)
+  - টিভি নিউজ বুলেটিন ভয়েসওভার ও ব্যাকগ্রাউন্ড মিউজিকের ব্যালেন্সড মিক্সিং
 
 টেস্ট করার জন্য টার্মিনালে চালান:
     python video_production/video_maker.py
@@ -17,7 +17,14 @@
 
 import os
 import sys
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 import math
+import struct
 import subprocess
 import urllib.request
 from pathlib import Path
@@ -32,11 +39,11 @@ from src.config import BGM_PATH, OUTPUT_DIR, TEMP_DIR
 
 ASSETS_DIR = BASE_DIR / "assets"
 TECH_CLIPS_DIR = ASSETS_DIR / "tech_clips"
+POSES_DIR = ASSETS_DIR / "presenter_poses"
 PRESENTER_IMG_PATH = ASSETS_DIR / "presenter.jpg"
 
 # Curated high-tech royalty-free clips repository
 CURATED_TECH_CLIPS = {
-    "red_laser_tunnel.mp4": "https://assets.mixkit.co/videos/35644/35644-720.mp4",
     "sci_fi_hand_gestures.mp4": "https://assets.mixkit.co/videos/51209/51209-720.mp4",
     "red_circuit_board.mp4": "https://assets.mixkit.co/videos/11821/11821-720.mp4",
     "brain_3d_screen.mp4": "https://assets.mixkit.co/videos/5665/5665-720.mp4",
@@ -50,16 +57,12 @@ CURATED_TECH_CLIPS = {
 
 
 def ensure_tech_clips_available():
-    """
-    নিশ্চিত করে যে হাই-টেক ভিডিও ফুটেজ ফোল্ডারে উপস্থিত আছে।
-    না থাকলে স্বয়ংক্রিয়ভাবে ব্যাকগ্রাউন্ডে ডাউনলোড করে নেয় (জিরো হ্যাসেল)।
-    """
+    """নিশ্চিত করে যে হাই-টেক ভিডিও ফুটেজ ফোল্ডারে উপস্থিত আছে।"""
     TECH_CLIPS_DIR.mkdir(parents=True, exist_ok=True)
     existing = list(TECH_CLIPS_DIR.glob("*.mp4"))
     if len(existing) >= 4:
         return
 
-    print("[VideoEngine] প্রয়োজনীয় হাই-টেক ভিডিও ফুটেজ ব্যাকগ্রাউন্ডে রেডি করা হচ্ছে...")
     headers = {'User-Agent': 'Mozilla/5.0'}
     for fname, url in CURATED_TECH_CLIPS.items():
         out_path = TECH_CLIPS_DIR / fname
@@ -70,81 +73,216 @@ def ensure_tech_clips_available():
                     data = resp.read()
                     with open(out_path, "wb") as f:
                         f.write(data)
-                print(f"[VideoEngine] ফুটেজ সংরক্ষিত: {fname}")
-            except Exception as e:
-                print(f"[VideoEngine] ফুটেজ ডাউনলোড স্কিপ: {fname} ({e})")
+            except Exception:
+                pass
 
 
-def prepare_circular_presenter_badge() -> Path:
+def prepare_circular_talking_badges() -> dict:
     """
-    জুবায়েরের প্রতিকৃতির চারপাশে ২০২৬/২০৩০ সাইবার রেড ও গোল্ড HUD রিং তৈরি করে।
-    কোনো টেক্সট বা নেমট্যাগ থাকবে না (১০০% ক্লিন ও পিওর ভিজ্যুয়াল)।
+    জুবায়েরের ৩টি টকিং পোজের জন্য সাইবার সায়ান ও গোল্ড HUD রিং যুক্ত ৩টি গোল ব্যাজ তৈরি করে:
+    - closed (মুখ বন্ধ)
+    - mid (মুখ সামান্য খোলা)
+    - open (মুখ সম্পূর্ণ খোলা, কথা বলার পোজ)
     """
-    badge_path = TEMP_DIR / "presenter_badge_cyber_red.png"
-    if badge_path.exists():
-        return badge_path
+    badges = {}
+    poses = {
+        "closed": POSES_DIR / "pose_closed.jpg",
+        "mid": POSES_DIR / "pose_talk_mid.jpg",
+        "open": POSES_DIR / "pose_talk_open.jpg"
+    }
 
-    if not PRESENTER_IMG_PATH.exists():
-        img = Image.new("RGBA", (360, 360), (0, 0, 0, 0))
-        img.save(badge_path)
-        return badge_path
-
-    # ক্রপ ও রিসাইজ
-    user_img = Image.open(PRESENTER_IMG_PATH).convert("RGBA")
-    w, h = user_img.size
-    min_dim = min(w, h)
-    left = (w - min_dim) // 2
-    top = 30
-    cropped = user_img.crop((left, top, left + min_dim, top + min_dim)).resize((300, 300), Image.Resampling.LANCZOS)
-
-    mask = Image.new("L", (300, 300), 0)
-    mask_draw = ImageDraw.Draw(mask)
-    mask_draw.ellipse((0, 0, 300, 300), fill=255)
-
-    circular_avatar = Image.new("RGBA", (300, 300), (0, 0, 0, 0))
-    circular_avatar.paste(cropped, (0, 0), mask)
-
-    canvas = Image.new("RGBA", (360, 360), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(canvas)
-    cx, cy = 180, 180
-
-    # ১. আউটার নিয়ন ক্রিস্টাল রেড গ্লো
-    for r_offset, alpha in [(8, 40), (6, 80), (4, 140), (2, 200)]:
-        r = 168 + r_offset
-        draw.ellipse((cx - r, cy - r, cx + r, cy + r), outline=(255, 23, 68, alpha), width=2)
-
-    # ২. মেইন সাইবার রেড বর্ডার
-    draw.ellipse((cx - 165, cy - 165, cx + 165, cy + 165), outline="#FF1744", width=4)
-
-    # ৩. গোল্ডেন HUD অ্যাকসেন্ট রিং
-    draw.ellipse((cx - 156, cy - 156, cx + 156, cy + 156), outline="#FFD700", width=2)
-
-    # ৪. সায়েন্স ফিকশন HUD টিক মার্কস
-    num_ticks = 24
-    for i in range(num_ticks):
-        angle = (2 * math.pi / num_ticks) * i
-        if i % 6 == 0:
+    for state, img_path in poses.items():
+        out_badge = TEMP_DIR / f"badge_{state}.png"
+        if out_badge.exists():
+            badges[state] = out_badge
             continue
-        r1 = 166
-        r2 = 173 if i % 2 == 0 else 170
-        x1 = cx + r1 * math.cos(angle)
-        y1 = cy + r1 * math.sin(angle)
-        x2 = cx + r2 * math.cos(angle)
-        y2 = cy + r2 * math.sin(angle)
-        draw.line([(x1, y1), (x2, y2)], fill="#FF5252", width=2)
 
-    # ৫. পোর্ট্রেট পেস্ট করা
-    canvas.paste(circular_avatar, (30, 30), circular_avatar)
-    draw.ellipse((cx - 150, cy - 150, cx + 150, cy + 150), outline=(255, 255, 255, 180), width=2)
+        if not img_path.exists():
+            # ফলব্যাক যদি পোজ না থাকে
+            img_path = PRESENTER_IMG_PATH
 
-    canvas.save(badge_path, format="PNG")
-    return badge_path
+        img = Image.open(img_path).convert("RGBA")
+        w, h = img.size
+        face_size = int(h * 0.38)
+        cx = w // 2
+        cy = int(h * 0.40)
+        cropped = img.crop((cx - face_size//2, cy - face_size//2, cx + face_size//2, cy + face_size//2)).resize((300, 300), Image.Resampling.LANCZOS)
+
+        mask = Image.new("L", (300, 300), 0)
+        mask_draw = ImageDraw.Draw(mask)
+        mask_draw.ellipse((0, 0, 300, 300), fill=255)
+
+        circular = Image.new("RGBA", (300, 300), (0, 0, 0, 0))
+        circular.paste(cropped, (0, 0), mask)
+
+        # আল্ট্রা-ক্লিন সাইবার সায়ান ও গোল্ডেন HUD রিং (কোনো অতিরিক্ত লাল ফিল্টার নেই)
+        canvas = Image.new("RGBA", (360, 360), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(canvas)
+        ccx, ccy = 180, 180
+
+        for r_offset, alpha in [(8, 40), (6, 80), (4, 140), (2, 200)]:
+            r = 168 + r_offset
+            draw.ellipse((ccx - r, ccy - r, ccx + r, ccy + r), outline=(0, 240, 255, alpha), width=2)
+
+        draw.ellipse((ccx - 165, ccy - 165, ccx + 165, ccy + 165), outline="#00F0FF", width=4)
+        draw.ellipse((ccx - 156, ccy - 156, ccx + 156, ccy + 156), outline="#FFD700", width=2)
+
+        for i in range(24):
+            if i % 6 == 0:
+                continue
+            angle = (2 * math.pi / 24) * i
+            r1 = 166
+            r2 = 173 if i % 2 == 0 else 170
+            x1 = ccx + r1 * math.cos(angle)
+            y1 = ccy + r1 * math.sin(angle)
+            x2 = ccx + r2 * math.cos(angle)
+            y2 = ccy + r2 * math.sin(angle)
+            draw.line([(x1, y1), (x2, y2)], fill="#38BDF8", width=2)
+
+        canvas.paste(circular, (30, 30), circular)
+        draw.ellipse((ccx - 150, ccy - 150, ccx + 150, cy + 150), outline=(255, 255, 255, 180), width=2)
+        canvas.save(out_badge, format="PNG")
+        badges[state] = out_badge
+
+    return badges
+
+
+def get_audio_phoneme_segments(audio_path: Path, scene_dur: float, fps: int = 30) -> list:
+    """ভয়েসের অ্যাম্প্লিচিউড ও শক্তি মেপে লিপ-সিঙ্ক সেগমেন্ট তৈরি করে।"""
+    raw_pcm = TEMP_DIR / f"pcm_{audio_path.stem}.raw"
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", str(audio_path),
+        "-f", "s16le",
+        "-ac", "1",
+        "-ar", "16000",
+        str(raw_pcm)
+    ]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    with open(raw_pcm, "rb") as f:
+        data = f.read()
+
+    sample_rate = 16000
+    total_samples = len(data) // 2
+    num_frames = max(1, int(scene_dur * fps))
+    samples_per_frame = max(1, sample_rate // fps)
+    samples = struct.unpack(f"<{total_samples}h", data)
+
+    rms_vals = []
+    for i in range(num_frames):
+        st = i * samples_per_frame
+        chunk = samples[st:st + samples_per_frame] if st < total_samples else []
+        rms = math.sqrt(sum(s**2 for s in chunk) / len(chunk)) if chunk else 0.0
+        rms_vals.append(rms)
+
+    active = [r for r in rms_vals if r > 200]
+    avg_r = sum(active) / len(active) if active else 500
+    low_th = avg_r * 0.4
+    high_th = avg_r * 0.85
+
+    segments = []
+    curr_state = None
+    curr_count = 0
+
+    for r in rms_vals:
+        st = "closed" if r < low_th else ("mid" if r < high_th else "open")
+        if st == curr_state:
+            curr_count += 1
+        else:
+            if curr_state is not None:
+                segments.append((curr_state, curr_count / fps))
+            curr_state = st
+            curr_count = 1
+    if curr_state is not None:
+        segments.append((curr_state, curr_count / fps))
+
+    return segments
+
+
+def render_aroll_presenter_scene(audio_path: Path, duration: float, out_path: Path, fps: int = 30):
+    """
+    ফুল স্ক্রিন জুবায়ের: মাইকে কথা বলছেন কম্পিউটার মনিটরের সামনে।
+    ভয়েসের সাথে তাল মিলিয়ে মুখ ও হাতের মুভমেন্ট এনিমেট হবে।
+    """
+    segments = get_audio_phoneme_segments(audio_path, duration, fps)
+    pose_map = {
+        "closed": (POSES_DIR / "pose_closed.jpg").resolve().as_posix(),
+        "mid": (POSES_DIR / "pose_talk_mid.jpg").resolve().as_posix(),
+        "open": (POSES_DIR / "pose_talk_open.jpg").resolve().as_posix()
+    }
+
+    concat_txt = TEMP_DIR / f"concat_aroll_{out_path.stem}.txt"
+    with open(concat_txt, "w", encoding="utf-8") as f:
+        for st, dur in segments:
+            f.write(f"file '{pose_map[st]}'\n")
+            f.write(f"duration {dur:.3f}\n")
+        f.write(f"file '{pose_map[segments[-1][0]]}'\n")
+
+    vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,eq=contrast=1.08:saturation=1.10"
+    cmd = [
+        "ffmpeg", "-y",
+        "-f", "concat", "-safe", "0",
+        "-i", str(concat_txt),
+        "-vf", vf,
+        "-t", f"{duration:.3f}",
+        "-r", str(fps),
+        "-c:v", "libx264",
+        "-preset", "veryfast",
+        "-pix_fmt", "yuv420p",
+        "-an",
+        str(out_path)
+    ]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def render_broll_scene_with_badge(clip_path: Path, audio_path: Path, duration: float, out_path: Path, fps: int = 30):
+    """
+    রোবোটিক্স/হলোগ্রাম B-roll ফুটেজ + নিচে কর্নারে জুবায়েরের রিয়েল টকিং অবতার ব্যাজ।
+    """
+    badges = prepare_circular_talking_badges()
+    segments = get_audio_phoneme_segments(audio_path, duration, fps)
+
+    badge_map = {
+        "closed": badges["closed"].resolve().as_posix(),
+        "mid": badges["mid"].resolve().as_posix(),
+        "open": badges["open"].resolve().as_posix()
+    }
+
+    concat_badge = TEMP_DIR / f"concat_badge_{out_path.stem}.txt"
+    with open(concat_badge, "w", encoding="utf-8") as f:
+        for st, dur in segments:
+            f.write(f"file '{badge_map[st]}'\n")
+            f.write(f"duration {dur:.3f}\n")
+        f.write(f"file '{badge_map[segments[-1][0]]}'\n")
+
+    # ক্লিয়ার ও ক্রিস্প টেক কালার (ন্যাচারাল ও ভাইব্র্যান্ট, কোনো জোরপূর্বক লাল ফিল্টার নেই)
+    vf = (
+        "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,"
+        "crop=1080:1920,setsar=1,"
+        "eq=contrast=1.12:saturation=1.15[bg];"
+        "[bg][1:v]overlay=680:1500:shortest=1[v]"
+    )
+
+    cmd = [
+        "ffmpeg", "-y",
+        "-stream_loop", "-1", "-i", str(clip_path),
+        "-f", "concat", "-safe", "0", "-i", str(concat_badge),
+        "-filter_complex", vf,
+        "-map", "[v]",
+        "-t", f"{duration:.3f}",
+        "-r", str(fps),
+        "-c:v", "libx264",
+        "-preset", "veryfast",
+        "-pix_fmt", "yuv420p",
+        "-an",
+        str(out_path)
+    ]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def get_scene_clip(scene_idx: int, scene_text: str = "", prev_clip_name: str = "") -> Path:
-    """
-    স্ক্রিপ্টের বিষয়বস্তু অনুযায়ী নিখুঁত রোবোটিক্স, হলোগ্রাম বা সাইবার রেড ফুটেজ নির্বাচন করে।
-    """
+    """স্ক্রিপ্টের বিষয়বস্তু অনুযায়ী সেরা টেক B-roll ফুটেজ নির্বাচন করে।"""
     ensure_tech_clips_available()
     text_lower = scene_text.lower()
 
@@ -157,19 +295,17 @@ def get_scene_clip(scene_idx: int, scene_text: str = "", prev_clip_name: str = "
     elif any(k in text_lower for k in ["রোবট", "যন্ত্র", "সহকারী", "রোবটিক্স", "হিউম্যানয়েড"]):
         target = "humanoid_robot.mp4"
     else:
-        # ডায়নামিক সাইবার রেড সিকোয়েন্স
         sequence = [
-            "red_laser_tunnel.mp4",
             "sci_fi_hand_gestures.mp4",
             "red_circuit_board.mp4",
             "brain_3d_screen.mp4",
+            "humanoid_robot.mp4",
             "red_mesh_3d.mp4"
         ]
         target = sequence[(scene_idx - 1) % len(sequence)]
 
-    # আগের সিনের সাথে হুবহু এক যেন না হয়
     if target == prev_clip_name:
-        alternatives = ["red_mesh_3d.mp4", "hologram_gestures.mp4", "cyber_laser_glasses.mp4", "red_laser_tunnel.mp4"]
+        alternatives = ["sci_fi_hand_gestures.mp4", "brain_3d_screen.mp4", "hologram_gestures.mp4", "humanoid_robot.mp4"]
         for alt in alternatives:
             if alt != prev_clip_name and (TECH_CLIPS_DIR / alt).exists():
                 target = alt
@@ -179,79 +315,60 @@ def get_scene_clip(scene_idx: int, scene_text: str = "", prev_clip_name: str = "
     if clip_path.exists():
         return clip_path
 
-    # ফলব্যাক
     all_clips = list(TECH_CLIPS_DIR.glob("*.mp4"))
     if all_clips:
         return all_clips[0]
     return BASE_DIR / "assets" / "tech_clip_1.mp4"
 
 
-def generate_dynamic_tech_montage(scene_timings: list, total_duration: float, output_path: Path):
+def render_final_reel(scene_timings: list, narration_path: Path, total_duration: float, title: str) -> Path:
     """
-    প্রতিটি সিনের জন্য আলাদা আলাদা আধুনিক সাইবার রেড ও হলোগ্রাফিক ভিডিও জুড়ে একটি পূর্ণাঙ্গ মন্টেজ তৈরি করে।
-    ১০৮০x১৯২০ (৯:১৬) রেশিও ও হাই-কনট্রাস্ট সাইবার রেড কালার গ্রেডিং প্রয়োগ করা হয়।
+    ১০০% সাবটাইটেল-মুক্ত, হাইব্রিড প্রেজেন্টার এআই রিলস ভিডিও রেন্ডার করে।
+    একবার জুবায়ের ফুল স্ক্রিন মাইকে কথা বলবে, একবার রোবট/হলোগ্রাম ফুটেজ দেখাবে।
     """
-    concat_list_file = TEMP_DIR / "montage_concat_list.txt"
+    print("[VideoEngine] হাইব্রিড প্রেজেন্টার ও B-roll ভিডিও মন্টেজ তৈরি হচ্ছে...")
+    ensure_tech_clips_available()
     rendered_parts = []
     prev_clip = ""
-
-    # কালার গ্রেড ফিল্টার: ১০৮০x১৯২০ ক্রপ + উচ্চ কনট্রাস্ট + নিয়ন লাল রঙের উজ্জ্বলতা
-    vf_template = (
-        "scale=1080:1920:force_original_aspect_ratio=increase,"
-        "crop=1080:1920,setsar=1,"
-        "eq=contrast=1.18:saturation=1.25:brightness=-0.02"
-    )
 
     for i, sc in enumerate(scene_timings, start=1):
         dur = sc.get("duration", sc.get("end", 0) - sc.get("start", 0))
         if dur <= 0:
             dur = 5.0
         text = sc.get("text", "")
-        clip_file = get_scene_clip(i, text, prev_clip)
-        prev_clip = clip_file.name
+        part_audio = TEMP_DIR / f"scene_{i}.mp3"
+        part_out = TEMP_DIR / f"hybrid_scene_{i}.mp4"
 
-        part_out = TEMP_DIR / f"montage_scene_{i}.mp4"
-        cmd = [
-            "ffmpeg", "-y",
-            "-stream_loop", "-1",
-            "-i", str(clip_file),
-            "-vf", vf_template,
-            "-t", f"{dur:.3f}",
-            "-r", "30",
-            "-c:v", "libx264",
-            "-preset", "veryfast",
-            "-an",
-            str(part_out)
-        ]
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # সিন ১ এবং ৪: ফুল স্ক্রিন প্রেজেন্টার (A-Roll)
+        # সিন ২, ৩, ৫: রোবট / হলোগ্রাম ফুটেজ + নিচে কর্নারে কথা বলা অবতার (B-Roll)
+        if i in (1, 4):
+            print(f"[VideoEngine] সিন {i}: ফুল স্ক্রিন প্রেজেন্টার রেন্ডারিং (মাইকে বক্তব্য)...")
+            render_aroll_presenter_scene(part_audio, dur, part_out)
+        else:
+            clip = get_scene_clip(i, text, prev_clip)
+            prev_clip = clip.name
+            print(f"[VideoEngine] সিন {i}: টেক ফুটেজ ({clip.name}) + কর্নার টকিং ব্যাজ রেন্ডারিং...")
+            render_broll_scene_with_badge(clip, part_audio, dur, part_out)
+
         rendered_parts.append(part_out)
 
-    with open(concat_list_file, "w", encoding="utf-8") as f:
+    # সকল সিন একত্রীকরণ
+    concat_list = TEMP_DIR / "final_hybrid_concat.txt"
+    with open(concat_list, "w", encoding="utf-8") as f:
         for p in rendered_parts:
             f.write(f"file '{p.resolve().as_posix()}'\n")
 
+    bg_video_path = TEMP_DIR / "hybrid_full_bg.mp4"
     cmd_cat = [
         "ffmpeg", "-y",
         "-f", "concat", "-safe", "0",
-        "-i", str(concat_list_file),
+        "-i", str(concat_list),
         "-c", "copy",
-        str(output_path)
+        str(bg_video_path)
     ]
     subprocess.run(cmd_cat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-
-def render_final_reel(scene_timings: list, narration_path: Path, total_duration: float, title: str) -> Path:
-    """
-    ১০০% সাবটাইটেল-মুক্ত, ঝাকানাকা সাইবার রেড এআই রিলস ভিডিও রেন্ডার করে।
-    """
-    print("[VideoEngine] আধুনিক সাইবার রেড ও হলোগ্রাফিক ভিডিও মন্টেজ তৈরি হচ্ছে...")
-    bg_video_path = TEMP_DIR / "cyber_red_montage_bg.mp4"
-    generate_dynamic_tech_montage(scene_timings, total_duration, bg_video_path)
-
-    # ২. প্রেজেন্টার ব্যাজ (নিয়ন সাইবার রেড HUD রিং, কোনো টেক্সট নেই)
-    badge_path = prepare_circular_presenter_badge()
-
-    # ৩. অডিও মিক্সিং (টিভি নিউজ ভয়েসওভার + ১০% ব্যাকগ্রাউন্ড মিউজিক)
+    # অডিও মিক্সিং (টিভি নিউজ ভয়েসওভার + ১০% ব্যাকগ্রাউন্ড মিউজিক)
     mixed_audio_path = TEMP_DIR / "final_mixed_audio.mp3"
     if BGM_PATH.exists():
         cmd_audio = [
@@ -267,10 +384,6 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
     else:
         mixed_audio_path = narration_path
 
-    # ৪. ফাইনাল কম্পোজিশন: ব্যাকগ্রাউন্ড ভিডিও + কর্নারে প্রেজেন্টার ব্যাজ + অডিও
-    # (কোনো drawtext বা সাবটাইটেল নেই — ১০০% ক্লিন ও সিনেমাটিক!)
-    filter_complex = "[0:v][1:v]overlay=680:1500:shortest=1[v_out]"
-
     safe_title = "".join(c for c in title if c.isalnum() or c in (" ", "_", "-")).strip().replace(" ", "_")
     if not safe_title:
         safe_title = "ai_tech_reel"
@@ -279,46 +392,37 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
     cmd_final = [
         "ffmpeg", "-y",
         "-i", str(bg_video_path),
-        "-loop", "1", "-i", str(badge_path),
         "-i", str(mixed_audio_path),
-        "-filter_complex", filter_complex,
-        "-map", "[v_out]",
-        "-map", "2:a",
-        "-t", str(total_duration),
-        "-c:v", "libx264",
-        "-preset", "fast",
-        "-crf", "20",
+        "-c:v", "copy",
         "-c:a", "aac",
         "-b:a", "192k",
-        "-pix_fmt", "yuv420p",
+        "-shortest",
         str(output_path)
     ]
 
-    print("[VideoEngine] ১০০% ক্লিন সিনেমাটিক রিলস ভিডিও রেন্ডারিং হচ্ছে...")
+    print("[VideoEngine] ১০০% ক্লিন হাইব্রিড রিলস ভিডিও এক্সপোর্ট হচ্ছে...")
     subprocess.run(cmd_final, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print(f"[VideoEngine] রেন্ডার সম্পন্ন! ভিডিও সংরক্ষিত: {output_path}")
     return output_path
 
 
-# Compatibility alias for external callers
+# Compatibility aliases
+def prepare_circular_presenter_badge() -> Path:
+    badges = prepare_circular_talking_badges()
+    return badges["closed"]
+
 def generate_dynamic_tech_bg(duration: float, output_path: Path):
-    """Legacy compatibility helper."""
-    dummy_timings = [{"duration": duration, "text": "Future tech robotics"}]
-    generate_dynamic_tech_montage(dummy_timings, duration, output_path)
+    clip = TECH_CLIPS_DIR / "sci_fi_hand_gestures.mp4"
+    cmd = ["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(clip), "-t", str(duration), "-c", "copy", str(output_path)]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 # =============================================================================
-# স্বতন্ত্র টেস্ট কোড (টার্মিনালে সরাসরি চালিয়ে চেক করার জন্য)
+# টেস্ট কোড
 # =============================================================================
 if __name__ == "__main__":
-    if sys.platform == "win32":
-        try:
-            sys.stdout.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
-
     print("=" * 60)
-    print("🎬 [VIDEO MAKER TEST] ২০২৬/২০৩০ সাইবার রেড রিলস ভিডিও টেস্ট")
+    print("🎬 [VIDEO MAKER TEST] হাইব্রিড প্রেজেন্টার ও টকিং হেড টেস্ট")
     print("=" * 60)
 
     from content_writing.script_writer import get_reel_content
@@ -329,16 +433,16 @@ if __name__ == "__main__":
     print("\n[১/২] টিভি নিউজ ভয়েসওভার তৈরি হচ্ছে...")
     audio_data = generate_voiceover_and_subtitles(reel["scenes"])
 
-    print("\n[২/২] সাইবার রেড মাল্টি-সিন রিলস ভিডিও রেন্ডারিং হচ্ছে...")
+    print("\n[২/২] হাইব্রিড প্রেজেন্টার রিলস ভিডিও রেন্ডারিং হচ্ছে...")
     test_video = render_final_reel(
         scene_timings=audio_data["scene_timings"],
         narration_path=audio_data["narration_path"],
         total_duration=audio_data["total_duration"],
-        title="cyber_red_reel_sample"
+        title="hybrid_presenter_reel_sample"
     )
 
     print("=" * 60)
-    print(f"✅ ঝাকানাকা সাইবার রেড রিলস ভিডিও তৈরি সম্পন্ন!")
+    print(f"✅ হাইব্রিড টকিং প্রেজেন্টার রিলস তৈরি সম্পন্ন!")
     print(f"📂 ভিডিও ফাইল: {test_video}")
     print(f"📏 ফাইল সাইজ: {test_video.stat().st_size / (1024*1024):.2f} MB")
     print("=" * 60)
