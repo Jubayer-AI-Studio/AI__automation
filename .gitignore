@@ -13,3 +13,7 @@ output/*.png
 *.token
 assets/tech_clips/*.mp4
 assets/my_voice_*.mp3
+
+cloudflared.exe
+temp/*
+*.db
