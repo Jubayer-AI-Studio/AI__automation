@@ -11,3 +11,5 @@ output/*.png
 # Environment and secrets
 .env
 *.token
+assets/tech_clips/*.mp4
+assets/my_voice_*.mp3

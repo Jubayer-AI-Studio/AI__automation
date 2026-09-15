@@ -21,12 +21,7 @@ def send_full_creator_kit(video_path: Path, title: str, caption: str, hashtags: 
 
     # 1. Send Video Reel
     print(f"[Telegram] Sending Video Reel to chat {TELEGRAM_CHAT_ID}...")
-    video_msg = (
-        f"ভিডিও শিরোনাম: {title}\n\n"
-        f"ক্যাপশন:\n"
-        f"{caption}\n\n"
-        f"{tags_str}"
-    )
+    video_msg = f"{caption}\n\n{tags_str}"
     try:
         with open(video_path, "rb") as vf:
             res = requests.post(
