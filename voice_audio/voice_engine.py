@@ -38,14 +38,14 @@ VOICE_MODE = os.getenv("VOICE_MODE", "pro_presenter").strip().lower()
 
 # আকর্ষণীয় ভয়েস প্রোফাইলসমূহ
 VOICE_PROFILES = {
-    # ১. টিভি নিউজ বুলেটিন উপস্থাপক (গম্ভীর, ভারী ও রেশমি মসৃণ পুরুষ কণ্ঠ - জুবায়ের ভাইয়ের চূড়ান্ত পছন্দ)
+    # ১. তরুণ ডেভেলপার (২৪ বছর বয়সী প্রাণবন্ত, স্মার্ট ও এনার্জেটিক কণ্ঠ)
     "male_energetic": {
-        "voice": "bn-BD-PradeepNeural",
-        "rate": "+3%",
-        "pitch": "-2Hz",
-        "label": "টিভি নিউজ বুলেটিন উপস্থাপক (গম্ভীর ও মসৃণ পুরুষ কণ্ঠ)"
+        "voice": "bn-IN-BashkarNeural",
+        "rate": "+18%",
+        "pitch": "+4Hz",
+        "label": "তরুণ টেক ডেভেলপার কণ্ঠ (স্মার্ট ও এনার্জেটিক)"
     },
-    # ২. প্রাণবন্ত ও অত্যন্ত আকর্ষণীয় নারী কণ্ঠ (খুবই মিষ্টি ও চটপটে)
+    # ২. প্রাণবন্ত ও অত্যন্ত আকর্ষণীয় নারী কণ্ঠ (খুবই মিষ্টি ও চটপটে)
     "female_lively": {
         "voice": "bn-BD-NabanitaNeural",
         "rate": "+4%",
@@ -61,7 +61,7 @@ VOICE_PROFILES = {
     }
 }
 
-# ডিফল্ট সক্রিয় ভয়েস প্রোফাইল
+# ডিফল্ট সক্রিয় ভয়েস প্রোফাইল
 CURRENT_PROFILE_KEY = os.getenv("VOICE_PROFILE", "male_energetic")
 
 def format_srt_time(seconds: float) -> str:
@@ -97,10 +97,10 @@ def apply_smooth_news_mastering(raw_path: Path, output_path: Path, is_cloned: bo
 
     filter_chain = (
         f"{pitch_filter}"
-        "highpass=f=80,"
-        "lowpass=f=11000,"
-        "equalizer=f=180:width_type=q:width=1.2:g=4.0,"
-        "equalizer=f=2800:width_type=q:width=1.5:g=1.5,"
+        "highpass=f=100,"
+        "lowpass=f=13000,"
+        "equalizer=f=250:width_type=q:width=1.2:g=2.5,"
+        "equalizer=f=3500:width_type=q:width=1.5:g=2.0,"
         "dynaudnorm=f=120:g=15:p=0.95:m=8.0,"
         "loudnorm=I=-16:TP=-1.5:LRA=7"
     )
