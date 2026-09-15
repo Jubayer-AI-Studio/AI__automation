@@ -11,18 +11,20 @@ if sys.platform == "win32":
 
 from pathlib import Path
 
-# ৩টি ডেডিকেটেড মডিউল থেকে ইমপোর্ট:
-# ১. লেখালেখি ও স্ক্রিপ্ট মডিউল
+# ৪টি ডেডিকেটেড মডিউল থেকে ইমপোর্ট:
+# ১. ✍️ লেখালেখি ও স্ক্রিপ্ট মডিউল
 from content_writing.script_writer import get_reel_content, get_daily_extras
 
-# ২. ভিডিও প্রোডাকশন মডিউল
+# ২. 🎙️ ভয়েস ও অডিও মডিউল
+from voice_audio.voice_engine import generate_voiceover_and_subtitles
+
+# ৩. 🎬 ভিডিও প্রোডাকশন মডিউল
 from video_production.video_maker import render_final_reel
 
-# ৩. থাম্বনেইল ও ফটো পোস্ট মডিউল
+# ৪. 🖼️ থাম্বনেইল ও ফটো পোস্ট মডিউল
 from thumbnail_card.thumbnail_maker import create_ai_photocard
 
-# ব্যাকএন্ড শেয়ার্ড সার্ভিস
-from src.audio_engine import generate_voiceover_and_subtitles
+# টেলিগ্রাম ডেলিভারি সার্ভিস
 from src.telegram_engine import send_full_creator_kit
 
 def run_pipeline():
