@@ -38,14 +38,14 @@ VOICE_MODE = os.getenv("VOICE_MODE", "pro_presenter").strip().lower()
 
 # আকর্ষণীয় ভয়েস প্রোফাইলসমূহ
 VOICE_PROFILES = {
-    # ১. তরুণ ডেভেলপার (২৪ বছর বয়সী প্রাণবন্ত, স্মার্ট ও এনার্জেটিক কণ্ঠ)
+    # ১. তরুণ ডেভেলপার — স্মুথ, মজাদার ও প্রাণবন্ত কণ্ঠ (২৪ বছর বয়সী)
     "male_energetic": {
         "voice": "bn-IN-BashkarNeural",
-        "rate": "+18%",
-        "pitch": "+4Hz",
-        "label": "তরুণ টেক ডেভেলপার কণ্ঠ (স্মার্ট ও এনার্জেটিক)"
+        "rate": "+10%",
+        "pitch": "+2Hz",
+        "label": "তরুণ টেক ডেভেলপার — স্মুথ ও প্রাণবন্ত"
     },
-    # ২. প্রাণবন্ত ও অত্যন্ত আকর্ষণীয় নারী কণ্ঠ (খুবই মিষ্টি ও চটপটে)
+    # ২. প্রাণবন্ত ও অত্যন্ত আকর্ষণীয় নারী কণ্ঠ
     "female_lively": {
         "voice": "bn-BD-NabanitaNeural",
         "rate": "+4%",
@@ -57,7 +57,7 @@ VOICE_PROFILES = {
         "voice": "bn-IN-BashkarNeural",
         "rate": "+3%",
         "pitch": "-2Hz",
-        "label": "রোমাঞ্চকর গল্প কথক পুরুষ কণ্ঠ (ভাস্কর)"
+        "label": "রোমাঞ্চকর গল্প কথক পুরুষ কণ্ঠ"
     }
 }
 
@@ -97,12 +97,13 @@ def apply_smooth_news_mastering(raw_path: Path, output_path: Path, is_cloned: bo
 
     filter_chain = (
         f"{pitch_filter}"
-        "highpass=f=100,"
-        "lowpass=f=13000,"
-        "equalizer=f=250:width_type=q:width=1.2:g=2.5,"
-        "equalizer=f=3500:width_type=q:width=1.5:g=2.0,"
-        "dynaudnorm=f=120:g=15:p=0.95:m=8.0,"
-        "loudnorm=I=-16:TP=-1.5:LRA=7"
+        "highpass=f=90,"
+        "lowpass=f=14000,"
+        "equalizer=f=200:width_type=q:width=1.0:g=2.0,"
+        "equalizer=f=1200:width_type=q:width=1.2:g=1.5,"
+        "equalizer=f=4000:width_type=q:width=1.5:g=2.5,"
+        "dynaudnorm=f=150:g=12:p=0.95:m=6.0,"
+        "loudnorm=I=-16:TP=-1.5:LRA=9"
     )
     cmd = [
         "ffmpeg", "-y",
