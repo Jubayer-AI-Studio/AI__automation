@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-🎬 VIDEO PRODUCTION ENGINE (JUBAYER.DEV DEVELOPER EDITION - FINAL)
+🎬 VIDEO PRODUCTION ENGINE (JUBAYER.DEV MULTI-THEME ROTATION EDITION)
 =============================================================================
-এই ইঞ্জিনে ফেসবুক রিলসের নিখুঁত সিনেমাটিক ও ডেভেলপার ব্র্যান্ডেড ভিজ্যুয়াল তৈরি হয়:
-  ১. শুরুতে সরাসরি হাই-টেক ভিজ্যুয়াল ও ভয়েস দিয়ে ভিডিও শুরু (কোনো টার্মিনাল ইন্ট্রো নেই)
-  ২. পুরো ভিডিও জুড়ে টপ-রাইট কর্নারে স্টাইলিশ কোড ওয়াটারমার্ক: `</> JUBAYER.DEV`
-  ৩. ভিডিওর ৩ নম্বর সিনে মাঝখানে মাত্র ১.৫ সেকেন্ডের জন্য দ্রুত পাইথন কোড এডিটর ঝলক
-  ৪. ফিউচারিস্টিক রোবোটিক্স, সাই-ফাই হলোগ্রাম ও ৩ডি ব্রেইন স্ক্যান
-  ৫. ভিডিওর শেষে ২.৮ সেকেন্ডের সিনেমাটিক ডেভেলপার আউটরো কার্ড:
-     ল্যাপটপে কোড করা জুবায়েরের আত্মবিশ্বাসী স্টুডিও ফটো (HUD সাইবার রিং) +
+এই ইঞ্জিনে ফেসবুক রিলসের বহুমুখী থিমে সিনেমাটিক ও ডেভেলপার ব্র্যান্ডেড ভিজ্যুয়াল তৈরি হয়:
+  ১. রোবট ছাড়াও মহাকাশ, কোয়ান্টাম, সাইবার, স্মার্ট সিটি, চিপ ও মেটাভার্স ফুটেজ
+  ২. প্রতিটি ক্লিপ স্বয়ংক্রিয় রোটেশন মেনে চলে যাতে একই ফুটেজ পরপর রিপিট না হয়
+  ৩. শুরুতে সরাসরি হাই-টেক ভিজ্যুয়াল ও ভয়েস দিয়ে ভিডিও শুরু (কোনো টার্মিনাল ইন্ট্রো নেই)
+  ৪. পুরো ভিডিও জুড়ে টপ-রাইট কর্নারে স্টাইলিশ কোড ওয়াটারমার্ক: `</> JUBAYER.DEV`
+  ৫. ভিডিওর ৩ নম্বর সিনে মাঝখানে মাত্র ১.০ সেকেন্ডের জন্য দ্রুত পাইথন কোড এডিটর ঝলক
+  ৬. ভিডিওর শেষে ২.৮ সেকেন্ডের সিনেমাটিক ডেভেলপার আউটরো কার্ড:
+     ল্যাপটপে কোড করা জুবায়েরের আত্মবিশ্বাসী স্টুডিও ফটো (HUD সাইবার রিং) +
      "ENGINEERED BY JUBAYER.DEV | AI & AUTOMATION LAB"
-  ৬. ব্যাকগ্রাউন্ড মিউজিক আউটরো কার্ড শেষ হওয়া পর্যন্ত বাজবে এবং মসৃণভাবে ফেইড হবে
+  ৭. ব্যাকগ্রাউন্ড মিউজিক আউটরো কার্ড শেষ হওয়া পর্যন্ত বাজবে এবং মসৃণভাবে ফেইড হবে
 =============================================================================
 """
 
@@ -24,6 +25,8 @@ if sys.platform == "win32":
         pass
 
 import math
+import json
+import random
 import subprocess
 import urllib.request
 from pathlib import Path
@@ -38,42 +41,68 @@ from src.config import BGM_PATH, OUTPUT_DIR, TEMP_DIR
 
 ASSETS_DIR = BASE_DIR / "assets"
 TECH_CLIPS_DIR = ASSETS_DIR / "tech_clips"
+DATA_DIR = BASE_DIR / "data"
+STATE_FILE = DATA_DIR / "rotation_state.json"
 
 font_mono_path = "C:/Windows/Fonts/consola.ttf"
 font_bold_path = "C:/Windows/Fonts/consolab.ttf"
 font_sans_path = "C:/Windows/Fonts/arialbd.ttf"
 
-CURATED_TECH_CLIPS = {
-    "sci_fi_hand_gestures.mp4": "https://assets.mixkit.co/videos/51209/51209-720.mp4",
-    "humanoid_robot.mp4": "https://assets.mixkit.co/videos/49042/49042-720.mp4",
-    "brain_3d_screen.mp4": "https://assets.mixkit.co/videos/5665/5665-720.mp4",
-    "hand_projecting_hologram.mp4": "https://assets.mixkit.co/videos/40277/40277-1080.mp4",
-    "cyborg_hologram.mp4": "https://assets.mixkit.co/videos/40202/40202-720.mp4",
-    "hologram_gestures.mp4": "https://assets.mixkit.co/videos/5427/5427-720.mp4",
-    "smartwatch_hologram.mp4": "https://assets.mixkit.co/videos/4364/4364-720.mp4",
-    "robot_walking.mp4": "https://assets.mixkit.co/videos/49040/49040-720.mp4"
+# থিমভিত্তিক ক্লিপ ক্যাটাগরি ম্যাপিং
+THEME_CLIPS_MAP = {
+    "space": [
+        "earth_space_orbit.mp4",
+        "hands_digital_realm.mp4",
+        "vr_hand_scrolling.mp4",
+        "sci_fi_hand_device.mp4"
+    ],
+    "quantum": [
+        "quantum_server_room.mp4",
+        "microchip_processor.mp4",
+        "cyber_code_matrix.mp4",
+        "red_circuit_board.mp4"
+    ],
+    "cyber": [
+        "cyber_code_matrix.mp4",
+        "cyber_laser_glasses.mp4",
+        "red_laser_tunnel.mp4",
+        "red_mesh_3d.mp4"
+    ],
+    "smart_city": [
+        "smart_city_traffic.mp4",
+        "smartwatch_hologram.mp4",
+        "sci_fi_hand_device.mp4",
+        "vr_hand_scrolling.mp4"
+    ],
+    "chips": [
+        "microchip_processor.mp4",
+        "red_circuit_board.mp4",
+        "cyber_code_matrix.mp4",
+        "quantum_server_room.mp4"
+    ],
+    "spatial": [
+        "vr_hand_scrolling.mp4",
+        "hand_projecting_hologram.mp4",
+        "hologram_gestures.mp4",
+        "smartwatch_hologram.mp4"
+    ],
+    "brain": [
+        "brain_3d_screen.mp4",
+        "smartwatch_hologram.mp4",
+        "hands_digital_realm.mp4",
+        "sci_fi_hand_gestures.mp4"
+    ],
+    "humanoid": [
+        "humanoid_robot.mp4",
+        "robot_walking.mp4",
+        "cyborg_hologram.mp4"
+    ]
 }
 
 
 def ensure_tech_clips_available():
     """নিশ্চিত করে যে হাই-টেক ভিডিও ফুটেজ ফোল্ডারে উপস্থিত আছে।"""
     TECH_CLIPS_DIR.mkdir(parents=True, exist_ok=True)
-    existing = list(TECH_CLIPS_DIR.glob("*.mp4"))
-    if len(existing) >= 4:
-        return
-
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    for fname, url in CURATED_TECH_CLIPS.items():
-        out_path = TECH_CLIPS_DIR / fname
-        if not out_path.exists():
-            try:
-                req = urllib.request.Request(url, headers=headers)
-                with urllib.request.urlopen(req, timeout=20) as resp:
-                    data = resp.read()
-                    with open(out_path, "wb") as f:
-                        f.write(data)
-            except Exception:
-                pass
 
 
 def create_watermark_badge() -> Path:
@@ -177,14 +206,10 @@ def create_code_ide_image() -> Path:
 
 
 def create_outro_slate_image() -> Path:
-    """
-    Creates the prestigious 1080x1920 developer end-slate with Jubayer's laptop photo,
-    glowing cyan/gold HUD rings, and 'ENGINEERED BY JUBAYER.DEV'.
-    """
+    """Creates the prestigious developer end-slate with Jubayer's laptop photo and HUD rings."""
     TEMP_DIR.mkdir(parents=True, exist_ok=True)
     out_path = TEMP_DIR / "outro_slate.png"
 
-    # Always generate or update with Jubayer's laptop photo
     w, h = 1080, 1920
     img = Image.new("RGBA", (w, h), "#080B14")
     draw = ImageDraw.Draw(img)
@@ -195,7 +220,6 @@ def create_outro_slate_image() -> Path:
     glow = glow.filter(ImageFilter.GaussianBlur(140))
     img.paste(glow, (0, 0), glow)
 
-    # Use Jubayer's uploaded laptop developer photo
     p_img_path = ASSETS_DIR / "jubayer_dev_laptop.jpg"
     if not p_img_path.exists():
         p_img_path = ASSETS_DIR / "presenter_poses/pose_closed.jpg"
@@ -279,7 +303,6 @@ def create_outro_slate_image() -> Path:
 
 
 def render_still_with_zoom(img_path: Path, duration: float, out_path: Path, fps: int = 30):
-    """Renders a static image with smooth subtle cinematic camera push-in."""
     vf = (
         f"zoompan=z='min(zoom+0.0004,1.05)':d={int(duration*fps)}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps={fps},"
         "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,"
@@ -298,7 +321,6 @@ def render_still_with_zoom(img_path: Path, duration: float, out_path: Path, fps:
 
 
 def render_broll_scene_with_watermark(clip_path: Path, duration: float, out_path: Path, fps: int = 30):
-    """Renders high-tech robotics footage with top-right </> JUBAYER.DEV watermark."""
     watermark = create_watermark_badge()
     vf = (
         "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,"
@@ -321,20 +343,14 @@ def render_broll_scene_with_watermark(clip_path: Path, duration: float, out_path
 
 
 def render_split_code_scene(broll_clip: Path, total_dur: float, out_path: Path, fps: int = 30):
-    """
-    সিন ৩-এ মাঝখানে মাত্র ১.৫ সেকেন্ডের জন্য দ্রুত পাইথন কোড এডিটর ঝলক দেখাবে,
-    এরপর বাকি সময়ে হাই-টেক B-roll ফুটেজ চলবে।
-    """
     code_img = create_code_ide_image()
-    part_code = TEMP_DIR / "split_code_1_5s.mp4"
+    part_code = TEMP_DIR / "split_code_1s.mp4"
     part_broll = TEMP_DIR / "split_broll_rest.mp4"
 
     code_dur = 1.0
     broll_dur = max(1.0, total_dur - code_dur)
 
-    # ১.৫ সে. কোড
     render_still_with_zoom(code_img, code_dur, part_code, fps=fps)
-    # বাকি সময়ে রোবোটিক্স ফুটেজ + ওয়াটারমার্ক
     render_broll_scene_with_watermark(broll_clip, broll_dur, part_broll, fps=fps)
 
     concat_txt = TEMP_DIR / "concat_split_code.txt"
@@ -352,66 +368,68 @@ def render_split_code_scene(broll_clip: Path, total_dur: float, out_path: Path, 
     subprocess.run(cmd_cat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def get_scene_clip(scene_idx: int, scene_text: str = "", used_clips: list = None) -> Path:
-    """স্ক্রিপ্টের বিষয়বস্তু অনুযায়ী প্রতিটি সিনের জন্য সম্পূর্ণ ভিন্ন ভিন্ন ফুটেজ নির্বাচন করে।"""
+def get_scene_clip(scene_idx: int, scene_text: str = "", theme: str = "", used_clips: list = None) -> Path:
+    """স্ক্রিপ্টের বিষয়বস্তু ও থিম অনুযায়ী সম্পূর্ণ ভিন্ন ভিন্ন ফুটেজ নির্বাচন করে।"""
     ensure_tech_clips_available()
     if used_clips is None:
         used_clips = []
 
-    priority_order = [
-        "sci_fi_hand_gestures.mp4",
-        "humanoid_robot.mp4",
-        "brain_3d_screen.mp4",
-        "hand_projecting_hologram.mp4",
-        "cyborg_hologram.mp4",
-        "robot_walking.mp4",
-        "smartwatch_hologram.mp4",
-        "hologram_gestures.mp4"
-    ]
+    # 1. থিমভিত্তিক প্রাথমিক ক্লিপ
+    pool = THEME_CLIPS_MAP.get(theme, [])
+    for c in pool:
+        if c not in used_clips and (TECH_CLIPS_DIR / c).exists():
+            return TECH_CLIPS_DIR / c
 
-    text_lower = scene_text.lower()
-    candidate = None
-
-    if any(k in text_lower for k in ["রোবট", "যন্ত্র", "সহকারী", "হিউম্যানয়েড"]):
-        for c in ["humanoid_robot.mp4", "robot_walking.mp4"]:
+    # 2. টেক্সট কীওয়ার্ডভিত্তিক অনুসন্ধান
+    t = scene_text.lower()
+    if any(k in t for k in ["মহাকাশ", "মঙ্গল", "গ্রহ", "রকেট", "স্টারশিপ", "স্যাটেলাইট", "চাঁদ"]):
+        for c in ["earth_space_orbit.mp4", "hands_digital_realm.mp4"]:
             if c not in used_clips and (TECH_CLIPS_DIR / c).exists():
-                candidate = c
-                break
-    elif any(k in text_lower for k in ["ব্রেইন", "মস্তিষ্ক", "চিন্তা", "নিউরাল"]):
-        if "brain_3d_screen.mp4" not in used_clips and (TECH_CLIPS_DIR / "brain_3d_screen.mp4").exists():
-            candidate = "brain_3d_screen.mp4"
-    elif any(k in text_lower for k in ["হাত", "ঘোরা", "স্পর্শ", "ইন্টারফেস", "স্ক্রিন", "হলোগ্রাম"]):
-        for c in ["sci_fi_hand_gestures.mp4", "hand_projecting_hologram.mp4", "hologram_gestures.mp4"]:
+                return TECH_CLIPS_DIR / c
+
+    if any(k in t for k in ["কোয়ান্টাম", "সুপারকম্পিউটার", "সার্ভার", "প্রসেসর"]):
+        for c in ["quantum_server_room.mp4", "microchip_processor.mp4", "cyber_code_matrix.mp4"]:
             if c not in used_clips and (TECH_CLIPS_DIR / c).exists():
-                candidate = c
-                break
+                return TECH_CLIPS_DIR / c
 
-    if not candidate:
-        for c in priority_order:
+    if any(k in t for k in ["সাইবার", "হ্যাকার", "পাসওয়ার্ড", "নিরাপত্তা", "ফিশিং"]):
+        for c in ["cyber_code_matrix.mp4", "cyber_laser_glasses.mp4", "red_laser_tunnel.mp4"]:
             if c not in used_clips and (TECH_CLIPS_DIR / c).exists():
-                candidate = c
-                break
+                return TECH_CLIPS_DIR / c
 
-    if not candidate:
-        candidate = priority_order[(scene_idx - 1) % len(priority_order)]
+    if any(k in t for k in ["শহর", "ট্রাফিক", "স্মার্ট সিটি", "গাড়ি", "পরিবহন"]):
+        for c in ["smart_city_traffic.mp4", "sci_fi_hand_device.mp4", "vr_hand_scrolling.mp4"]:
+            if c not in used_clips and (TECH_CLIPS_DIR / c).exists():
+                return TECH_CLIPS_DIR / c
 
-    return TECH_CLIPS_DIR / candidate
+    if any(k in t for k in ["চিপ", "মাইক্রোচিপ", "সিলিকন", "সেমিকন্ডাক্টর"]):
+        for c in ["microchip_processor.mp4", "red_circuit_board.mp4"]:
+            if c not in used_clips and (TECH_CLIPS_DIR / c).exists():
+                return TECH_CLIPS_DIR / c
+
+    # 3. সাধারণ রোটেশন পুল (রোবট বাদে অন্যান্য ক্লিপকে অগ্রাধিকার)
+    all_available = sorted([p.name for p in TECH_CLIPS_DIR.glob("*.mp4")])
+    non_robot = [c for c in all_available if "robot" not in c]
+    for c in non_robot:
+        if c not in used_clips:
+            return TECH_CLIPS_DIR / c
+
+    for c in all_available:
+        if c not in used_clips:
+            return TECH_CLIPS_DIR / c
+
+    return TECH_CLIPS_DIR / (all_available[scene_idx % len(all_available)])
 
 
-def render_final_reel(scene_timings: list, narration_path: Path, total_duration: float, title: str) -> Path:
+def render_final_reel(scene_timings: list, narration_path: Path, total_duration: float, title: str, theme: str = "") -> Path:
     """
-    ১০০% সিনেমাটিক, রোবোটিক্স ও জুবায়েরের ডেভেলপার ব্র্যান্ডেড রিলস ভিডিও রেন্ডার করে।
-      - শুরুতে সরাসরি মূল ভিডিও ও ভয়েসওভার (কোনো টার্মিনাল ইন্ট্রো নেই)
-      - টপ কর্নারে </> JUBAYER.DEV ওয়াটারমার্ক
-      - সিন ৩-এর মাঝে মাত্র ১.৫ সেকেন্ড কোড ফ্ল্যাশ
-      - ভিডিওর শেষে নিশ্চিতভাবে ২.৮ সেকেন্ডের সিনেমাটিক আউটরো কার্ড (জুবায়েরের ল্যাপটপ ফটো ও HUD)
+    ১০০% সিনেমাটিক, রোবট-মুক্ত/মাল্টি-থিম ও জুবায়েরের ডেভেলপার ব্র্যান্ডেড রিলস ভিডিও রেন্ডার করে।
     """
-    print("[VideoEngine] JUBAYER.DEV সিনেমাটিক ডেভেলপার রিলস তৈরি হচ্ছে...")
+    print(f"[VideoEngine] JUBAYER.DEV সিনেমাটিক ডেভেলপার রিলস (থিম: {theme or 'general'}) তৈরি হচ্ছে...")
     ensure_tech_clips_available()
     rendered_parts = []
     used_clips = []
 
-    # ১. মূল ৫টি রোবোটিক্স ও কোডিং সিন (শুরুতেই সরাসরি সিন ১ দিয়ে স্টার্ট)
     total_scenes_dur = 0.0
     for i, sc in enumerate(scene_timings, start=1):
         dur = sc.get("duration", sc.get("end", 0) - sc.get("start", 0))
@@ -421,28 +439,25 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
         text = sc.get("text", "")
         part_out = TEMP_DIR / f"final_part_{i}_scene.mp4"
 
-        clip = get_scene_clip(i, text, used_clips)
+        clip = get_scene_clip(i, text, theme, used_clips)
         used_clips.append(clip.name)
 
         if i == 3:
-            # সিন ৩-এ মাত্র ১.৫ সেকেন্ড কোড ঝলক + বাকিটা রোবোটিক্স ফুটেজ
-            print(f"[VideoEngine] সিন {i}: ১.০ সেকেন্ড কোড ঝলক + রোবোটিক্স ফুটেজ ({clip.name}) রেন্ডারিং...")
+            print(f"[VideoEngine] সিন {i}: ১.০ সেকেন্ড কোড ঝলক + ফুটেজ ({clip.name}) রেন্ডারিং...")
             render_split_code_scene(clip, dur, part_out)
         else:
-            print(f"[VideoEngine] সিন {i}: সাই-ফাই রোবোটিক্স ফুটেজ ({clip.name}) + ওয়াটারমার্ক রেন্ডারিং...")
+            print(f"[VideoEngine] সিন {i}: হাই-টেক ফুটেজ ({clip.name}) + ওয়াটারমার্ক রেন্ডারিং...")
             render_broll_scene_with_watermark(clip, dur, part_out)
 
         rendered_parts.append(part_out)
 
-    # ২. সিনেমাটিক আউটরো কার্ড (২.৮ সেকেন্ড - ১০০% দৃশ্যমান)
     outro_img = create_outro_slate_image()
     outro_vid = TEMP_DIR / "final_outro_slate.mp4"
     outro_dur = 2.8
-    print("[VideoEngine] সিনেমাটিক ডেভেলপার আউটরো কার্ড (জুবায়েরের ল্যাপটপ পোর্ট্রেট) রেন্ডারিং...")
+    print("[VideoEngine] সিনেমাটিক ডেভেলপার আউটরো কার্ড (জুবায়েরের ল্যাপটপ পোর্ট্রেট) রেন্ডারিং...")
     render_still_with_zoom(outro_img, outro_dur, outro_vid)
     rendered_parts.append(outro_vid)
 
-    # ভিডিও ক্লিপগুলো কনক্যাট করা
     concat_list = TEMP_DIR / "final_developer_concat.txt"
     with open(concat_list, "w", encoding="utf-8") as f:
         for p in rendered_parts:
@@ -458,13 +473,9 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
     ]
     subprocess.run(cmd_cat, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    # মোট ভিডিও দৈর্ঘ্য (সিনসমূহ + আউটরো কার্ড)
     total_video_dur = total_scenes_dur + outro_dur
     mixed_audio_path = TEMP_DIR / "final_mixed_audio.mp3"
 
-    # অডিও মিক্সিং:
-    # ভয়েস শুরু হবে ঠিক ০.০ সেকেন্ডে।
-    # ভয়েস শেষ হওয়ার পর আউটরো কার্ডের শেষ পর্যন্ত ব্যাকগ্রাউন্ড মিউজিক বাজবে এবং শেষ ০.৮ সেকেন্ডে ফেইড আউট হবে।
     fade_start = max(1.0, total_video_dur - 0.8)
     if BGM_PATH.exists():
         cmd_audio = [
@@ -485,7 +496,6 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
         safe_title = "jubayer_dev_ai_reel"
     output_path = OUTPUT_DIR / f"{safe_title}.mp4"
 
-    # আউটরো কার্ড যাতে কখনো কাটা না পড়ে, তাই -t দিয়ে সম্পূর্ণ ভিডিও দৈর্ঘ্য নিশ্চিত করা হয়েছে
     cmd_final = [
         "ffmpeg", "-y",
         "-i", str(bg_video_path),
@@ -497,45 +507,18 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
         str(output_path)
     ]
 
-    print("[VideoEngine] JUBAYER.DEV ১০০% মাস্টার্ড ভিডিও এক্সপোর্ট হচ্ছে...")
+    print("[VideoEngine] JUBAYER.DEV মাস্টার্ড ভিডিও এক্সপোর্ট হচ্ছে...")
     subprocess.run(cmd_final, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print(f"[VideoEngine] রেন্ডার সম্পন্ন! ভিডিও সংরক্ষিত: {output_path}")
     return output_path
 
 
-# Compatibility aliases
 def prepare_circular_presenter_badge() -> Path:
     return None
 
 def generate_dynamic_tech_bg(duration: float, output_path: Path):
-    clip = TECH_CLIPS_DIR / "sci_fi_hand_gestures.mp4"
+    clip = TECH_CLIPS_DIR / "earth_space_orbit.mp4"
+    if not clip.exists():
+        clip = TECH_CLIPS_DIR / "sci_fi_hand_gestures.mp4"
     cmd = ["ffmpeg", "-y", "-stream_loop", "-1", "-i", str(clip), "-t", str(duration), "-c", "copy", str(output_path)]
     subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-if __name__ == "__main__":
-    print("=" * 60)
-    print("🎬 [JUBAYER.DEV] সিনেমাটিক ডেভেলপার এডিশন টেস্ট")
-    print("=" * 60)
-
-    from content_writing.script_writer import get_reel_content
-    from voice_audio.voice_engine import generate_voiceover_and_subtitles
-
-    reel = get_reel_content()
-    print(f"📌 টপিক: {reel['title']}")
-    print("\n[১/২] টিভি নিউজ ভয়েসওভার তৈরি হচ্ছে...")
-    audio_data = generate_voiceover_and_subtitles(reel["scenes"])
-
-    print("\n[২/২] সিনেমাটিক ডেভেলপার রিলস ভিডিও রেন্ডারিং হচ্ছে...")
-    test_video = render_final_reel(
-        scene_timings=audio_data["scene_timings"],
-        narration_path=audio_data["narration_path"],
-        total_duration=audio_data["total_duration"],
-        title="jubayer_dev_final_test"
-    )
-
-    print("=" * 60)
-    print("✅ JUBAYER.DEV সিনেমাটিক রিলস তৈরি সম্পন্ন!")
-    print(f"📂 ভিডিও ফাইল: {test_video}")
-    print(f"📏 ফাইল সাইজ: {test_video.stat().st_size / (1024*1024):.2f} MB")
-    print("=" * 60)

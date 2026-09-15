@@ -40,7 +40,8 @@ def run_pipeline():
     scenes = content["scenes"]
     caption = content["caption"]
     hashtags = content["hashtags"]
-    print(f"🤖 নির্বাচিত এআই টপিক: {title}")
+    theme = content.get("theme", "")
+    print(f"🤖 নির্বাচিত এআই টপিক: {title} (থিম: {theme})")
     print(f"📄 মোট সিনের সংখ্যা: {len(scenes)}")
 
     # 2. বাংলা ভয়েসওভার ও সাবটাইটেল টাইমিং তৈরি
@@ -57,7 +58,8 @@ def run_pipeline():
         scene_timings=scene_timings,
         narration_path=narration_path,
         total_duration=total_duration,
-        title=title
+        title=title,
+        theme=theme
     )
     print(f"✅ এআই রিলস তৈরি সম্পন্ন: {output_video_path}")
 
