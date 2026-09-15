@@ -329,7 +329,7 @@ def render_split_code_scene(broll_clip: Path, total_dur: float, out_path: Path, 
     part_code = TEMP_DIR / "split_code_1_5s.mp4"
     part_broll = TEMP_DIR / "split_broll_rest.mp4"
 
-    code_dur = 1.5
+    code_dur = 1.0
     broll_dur = max(1.0, total_dur - code_dur)
 
     # ১.৫ সে. কোড
@@ -426,7 +426,7 @@ def render_final_reel(scene_timings: list, narration_path: Path, total_duration:
 
         if i == 3:
             # সিন ৩-এ মাত্র ১.৫ সেকেন্ড কোড ঝলক + বাকিটা রোবোটিক্স ফুটেজ
-            print(f"[VideoEngine] সিন {i}: ১.৫ সেকেন্ড কোড ঝলক + রোবোটিক্স ফুটেজ ({clip.name}) রেন্ডারিং...")
+            print(f"[VideoEngine] সিন {i}: ১.০ সেকেন্ড কোড ঝলক + রোবোটিক্স ফুটেজ ({clip.name}) রেন্ডারিং...")
             render_split_code_scene(clip, dur, part_out)
         else:
             print(f"[VideoEngine] সিন {i}: সাই-ফাই রোবোটিক্স ফুটেজ ({clip.name}) + ওয়াটারমার্ক রেন্ডারিং...")
