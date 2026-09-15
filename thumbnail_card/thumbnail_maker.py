@@ -31,110 +31,160 @@ from src.config import FONT_PATH, OUTPUT_DIR, TEMP_DIR
 
 FONT_REL_PATH = "assets/fonts/HindSiliguri-Bold.ttf"
 
-def create_ai_photocard(title: str, points: list, category: str = "কৃত্রিম বুদ্ধিমত্তা ও ভবিষ্যৎ") -> Path:
+def create_ai_photocard(title: str, points: list, category: str = "বিশেষ টেক বুলেটিন ২০৩০") -> Path:
     """
-    Creates a premium 1080x1080 square Facebook infographic photo-card.
-    Uses FFmpeg HarfBuzz to ensure 100% flawless Bengali ligature shaping.
+    Creates an ultra-modern 2026-2030 futuristic, high-engagement 1080x1080 Facebook infographic card.
+    Features:
+    - Glowing neon mesh gradients (Cyan, Magenta & Royal Violet)
+    - 4 floating frosted-glass point cards with distinct neon badges
+    - High-contrast Cyber Gold and Pure White HarfBuzz Bengali typography
+    - 100% flawless ligatures on Windows via FFmpeg drawtext
     """
     width, height = 1080, 1080
     
-    # 1. Generate base UI frame with PIL (shapes, borders, colors)
-    base_img = Image.new("RGB", (width, height), "#080D1A")
-    draw = ImageDraw.Draw(base_img)
+    # 1. Base futuristic dark canvas
+    img = Image.new("RGBA", (width, height), (10, 8, 28, 255))
 
-    # Subtle neon grid pattern
-    for y in range(0, height, 40):
-        draw.line([(0, y), (width, y)], fill="#0F172A", width=1)
+    # Glowing neon mesh gradient bursts
+    glow_layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    g_draw = ImageDraw.Draw(glow_layer)
 
-    # Glowing outer border
-    draw.rounded_rectangle([(24, 24), (width - 24, height - 24)], radius=24, outline="#00E5FF", width=3)
+    # Top-right Hot Magenta/Pink glow
+    for r in range(420, 0, -12):
+        alpha = int(75 * (1 - r / 420))
+        g_draw.ellipse([(860 - r, 110 - r), (860 + r, 110 + r)], fill=(236, 72, 153, alpha))
 
-    # Category Pill Background
-    draw.rounded_rectangle([(70, 55), (460, 115)], radius=20, fill="#132038", outline="#00E5FF", width=2)
+    # Bottom-left Electric Cyan glow
+    for r in range(460, 0, -12):
+        alpha = int(80 * (1 - r / 460))
+        g_draw.ellipse([(140 - r, 930 - r), (140 + r, 930 + r)], fill=(0, 240, 255, alpha))
 
-    # Horizontal Divider
-    draw.line([(70, 250), (1010, 250)], fill="#00E5FF", width=3)
-    draw.line([(70, 254), (1010, 254)], fill="#1E293B", width=1)
+    # Center Royal Violet ambient warmth
+    for r in range(500, 0, -15):
+        alpha = int(45 * (1 - r / 500))
+        g_draw.ellipse([(540 - r, 540 - r), (540 + r, 540 + r)], fill=(139, 92, 246, alpha))
 
-    # Point Bullet Boxes (4 items)
-    y_positions = [280, 430, 580, 730]
-    font_num = ImageFont.truetype(str(FONT_PATH), 32)
-    for i, y_pos in enumerate(y_positions[:len(points)], 1):
-        # Cyan glowing number box
-        draw.rounded_rectangle([(70, y_pos), (130, y_pos + 55)], radius=12, fill="#0284C7", outline="#38BDF8", width=2)
-        draw.text((90, y_pos + 6), str(i), font=font_num, fill="#FFFFFF")
+    img = Image.alpha_composite(img, glow_layer)
+    draw = ImageDraw.Draw(img)
 
-    # Footer CTA Box
-    draw.rounded_rectangle([(70, 930), (1010, 1005)], radius=18, fill="#0F172A", outline="#38BDF8", width=2)
+    # Futuristic digital grid dot array
+    for gx in range(60, width - 60, 60):
+        for gy in range(60, height - 60, 60):
+            draw.ellipse([(gx - 1, gy - 1), (gx + 1, gy + 1)], fill=(255, 255, 255, 22))
+
+    # Double outer glowing frame (Cyan neon + Violet accent)
+    draw.rounded_rectangle([(24, 24), (width - 24, height - 24)], radius=30, outline=(0, 240, 255, 180), width=3)
+    draw.rounded_rectangle([(32, 32), (width - 32, height - 32)], radius=24, outline=(139, 92, 246, 80), width=1)
+
+    # Top Category Badge (Glassmorphic Pill with Glowing Live Dot)
+    draw.rounded_rectangle([(70, 60), (450, 120)], radius=25, fill=(15, 23, 42, 220), outline=(0, 240, 255, 255), width=2)
+    draw.ellipse([(95, 82), (111, 98)], fill=(0, 240, 255, 255))
+    draw.ellipse([(92, 79), (114, 101)], outline=(0, 240, 255, 120), width=2)
+
+    # Title Separator Line (Gradient-style Cyan to Magenta)
+    draw.line([(70, 240), (1010, 240)], fill=(0, 240, 255, 200), width=3)
+    draw.line([(70, 244), (520, 244)], fill=(236, 72, 153, 220), width=2)
+
+    # 4 Floating Glassmorphic Point Cards with Neon Badges
+    card_colors = [
+        {"badge": (0, 240, 255), "border": (0, 240, 255, 140), "fill": (15, 23, 42, 200)},
+        {"badge": (236, 72, 153), "border": (236, 72, 153, 140), "fill": (24, 15, 38, 200)},
+        {"badge": (245, 158, 11), "border": (245, 158, 11, 140), "fill": (30, 22, 15, 200)},
+        {"badge": (16, 185, 129), "border": (16, 185, 129, 140), "fill": (15, 30, 26, 200)},
+    ]
+
+    y_positions = [270, 425, 580, 735]
+    card_height = 125
+
+    for i, (y_pos, col) in enumerate(zip(y_positions, card_colors[:len(points)]), 1):
+        # Frosted glass card panel
+        draw.rounded_rectangle([(70, y_pos), (1010, y_pos + card_height)], radius=20, fill=col["fill"], outline=col["border"], width=2)
+        # Left accent glow bar
+        draw.rounded_rectangle([(70, y_pos), (76, y_pos + card_height)], radius=3, fill=col["badge"])
+        # Neon Number Badge
+        b_left, b_top = 100, y_pos + 32
+        draw.rounded_rectangle([(b_left, b_top), (b_left + 60, b_top + 60)], radius=15, fill=col["badge"])
+
+    # Modern Footer Bar
+    draw.rounded_rectangle([(70, 930), (1010, 1010)], radius=20, fill=(15, 23, 42, 230), outline=(0, 240, 255, 120), width=2)
+    draw.line([(70, 930), (1010, 930)], fill=(236, 72, 153, 180), width=2)
 
     temp_base_path = TEMP_DIR / "card_base_frame.png"
-    base_img.save(temp_base_path, format="PNG")
+    img.convert("RGB").save(temp_base_path, format="PNG")
 
-    # 2. Prepare text files for FFmpeg HarfBuzz text rendering
+    # 2. Text rendering via FFmpeg HarfBuzz for 100% Bengali ligature accuracy
     filters = []
 
-    # Category
-    clean_cat = category.replace("⚡", "").replace("💡", "").strip()
+    # Category Tag Text
+    clean_cat = category.replace("⚡", "").replace("💡", "").replace("📺", "").strip()
     cat_text_file = TEMP_DIR / "card_cat_txt.txt"
     with open(cat_text_file, "w", encoding="utf-8") as f:
-        f.write(f"• {clean_cat}")
+        f.write(clean_cat)
     filters.append(
-        f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_cat_txt.txt':fontsize=24:fontcolor=#00E5FF:x=105:y=72"
+        f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_cat_txt.txt':fontsize=24:fontcolor=#00E5FF:x=125:y=76"
     )
 
-    # Title lines (explicit coordinates)
+    # Main Title (High-contrast Cyber Gold for mobile feed eye-catch)
     title_lines = textwrap.wrap(title, width=32)
     if len(title_lines) == 1:
         f_path = TEMP_DIR / "card_title_1.txt"
         with open(f_path, "w", encoding="utf-8") as f:
             f.write(title_lines[0])
         filters.append(
-            f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_title_1.txt':fontsize=38:fontcolor=white:x=70:y=165"
+            f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_title_1.txt':fontsize=42:fontcolor=#FDE047:x=70:y=160"
         )
     else:
         for idx, t_line in enumerate(title_lines[:2]):
             f_path = TEMP_DIR / f"card_title_{idx+1}.txt"
             with open(f_path, "w", encoding="utf-8") as f:
                 f.write(t_line)
-            y_t = 145 + (idx * 48)
+            y_t = 142 + (idx * 48)
             filters.append(
-                f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_title_{idx+1}.txt':fontsize=36:fontcolor=white:x=70:y={y_t}"
+                f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_title_{idx+1}.txt':fontsize=40:fontcolor=#FDE047:x=70:y={y_t}"
             )
 
-    # Bullet points (explicit coordinates)
-    for i, pt in enumerate(points[:4], 1):
+    # Numbers and Points inside the 4 Glassmorphic cards
+    bengali_digits = ["১", "২", "৩", "৪"]
+    for i, (y_pos, pt) in enumerate(zip(y_positions, points[:4]), 1):
         clean_pt = pt
-        for prefix in [f"{i}.", f"{i} .", f"{['১','২','৩','৪'][i-1]}.", f"{['১','২','৩','৪'][i-1]} ."]:
+        for prefix in [f"{i}.", f"{i} .", f"{bengali_digits[i-1]}.", f"{bengali_digits[i-1]} ."]:
             if clean_pt.startswith(prefix):
                 clean_pt = clean_pt[len(prefix):].strip()
                 break
 
-        pt_lines = textwrap.wrap(clean_pt, width=38)
-        y_pos = y_positions[i - 1]
+        # Number inside badge
+        num_f = TEMP_DIR / f"card_num_{i}.txt"
+        with open(num_f, "w", encoding="utf-8") as f:
+            f.write(bengali_digits[i - 1])
+        filters.append(
+            f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_num_{i}.txt':fontsize=36:fontcolor=#090D1A:x=118:y={y_pos + 42}"
+        )
 
+        # Point text
+        pt_lines = textwrap.wrap(clean_pt, width=36)
         if len(pt_lines) == 1:
             pt_f = TEMP_DIR / f"card_pt_{i}_1.txt"
             with open(pt_f, "w", encoding="utf-8") as f:
                 f.write(pt_lines[0])
             filters.append(
-                f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_pt_{i}_1.txt':fontsize=28:fontcolor=#F1F5F9:x=155:y={y_pos + 12}"
+                f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_pt_{i}_1.txt':fontsize=32:fontcolor=#FFFFFF:x=190:y={y_pos + 45}"
             )
         else:
-            for line_idx, line_txt in enumerate(pt_lines[:2]):
-                pt_f = TEMP_DIR / f"card_pt_{i}_{line_idx+1}.txt"
+            for l_idx, l_txt in enumerate(pt_lines[:2]):
+                pt_f = TEMP_DIR / f"card_pt_{i}_{l_idx+1}.txt"
                 with open(pt_f, "w", encoding="utf-8") as f:
-                    f.write(line_txt)
-                y_line = y_pos + 4 + (line_idx * 34)
+                    f.write(l_txt)
+                y_l = y_pos + 26 + (l_idx * 38)
                 filters.append(
-                    f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_pt_{i}_{line_idx+1}.txt':fontsize=26:fontcolor=#F1F5F9:x=155:y={y_line}"
+                    f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_pt_{i}_{l_idx+1}.txt':fontsize=29:fontcolor=#FFFFFF:x=190:y={y_l}"
                 )
 
     # Footer CTA
     footer_text_file = TEMP_DIR / "card_footer_txt.txt"
     with open(footer_text_file, "w", encoding="utf-8") as f:
-        f.write("প্রযুক্তি ও এআই-এর নিত্যনতুন তথ্যের জন্য আমাদের পেজটি ফলো করুন")
+        f.write("প্রযুক্তির সবশেষ বিশ্লেষণ ও আপডেটের জন্য পেজটি ফলো রাখুন")
     filters.append(
-        f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_footer_txt.txt':fontsize=24:fontcolor=#94A3B8:x=115:y=954"
+        f"drawtext=fontfile='{FONT_REL_PATH}':textfile='temp/card_footer_txt.txt':fontsize=25:fontcolor=#E2E8F0:x=200:y=958"
     )
 
     out_path = OUTPUT_DIR / "ai_photo_post.png"
