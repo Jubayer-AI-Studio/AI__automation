@@ -43,78 +43,96 @@ def create_ai_photocard(title: str, points: list, category: str = "সিলি�
     """
     width, height = 1080, 1080
     
-    # 1. Base dark silicon substrate canvas (#070913)
-    img = Image.new("RGBA", (width, height), (7, 9, 19, 255))
+    # 1. Base dark silicon substrate canvas (#04060F)
+    img = Image.new("RGBA", (width, height), (4, 6, 15, 255))
 
     # Glowing lab ambient lighting (Cyan & Deep Indigo glow)
     glow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(glow)
 
-    # High-tech cyan lab glow top-left (chip fabrication chamber feel)
-    for r in range(450, 0, -15):
-        alpha = int(70 * (1 - r / 450))
-        g_draw.ellipse([(150 - r, 100 - r), (150 + r, 100 + r)], fill=(0, 240, 255, alpha))
+    # Electric Cyan bloom (top left)
+    for r in range(480, 0, -12):
+        alpha = int(75 * (1 - r / 480))
+        g_draw.ellipse([(180 - r, 120 - r), (180 + r, 120 + r)], fill=(0, 240, 255, alpha))
 
-    # Hot Magenta/Purple quantum core glow bottom-right
-    for r in range(450, 0, -15):
-        alpha = int(75 * (1 - r / 450))
-        g_draw.ellipse([(920 - r, 950 - r), (920 + r, 950 + r)], fill=(236, 72, 153, alpha))
+    # Vivid Magenta bloom (bottom right)
+    for r in range(480, 0, -12):
+        alpha = int(75 * (1 - r / 480))
+        g_draw.ellipse([(900 - r, 920 - r), (900 + r, 920 + r)], fill=(255, 0, 110, alpha))
 
-    # Center tensor engine glow
-    for r in range(350, 0, -15):
-        alpha = int(40 * (1 - r / 350))
-        g_draw.ellipse([(540 - r, 500 - r), (540 + r, 500 + r)], fill=(124, 58, 237, alpha))
+    # Deep Electric Violet core bloom (center)
+    for r in range(400, 0, -15):
+        alpha = int(45 * (1 - r / 400))
+        g_draw.ellipse([(540 - r, 540 - r), (540 + r, 540 + r)], fill=(120, 40, 240, alpha))
 
     img = Image.alpha_composite(img, glow)
     draw = ImageDraw.Draw(img)
 
+    # Holographic Sci-Fi HUD Concentric Circles (Center Watermark)
+    cx, cy = 540, 560
+    for cr, col in [(280, (0, 240, 255, 25)), (380, (255, 0, 110, 20)), (480, (139, 92, 246, 18))]:
+        draw.ellipse([(cx - cr, cy - cr), (cx + cr, cy + cr)], outline=col, width=1)
+
+    import math
+    for angle_deg in range(0, 360, 15):
+        rad = math.radians(angle_deg)
+        x1 = cx + int(475 * math.cos(rad))
+        y1 = cy + int(475 * math.sin(rad))
+        x2 = cx + int(485 * math.cos(rad))
+        y2 = cy + int(485 * math.sin(rad))
+        draw.line([(x1, y1), (x2, y2)], fill=(0, 240, 255, 35), width=1)
+
     # Silicon Wafer / Digital Circuit Grid (Subtle CS Lab Matrix)
-    for x in range(40, width, 40):
-        draw.line([(x, 0), (x, height)], fill=(255, 255, 255, 8), width=1)
-    for y in range(40, height, 40):
-        draw.line([(0, y), (width, y)], fill=(255, 255, 255, 8), width=1)
+    for x in range(50, width - 50, 50):
+        for y in range(50, height - 50, 50):
+            draw.ellipse([(x - 1, y - 1), (x + 1, y + 1)], fill=(255, 255, 255, 16))
 
     # PCB Circuit Traces with solder pads (Microchip Board traces)
-    trace_color = (0, 240, 255, 60)
-    draw.line([(40, 40), (200, 40)], fill=trace_color, width=2)
-    draw.line([(200, 40), (240, 80)], fill=trace_color, width=2)
-    draw.ellipse([(36, 36), (44, 44)], fill=(0, 240, 255, 180))
+    draw.line([(50, 50), (220, 50)], fill=(0, 240, 255, 70), width=2)
+    draw.line([(220, 50), (260, 90)], fill=(0, 240, 255, 70), width=2)
+    draw.ellipse([(46, 46), (54, 54)], fill=(0, 240, 255, 200))
 
-    draw.line([(width - 40, height - 40), (width - 220, height - 40)], fill=(236, 72, 153, 90), width=2)
-    draw.line([(width - 220, height - 40), (width - 260, height - 80)], fill=(236, 72, 153, 90), width=2)
-    draw.ellipse([(width - 44, height - 44), (width - 36, height - 36)], fill=(236, 72, 153, 200))
+    draw.line([(width - 50, height - 50), (width - 220, height - 50)], fill=(255, 0, 110, 80), width=2)
+    draw.line([(width - 220, height - 50), (width - 260, height - 90)], fill=(255, 0, 110, 80), width=2)
+    draw.ellipse([(width - 54, height - 54), (width - 46, height - 46)], fill=(255, 0, 110, 220))
 
-    # Outer Lab Frame with Chamfered Style (GPU Server Chassis style)
-    draw.rounded_rectangle([(24, 24), (width - 24, height - 24)], radius=24, outline=(0, 240, 255, 150), width=2)
-    draw.rounded_rectangle([(30, 30), (width - 30, height - 30)], radius=20, outline=(139, 92, 246, 70), width=1)
+    # Dual Outer Frame with Sci-Fi Chamfer Accents
+    draw.rounded_rectangle([(24, 24), (width - 24, height - 24)], radius=24, outline=(0, 240, 255, 160), width=2)
+    draw.rounded_rectangle([(30, 30), (width - 30, height - 30)], radius=20, outline=(255, 0, 110, 60), width=1)
+
+    # Corner Tech Brackets (HUD Reticle style)
+    bracket_len = 35
+    for (bx, by, dx, dy) in [(40, 40, 1, 1), (width - 40, 40, -1, 1), (40, height - 40, 1, -1), (width - 40, height - 40, -1, -1)]:
+        draw.line([(bx, by), (bx + dx * bracket_len, by)], fill=(0, 240, 255, 240), width=3)
+        draw.line([(bx, by), (bx, by + dy * bracket_len)], fill=(0, 240, 255, 240), width=3)
 
     # Top Terminal Header Bar (Developer / CS Lab Style)
-    draw.ellipse([(65, 55), (77, 67)], fill=(255, 95, 86, 255))
-    draw.ellipse([(85, 55), (97, 67)], fill=(255, 189, 46, 255))
-    draw.ellipse([(105, 55), (117, 67)], fill=(39, 201, 63, 255))
+    draw.ellipse([(70, 58), (82, 70)], fill=(255, 95, 86, 255))
+    draw.ellipse([(90, 58), (102, 70)], fill=(255, 189, 46, 255))
+    draw.ellipse([(110, 58), (122, 70)], fill=(39, 201, 63, 255))
 
     # System Telemetry Pill (Lab ID)
-    draw.rounded_rectangle([(140, 45), (490, 80)], radius=8, fill=(15, 23, 42, 220), outline=(0, 240, 255, 120), width=1)
+    draw.rounded_rectangle([(145, 48), (480, 80)], radius=8, fill=(12, 18, 36, 230), outline=(0, 240, 255, 120), width=1)
     
     # Category Badge Pill
-    draw.rounded_rectangle([(70, 95), (440, 145)], radius=14, fill=(15, 23, 42, 240), outline=(0, 240, 255, 220), width=2)
+    draw.rounded_rectangle([(70, 95), (460, 145)], radius=14, fill=(12, 20, 42, 240), outline=(0, 240, 255, 220), width=2)
     # Chip Icon Graphic (Mini Microchip)
     draw.rectangle([(88, 110), (108, 130)], fill=(0, 240, 255, 255))
-    draw.rectangle([(93, 115), (103, 125)], fill=(10, 15, 30, 255))
+    draw.rectangle([(93, 115), (103, 125)], fill=(8, 12, 26, 255))
     for p in [-4, 0, 4]:
         draw.line([(88 + 10 + p, 106), (88 + 10 + p, 109)], fill=(0, 240, 255, 255), width=2)
         draw.line([(88 + 10 + p, 131), (88 + 10 + p, 134)], fill=(0, 240, 255, 255), width=2)
 
     # Title Separator Line (High-voltage Bus Bar look)
-    draw.line([(70, 245), (1010, 245)], fill=(0, 240, 255, 180), width=2)
-    draw.line([(70, 248), (480, 248)], fill=(236, 72, 153, 240), width=2)
+    draw.line([(70, 245), (1010, 245)], fill=(0, 240, 255, 160), width=2)
+    draw.line([(70, 248), (520, 248)], fill=(255, 0, 110, 240), width=2)
 
     # 4 Microchip Architecture Module Cards
     module_configs = [
-        {"badge": (0, 240, 255), "tag": "MODULE_01 // TENSOR_CORE_PROCESSING", "fill": (12, 20, 38, 220), "border": (0, 240, 255, 140)},
-        {"badge": (236, 72, 153), "tag": "MODULE_02 // NEURAL_LANGUAGE_SYNAPSE", "fill": (25, 14, 38, 220), "border": (236, 72, 153, 140)},
-        {"badge": (245, 158, 11), "tag": "MODULE_03 // CODE_COMPILER_AUTOMATION", "fill": (30, 20, 12, 220), "border": (245, 158, 11, 140)},
-        {"badge": (16, 185, 129), "tag": "MODULE_04 // GENERATIVE_GRAPHICS_PIPELINE", "fill": (12, 30, 24, 220), "border": (16, 185, 129, 140)},
+        {"badge": (0, 240, 255), "tag": "CORE_01 // TENSOR_NEURAL_NODE", "fill": (10, 18, 36, 230), "border": (0, 240, 255, 160)},
+        {"badge": (255, 0, 110), "tag": "CORE_02 // NATURAL_LANGUAGE_SYNAPSE", "fill": (24, 10, 32, 230), "border": (255, 0, 110, 160)},
+        {"badge": (255, 183, 3), "tag": "CORE_03 // QUANTUM_LOGIC_COMPILER", "fill": (28, 18, 8, 230), "border": (255, 183, 3, 160)},
+        {"badge": (0, 230, 150), "tag": "CORE_04 // GENERATIVE_GRAPHICS_PIPELINE", "fill": (8, 26, 20, 230), "border": (0, 230, 150, 160)},
     ]
 
     y_positions = [270, 425, 580, 735]
@@ -122,17 +140,17 @@ def create_ai_photocard(title: str, points: list, category: str = "সিলি�
 
     for i, (y_pos, cfg) in enumerate(zip(y_positions, module_configs[:len(points)]), 1):
         # Frosted Silicon Chip Panel
-        draw.rounded_rectangle([(70, y_pos), (1010, y_pos + card_height)], radius=16, fill=cfg["fill"], outline=cfg["border"], width=2)
+        draw.rounded_rectangle([(70, y_pos), (1010, y_pos + card_height)], radius=18, fill=cfg["fill"], outline=cfg["border"], width=2)
         
         # Golden Microchip Contact Pins (PCB Edge Connector style)
-        for pin_y in range(y_pos + 18, y_pos + card_height - 15, 16):
-            draw.rounded_rectangle([(62, pin_y), (69, pin_y + 8)], radius=2, fill=(245, 158, 11, 240))
+        for pin_y in range(y_pos + 16, y_pos + card_height - 14, 15):
+            draw.rounded_rectangle([(61, pin_y), (69, pin_y + 8)], radius=2, fill=(255, 183, 3, 240))
             draw.line([(70, pin_y + 4), (78, pin_y + 4)], fill=cfg["badge"], width=2)
         
         # Glowing Microchip Core Die Badge
         b_left, b_top = 95, y_pos + 32
-        draw.rounded_rectangle([(b_left, b_top), (b_left + 60, b_top + 60)], radius=12, fill=cfg["badge"])
-        draw.rounded_rectangle([(b_left + 6, b_top + 6), (b_left + 54, b_top + 54)], radius=8, outline=(10, 15, 30, 150), width=2)
+        draw.rounded_rectangle([(b_left, b_top), (b_left + 60, b_top + 60)], radius=14, fill=cfg["badge"])
+        draw.rounded_rectangle([(b_left + 5, b_top + 5), (b_left + 55, b_top + 55)], radius=10, outline=(5, 8, 20, 160), width=2)
 
     # Modern CS Lab Telemetry Footer
     draw.rounded_rectangle([(70, 930), (1010, 1010)], radius=16, fill=(12, 18, 34, 240), outline=(0, 240, 255, 140), width=2)

@@ -44,8 +44,9 @@ def send_full_creator_kit(video_path: Path, title: str, caption: str, hashtags: 
     if photo_card_path and photo_card_path.exists():
         print(f"[Telegram] Sending Photo Card...")
         photo_msg = (
-            f"{extras['photo_card']['title']} সম্পর্কে বিস্তারিত তথ্য।\n\n"
-            f"#Technology #TechBangladesh #BanglaTech #Infographic"
+            f"কৃত্রিম বুদ্ধিমত্তা ও প্রযুক্তির দ্রুত অগ্রগতিতে আগামী কয়েক বছরে কর্মসংস্থানের রূপরেখা কীভাবে বদলে যাবে, তার একটি চিত্র।\n\n"
+            f"আপনার পেশা বা পড়াশোনায় প্রযুক্তির প্রভাব নিয়ে আপনার ভাবনা কী? কমেন্টে জানাতে পারেন।\n\n"
+            f"#Technology #TechBangladesh #BanglaTech #FutureTech"
         )
         try:
             with open(photo_card_path, "rb") as pf:
@@ -64,25 +65,17 @@ def send_full_creator_kit(video_path: Path, title: str, caption: str, hashtags: 
     story_poll = extras["story_poll"]
 
     try:
-        # ফেসবুক পোস্ট: সরাসরি কপি করার জন্য একদম নিখুঁত টেক্সট
-        post_bundle = (
-            f"[ফেসবুক পোস্ট - সরাসরি কপি করে আপলোড করুন]\n\n"
-            f"{discussion_text}"
-        )
+        # ফেসবুক পোস্ট: ১০০% পিওর টেক্সট (কোনো বাড়তি কথা নেই, জাস্ট এক ট্যাপে কপি)
         requests.post(
             f"{base_url}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": post_bundle},
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": discussion_text},
             timeout=30
         )
 
-        # ফেসবুক স্টোরি: সরাসরি কপি করার জন্য আলাদা মেসেজ
-        story_bundle = (
-            f"[ফেসবুক স্টোরি - সরাসরি কপি করার জন্য]\n\n"
-            f"{story_poll}"
-        )
+        # ফেসবুক স্টোরি: ১০০% পিওর টেক্সট
         requests.post(
             f"{base_url}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": story_bundle},
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": story_poll},
             timeout=30
         )
 
