@@ -1,0 +1,15 @@
+name: Keep Render Alive 24/7
+
+on:
+  schedule:
+    # Runs every 10 minutes from GitHub cloud servers
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Server
+        run: |
+          curl -s -f --max-time 30 "https://facebook-hx1b.onrender.com/" || echo "Ping failed or server waking up"
