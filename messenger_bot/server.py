@@ -20,18 +20,66 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+import os
+import requests
+from datetime import datetime
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from messenger_bot.agent_brain import call_gemini_api
 from messenger_bot.leads_db import get_all_leads
-from src.config import TELEGRAM_BOT_TOKEN
+from src.config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+
+FB_VERIFY_TOKEN = os.getenv("FB_VERIFY_TOKEN", "jubayer_dev_webhook_2026")
+FB_PAGE_ACCESS_TOKEN = os.getenv("FB_PAGE_ACCESS_TOKEN", "")
 
 app = Flask(__name__)
+
+
+def send_telegram_alert(sender_name: str, incoming_msg: str, ai_reply: str):
+    """টেলিগ্রামে ক্লাউড মেসেঞ্জার অ্যালার্ট পাঠায়।"""
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+    alert_text = (
+        f"⚡ <b>ফেসবুক মেসেঞ্জারে ক্লাউড এআই অটো-রিপ্লাই দিয়েছে!</b>\n\n"
+        f"👤 <b>ক্লায়েন্ট:</b> {sender_name}\n"
+        f"💬 <b>মেসেজ:</b> {incoming_msg}\n"
+        f"🤖 <b>এআই উত্তর:</b>\n{ai_reply}\n\n"
+        f"⏰ <i>সময়: {datetime.now().strftime('%I:%M %p, %d %b %Y')}</i>"
+    )
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": alert_text, "parse_mode": "HTML"},
+            timeout=8
+        )
+    except Exception:
+        pass
+
+
+def send_meta_messenger_reply(recipient_id: str, message_text: str):
+    """মেটার অফিসিয়াল গ্রাফ এপিআই দিয়ে মেসেঞ্জারে সরাসরি রিপ্লাই সেন্ড করে।"""
+    token = os.getenv("FB_PAGE_ACCESS_TOKEN", "").strip() or FB_PAGE_ACCESS_TOKEN
+    if not token:
+        print("[Meta Send] Warning: FB_PAGE_ACCESS_TOKEN সেট করা নেই।")
+        return False
+    url = f"https://graph.facebook.com/v20.0/me/messages?access_token={token}"
+    payload = {
+        "recipient": {"id": recipient_id},
+        "message": {"text": message_text}
+    }
+    try:
+        res = requests.post(url, json=payload, timeout=10)
+        print(f"[Meta Send Response] {res.status_code}")
+        return res.status_code == 200
+    except Exception as e:
+        print(f"[Meta Send Exception] {e}")
+        return False
+
 
 
 def detect_platform(data: dict, args: dict) -> str:
@@ -72,6 +120,46 @@ def unified_webhook():
     args = request.args.to_dict()
 
     platform = detect_platform(data, args)
+
+    # -------------------------------------------------------------
+    # 🌟 ১. মেটার অফিশিয়াল ওয়েবভেরিফিকেশন হ্যান্ডলার (GET hub.challenge)
+    # -------------------------------------------------------------
+    if request.method == "GET":
+        mode = args.get("hub.mode")
+        token = args.get("hub.verify_token")
+        challenge = args.get("hub.challenge")
+        if mode and token:
+            if mode == "subscribe" and token == FB_VERIFY_TOKEN:
+                print("✅ [Meta Webhook] ভেরিফিকেশন সফলভাবে সম্পন্ন হয়েছে!")
+                return Response(challenge, mimetype='text/plain', status=200)
+            else:
+                return "Forbidden", 403
+
+    # -------------------------------------------------------------
+    # 🌟 ২. মেটার অফিশিয়াল ফেসবুক পেজ মেসেঞ্জার হ্যান্ডলার (POST object == 'page')
+    # -------------------------------------------------------------
+    if isinstance(data, dict) and data.get("object") == "page":
+        try:
+            for entry in data.get("entry", []):
+                for messaging_event in entry.get("messaging", []):
+                    sender_id = messaging_event.get("sender", {}).get("id")
+                    if "message" in messaging_event and not messaging_event.get("message", {}).get("is_echo"):
+                        user_text = messaging_event["message"].get("text", "")
+                        if user_text:
+                            print(f"\n[Meta Messenger In] ক্লায়েন্ট ({sender_id}): {user_text}")
+                            ai_reply = call_gemini_api(
+                                user_message=user_text,
+                                sender_id=str(sender_id),
+                                sender_name=f"Client_{sender_id[:6]}",
+                                platform="messenger"
+                            )
+                            print(f"[Meta Messenger Out] AI Reply: {ai_reply}")
+                            send_meta_messenger_reply(sender_id, ai_reply)
+                            send_telegram_alert(f"Meta Client ({sender_id[:6]})", user_text, ai_reply)
+            return "EVENT_RECEIVED", 200
+        except Exception as ex:
+            print(f"[Meta Webhook Event Error] {ex}")
+            return "EVENT_RECEIVED", 200
 
     try:
         # ১. JSON বডি পার্সিং (AutoResponder ফরম্যাট)
