@@ -171,3 +171,57 @@ def call_jubayer_personal_ai(user_message: str) -> str:
 
     return "জুবায়ের ভাই, আপনার বার্তাটি পেয়েছি। সাময়িক নেটওয়ার্ক ধীরগতির কারণে আমি দ্রুত উত্তর প্রস্তুত করছি, আপনি কী বিষয়ে জানতে চান আমাকে বলুন।"
 
+
+COMMENT_REPLY_SYSTEM_PROMPT = """তুমি হলে জুবায়ের (Jubayer.dev, AI & Software Systems Developer)-এর ফেসবুক ভিডিও ও পোস্টের কমেন্ট অ্যাসিস্ট্যান্ট।
+ফেসবুকে ভিডিও বা পোস্টে সাধারণ মানুষ ও ক্লায়েন্টরা বিভিন্ন মন্তব্য বা প্রশ্ন করেন। তোমাকে তাদের মন্তব্যের প্রেক্ষিতে একজন বাস্তবসম্মত, আন্তরিক, বুদ্ধিদীপ্ত ও প্রফেশনাল মানুষ হিসেবে সুন্দর ও সংক্ষিপ্ত কমেন্ট রিপ্লাই দিতে হবে।
+
+নির্দেশনাবলী:
+১. কমেন্টের উত্তর সবসময় ১ থেকে ৩ লাইনের মধ্যে সংক্ষিপ্ত ও সাবলীল রাখবে।
+২. প্রশংসামূলক মন্তব্যে আন্তরিক কৃতজ্ঞতা ও ভালোবাসা প্রকাশ করবে (যেমন: "অনেক ধন্যবাদ ভাই!", "অনুপ্রেরণা দেওয়ার জন্য আন্তরিক কৃতজ্ঞতা!", "থ্যাংকস ব্রো! সাথে থাকবেন।")।
+৩. টেকনিক্যাল প্রশ্ন থাকলে সংক্ষেপে স্পষ্ট ভাষায় সঠিক উত্তর দেবে।
+৪. কাজের প্রস্তাব বা সার্ভিস নিয়ে জানতে চাইলে বলবে বিস্তারিত জানার জন্য সরাসরি ইনবক্সে মেসেজ দিতে।
+৫. প্রতি উত্তরে একই কথা না বলে ভিন্ন ভিন্ন বৈচিত্র্যময় শব্দ ও বন্ধুত্বপূর্ণ বাচনভঙ্গি ব্যবহার করবে।
+৬. কোনো উদ্ধৃতি চিহ্ন (" ") ছাড়া সরাসরি কমেন্টের উত্তরটি প্রদান করবে।
+"""
+
+
+def call_comment_ai(commenter_name: str, comment_text: str, post_context: str = "") -> str:
+    """ফেসবুক পোস্ট বা ভিডিওর কমেন্টের জন্য স্মার্ট এআই রিপ্লাই তৈরি করে।"""
+    api_key = os.getenv("GEMINI_API_KEY", "").strip() or GEMINI_API_KEY
+
+    user_prompt = f"মন্তব্যকারী: {commenter_name}\n"
+    if post_context:
+        user_prompt += f"পোস্ট/ভিডিওর বিষয়: {post_context}\n"
+    user_prompt += f"মন্তব্য: {comment_text}\n\nউপযুক্ত, আন্তরিক ও চমৎকার ফেসবুক কমেন্ট রিপ্লাই দিন:"
+
+    payload = {
+        "system_instruction": {
+            "parts": [{"text": COMMENT_REPLY_SYSTEM_PROMPT}]
+        },
+        "contents": [
+            {"role": "user", "parts": [{"text": user_prompt}]}
+        ],
+        "generationConfig": {
+            "temperature": 0.8,
+            "maxOutputTokens": 200
+        }
+    }
+    headers = {"Content-Type": "application/json"}
+
+    for idx, model in enumerate(CANDIDATE_MODELS):
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        t_limit = 5.0 if idx == 0 else 3.0
+        try:
+            res = requests.post(url, headers=headers, json=payload, timeout=t_limit)
+            if res.status_code == 200:
+                data = res.json()
+                reply = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if (reply.startswith('"') and reply.endswith('"')) or (reply.startswith("'") and reply.endswith("'")):
+                    reply = reply[1:-1].strip()
+                return reply
+        except Exception as ex:
+            print(f"[Comment AI Exception] Model {model}: {ex}")
+
+    return f"অনেক অনেক ধন্যবাদ {commenter_name} ভাই! অনুপ্রেরণা দেওয়ার জন্য আন্তরিক কৃতজ্ঞতা।"
+
+
