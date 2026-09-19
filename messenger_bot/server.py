@@ -30,7 +30,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from flask import Flask, request, jsonify, Response
-from messenger_bot.agent_brain import call_gemini_api
+from messenger_bot.agent_brain import call_gemini_api, call_jubayer_personal_ai
 from messenger_bot.leads_db import get_all_leads
 from src.config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 
@@ -38,6 +38,9 @@ FB_VERIFY_TOKEN = os.getenv("FB_VERIFY_TOKEN", "jubayer_dev_webhook_2026")
 FB_PAGE_ACCESS_TOKEN = os.getenv("FB_PAGE_ACCESS_TOKEN", "")
 
 app = Flask(__name__)
+
+# জুবায়ের ভাই যখন ভিডিও বা পোস্ট রেন্ডার করতে বলবেন, পিসির জন্য জব কিউ
+PENDING_JOBS = []
 
 
 def send_telegram_alert(sender_name: str, incoming_msg: str, ai_reply: str):
@@ -227,32 +230,104 @@ def unified_webhook():
 
 @app.route("/telegram-webhook", methods=["POST"])
 def telegram_webhook():
-    """সরাসরি টেলিগ্রাম বটের সাথে লাইভ টু-ওয়ে চ্যাটিং হ্যান্ডলার।"""
+    """
+    টেলিগ্রাম বট হ্যান্ডলার:
+    - জুবায়ের ভাই মেসেজ দিলে পার্সোনাল এআই অ্যাসিস্ট্যান্ট হিসেবে উত্তর দেয় এবং ভিডিও/পোস্ট রেন্ডার কিউতে যোগ করে।
+    - বহিরাগত কোনো ভিজিটর মেসেজ দিলে জুবায়ের স্যারের রিপ্রেজেন্টেটিভ হিসেবে উত্তর দেয়।
+    """
     update = request.get_json(silent=True) or {}
     message = update.get("message", {})
-    text = message.get("text", "")
+    text = message.get("text", "").strip()
     chat = message.get("chat", {})
     chat_id = chat.get("id")
-    user_name = chat.get("first_name", "Telegram User")
+    user_name = chat.get("first_name", "User")
 
     if not text or not chat_id:
         return jsonify({"ok": True})
 
-    # এআই উত্তর তৈরি
-    ai_reply = call_gemini_api(
-        user_message=text,
-        sender_id=str(chat_id),
-        sender_name=user_name,
-        platform="telegram"
-    )
+    # ১. ইউজার কি জুবায়ের ভাই নিজে? (Boss / Creator)
+    is_jubayer = str(chat_id) == str(TELEGRAM_CHAT_ID) or str(chat_id) == "8273323826"
+
+    if is_jubayer:
+        text_lower = text.lower()
+        # ক. ভিডিও বানানোর নির্দেশ
+        if any(kw in text_lower for kw in ["ভিডিও", "রিল", "রিলস", "video", "reel", "/video"]):
+            job_id = f"job_vid_{int(datetime.now().timestamp())}"
+            PENDING_JOBS.append({
+                "job_id": job_id,
+                "type": "video",
+                "prompt": text,
+                "chat_id": chat_id,
+                "created_at": datetime.now().strftime("%I:%M %p, %d %b %Y")
+            })
+            ai_reply = (
+                "🚀 জুবায়ের ভাই, আপনার ভিডিও তৈরির কম্যান্ড পেয়েছি!\n\n"
+                "💻 আপনার পিসির এআই ভিডিও রেন্ডারিং পাইপলাইন স্বয়ংক্রিয়ভাবে ব্যাকগ্রাউন্ডে শুরু হচ্ছে...\n"
+                "⏱️ অডিও সিন্থেসিস, বাংলা সাবটাইটেল ও মোশন রেন্ডার সম্পন্ন হলেই সরাসরি এই চ্যাটে ফুল ক্রিয়েটর কিট (ভিডিও + ফটো কার্ড + ক্যাপশন) পৌঁছে যাবে!"
+            )
+        # খ. পোস্ট বা ফটো কার্ড বানানোর নির্দেশ
+        elif any(kw in text_lower for kw in ["পোস্ট", "ফটো কার্ড", "ক্যাপশন", "/post", "post"]):
+            post_caption = call_jubayer_personal_ai(
+                f"জুবায়ের ভাই একটি নতুন সোশ্যাল মিডিয়া পোস্ট বা স্ট্যাটাস চেয়েছেন। তার নির্দেশ: {text}। "
+                "একটি আকর্ষণীয়, প্রফেশনাল এবং এঙ্গেজিং পোস্ট লিখে দিন সাথে পাওয়ারফুল হুক ও ট্রেন্ডিং হ্যাশট্যাগ।"
+            )
+            job_id = f"job_post_{int(datetime.now().timestamp())}"
+            PENDING_JOBS.append({
+                "job_id": job_id,
+                "type": "post_card",
+                "prompt": text,
+                "caption": post_caption,
+                "chat_id": chat_id,
+                "created_at": datetime.now().strftime("%I:%M %p, %d %b %Y")
+            })
+            ai_reply = (
+                f"📝 জুবায়ের ভাই, আপনার সোশ্যাল মিডিয়া পোস্ট প্রস্তুত:\n\n"
+                f"{post_caption}\n\n"
+                f"🎨 (আপনার পিসির এআই ফটো কার্ড জেনারেটর ব্যাকগ্রাউন্ডে কার্ড তৈরি করে টেলিগ্রামে পাঠিয়ে দেবে।)"
+            )
+        # গ. সাধারণ কথোপকথন, কোডিং হেল্প, টেকনিক্যাল সমস্যা সমাধান বা যে কোনো প্রশ্ন
+        else:
+            ai_reply = call_jubayer_personal_ai(text)
+    else:
+        # বহিরাগত ক্লায়েন্ট বা ভিজিটরদের জন্য বিজনেস অ্যাসিস্ট্যান্ট
+        ai_reply = call_gemini_api(
+            user_message=text,
+            sender_id=str(chat_id),
+            sender_name=user_name,
+            platform="telegram"
+        )
 
     # টেলিগ্রামে উত্তর পাঠানো
     if TELEGRAM_BOT_TOKEN:
-        import requests
         send_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        requests.post(send_url, json={"chat_id": chat_id, "text": ai_reply}, timeout=8)
+        try:
+            requests.post(send_url, json={"chat_id": chat_id, "text": ai_reply}, timeout=10)
+        except Exception as ex:
+            print(f"[Telegram Send Error] {ex}")
 
     return jsonify({"ok": True})
+
+
+@app.route("/api/jobs/pending", methods=["GET"])
+def get_pending_jobs():
+    """পিসির লোকাল ওয়ার্কারের জন্য কিউতে থাকা পেন্ডিং জবগুলোর তালিকা।"""
+    return jsonify({
+        "count": len(PENDING_JOBS),
+        "jobs": PENDING_JOBS
+    })
+
+
+@app.route("/api/jobs/complete", methods=["POST"])
+def complete_job():
+    """পিসিতে জব সম্পন্ন হলে কিউ থেকে তা সরিয়ে ফেলার এপিআই।"""
+    global PENDING_JOBS
+    data = request.get_json(silent=True) or {}
+    job_id = data.get("job_id")
+    if job_id:
+        PENDING_JOBS = [j for j in PENDING_JOBS if j.get("job_id") != job_id]
+    elif PENDING_JOBS:
+        PENDING_JOBS.pop(0)
+    return jsonify({"ok": True, "remaining": len(PENDING_JOBS)})
 
 
 @app.route("/api/leads", methods=["GET"])

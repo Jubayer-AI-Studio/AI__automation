@@ -116,3 +116,58 @@ def call_gemini_api(user_message: str, sender_id: str = "default_user", sender_n
         "স্যার কোডিং ল্যাবে অত্যন্ত ব্যস্ত আছেন। আপনার বার্তাটি আমি নোট করে রেখেছি, "
         "কাজের বিস্তারিত ও আপনার হোয়াটসঅ্যাপ নম্বরটি লিখে রাখুন, স্যার দ্রুত যোগাযোগ করবেন।"
     )
+
+
+JUBAYER_PERSONAL_SYSTEM_PROMPT = """তুমি হলে জুবায়ের ভাইয়ের (Jubayer - 24yo AI & Software Systems Developer, Creator of Jubayer.dev) ব্যক্তিগত সুপার-ইন্টেলিজেন্ট এআই এক্সিকিউটিভ পার্টনার ও অ্যাসিস্ট্যান্ট।
+তুমি জুবায়ের ভাইয়ের সাথে অত্যন্ত বন্ধুত্বপূর্ণ, আন্তরিক, বুদ্ধিদীপ্ত, প্রজ্ঞাপূর্ণ এবং স্বাভাবিক বাংলায় (প্রয়োজনে স্পষ্ট টেকনিক্যাল ইংরেজি সহ) কথা বলো।
+
+তোমার মূল দায়িত্বসমূহ:
+১. জুবায়ের ভাই তোমার বস ও ক্রিয়েটর। তাকে কখনো বলবে না "জুবায়ের স্যার ব্যস্ত আছেন" বা থার্ড-পার্টি হিসেবে কথা বলবে না। তাকে সরাসরি "জুবায়ের ভাই" বলে ডাকবে।
+২. টেকনিক্যাল সলিউশন ও কোডিং: পাইথন, এআই, অটোমেশন, ওয়েব ডেভেলপমেন্ট, বা যেকোনো কোডিংয়ের ত্রুটি জিজ্ঞেস করলে সরাসরি একদম নিখুঁত কোড ও প্র্যাকটিক্যাল সমাধান দেবে।
+৩. কনটেন্ট ও আইডিয়া: রিলস, ফেসবুক পোস্ট, ইউটিউব ভিডিও আইডিয়া, বা যেকোনো ক্রিয়েটিভ পরামর্শ চাইলে সাথে সাথে আকর্ষণীয় ও ভাইরাল ফরম্যাটে আইডিয়া দেবে।
+৪. বিজনেস ও স্ট্র্যাটেজি: ক্লায়েন্ট হ্যান্ডেলিং, বাজেট, প্রজেক্ট প্ল্যানিং নিয়ে জিজ্ঞেস করলে অত্যন্ত শার্প ও বিজনেস-মাইন্ডেড পরামর্শ দেবে।
+৫. সাহায্যকারী বাচনভঙ্গি: Antigravity যেমন কম্পিউটারে পেয়ার প্রোগ্রামার হিসেবে হেল্প করে, তুমি টেলিগ্রামে তার সার্বক্ষণিক বিশ্বস্ত এআই পার্টনার হিসেবে সেভাবেই হেল্প করবে।
+"""
+
+
+def call_jubayer_personal_ai(user_message: str) -> str:
+    """জুবায়ের ভাইয়ের সাথে ১-অন-১ ব্যক্তিগত এআই পার্টনার হিসেবে কথা বলে ও সলিউশন দেয়।"""
+    api_key = os.getenv("GEMINI_API_KEY", "").strip() or GEMINI_API_KEY
+
+    history_key = "jubayer_personal_chat"
+    history = CONVERSATION_HISTORY.get(history_key, [])
+
+    contents = []
+    for role, text in history:
+        contents.append({"role": role, "parts": [{"text": text}]})
+    contents.append({"role": "user", "parts": [{"text": user_message}]})
+
+    payload = {
+        "system_instruction": {
+            "parts": [{"text": JUBAYER_PERSONAL_SYSTEM_PROMPT}]
+        },
+        "contents": contents,
+        "generationConfig": {
+            "temperature": 0.7,
+            "maxOutputTokens": 800
+        }
+    }
+    headers = {"Content-Type": "application/json"}
+
+    for idx, model in enumerate(CANDIDATE_MODELS):
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        t_limit = 6.0 if idx == 0 else 4.0
+        try:
+            res = requests.post(url, headers=headers, json=payload, timeout=t_limit)
+            if res.status_code == 200:
+                data = res.json()
+                reply = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                history.append(("user", user_message))
+                history.append(("model", reply))
+                CONVERSATION_HISTORY[history_key] = history[-MAX_HISTORY_LEN:]
+                return reply
+        except Exception as ex:
+            print(f"[Personal AI Error] {ex}")
+
+    return "জুবায়ের ভাই, আপনার বার্তাটি পেয়েছি। সাময়িক নেটওয়ার্ক ধীরগতির কারণে আমি দ্রুত উত্তর প্রস্তুত করছি, আপনি কী বিষয়ে জানতে চান আমাকে বলুন।"
+
