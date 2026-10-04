@@ -5,15 +5,19 @@ __pycache__/
 
 # Temporary and render cache
 temp/
-output/*.mp4
-output/*.png
-
-# Environment and secrets
-.env
-*.token
+output/
+scratch/
 assets/tech_clips/*.mp4
 assets/my_voice_*.mp3
+*.mp4
 
-cloudflared.exe
-temp/*
+# Environment, sessions, and cookies
+.env
+*.token
+*.log
 *.db
+*chrome_profile*
+chrome_profile/
+*.png
+*.jpg
+cloudflared.exe
