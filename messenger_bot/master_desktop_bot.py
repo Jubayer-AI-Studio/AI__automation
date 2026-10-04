@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 =============================================================================
 🤖 JUBAYER.DEV - UNIFIED MASTER DESKTOP AI AUTOMATOR (ALL-IN-ONE)
@@ -46,8 +46,9 @@ DATA_DIR = ROOT_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 REPLIED_COMMENTS_FILE = DATA_DIR / "replied_comments.json"
 
-MESSENGER_URL = "https://www.facebook.com/messages"
+MESSENGER_URL = "https://business.facebook.com/latest/inbox/all?asset_id=1354604231069150"
 JUBAYER_REELS_URL = "https://www.facebook.com/profile.php?id=61593846507081&sk=reels_tab"
+
 
 # কমেন্ট চেক করার বিরতি (সেকেন্ডে): ১০ মিনিট
 COMMENT_CHECK_INTERVAL = 600
@@ -159,9 +160,14 @@ class MasterDesktopAutomator:
         print("✅ [ট্যাব ২] রিলস সেকশন কানেক্টেড ও রেডি!")
 
     def scan_messenger(self):
-        """ট্যাব ১-এ মেসেঞ্জারের আনরিড চ্যাট চেক করে রিপ্লাই দেয়।"""
+        """ট্যাব ১-এ মেসেঞ্জারের আনরিড চ্যাট চেক করে রিপ্লাই দেয় (Meta Business Suite Inbox ও Standard Messenger উভয়ই সাপোর্ট করে)।"""
         try:
-            # নোটিফিকেশন ড্রপডাউন থাকলে ক্লোজ
+            curr_url = self.page_messenger.url.lower()
+            if "business.facebook.com" in curr_url or "inbox" in curr_url:
+                self.process_meta_inbox()
+                return
+
+            # স্ট্যান্ডার্ড ফেসবুক মেসেঞ্জার হ্যান্ডলার
             try:
                 if self.page_messenger.locator('div[aria-label="Notifications"]').is_visible():
                     self.page_messenger.keyboard.press("Escape")
@@ -185,6 +191,95 @@ class MasterDesktopAutomator:
                 self.process_active_messenger_chat()
             else:
                 self.process_active_messenger_chat()
+
+        except Exception:
+            pass
+
+    def process_meta_inbox(self):
+        """মেটা বিজনেস স্যুট ইনবক্স (Meta Business Suite Inbox) অটোমেশন হ্যান্ডলার।"""
+        try:
+            # ১. সেন্ডার নাম ডিটেক্ট করা
+            sender_name = self.page_messenger.evaluate('''() => {
+                const cards = document.querySelectorAll('div._5_n1');
+                for (const card of cards) {
+                    const lines = card.innerText.split('\\n').map(s => s.trim()).filter(Boolean);
+                    if (lines.length > 0 && lines[0].length < 40) return lines[0];
+                }
+                const viewProfile = Array.from(document.querySelectorAll('*')).find(el => (el.innerText || '').includes('View profile'));
+                if (viewProfile && viewProfile.parentElement) {
+                    const pText = viewProfile.parentElement.innerText || '';
+                    const lines = pText.split('\\n').map(s => s.trim()).filter(Boolean);
+                    if (lines.length > 0 && lines[0] !== 'View profile') return lines[0];
+                }
+                return "Facebook User";
+            }''')
+
+            # ২. লেটেস্ট মেসেজ বাব্ল এক্সট্র্যাক্ট করা
+            last_text = self.page_messenger.evaluate('''() => {
+                const nodes = document.querySelectorAll('div.x1y1aw1k, div[dir="auto"]');
+                const ignored = [
+                    'Inbox', 'All messages', 'Messenger', 'Instagram', 'Search', 'Manage',
+                    'Unread', 'Priority', 'Ad replies', 'Follow up', 'Create messaging ad',
+                    'Messaging insights', 'Message settings', 'To-dos', 'Open Dropdown',
+                    'Assign this conversation', 'View profile', 'Create order', 'Mark as lead',
+                    'Submit', 'More items', 'Collapse contact details'
+                ];
+                let latest = "";
+                for (const n of nodes) {
+                    const t = (n.innerText || '').trim();
+                    if (!t || ignored.some(ig => t.includes(ig)) || t.includes('Reply in Messenger') || t.includes('AM') || t.includes('PM')) {
+                        continue;
+                    }
+                    latest = t;
+                }
+                return latest;
+            }''')
+
+            if not last_text or len(last_text) < 1:
+                return
+
+            # যদি এটি আমাদের নিজের দেওয়া পূর্ববর্তী উত্তর হয় তাহলে স্কিপ
+            if any(w in last_text for w in ["জুবায়ের ভাই", "জুবায়ের স্যার", "আসসালামু আলাইকুম", "ল্যাবে ব্যস্ত", "অ্যাসিস্ট্যান্ট"]):
+                return
+
+            history_key = (sender_name, last_text)
+            if history_key in self.replied_msg_history:
+                return
+
+            print(f"\n📩 [মেটা ইনবক্স - {sender_name}]: \"{last_text}\"", flush=True)
+            print("🧠 এআই মেসেঞ্জার উত্তর তৈরি করছে...", flush=True)
+
+            ai_reply = call_gemini_api(
+                user_message=last_text,
+                sender_id=sender_name,
+                sender_name=sender_name,
+                platform="messenger"
+            )
+            print(f"🤖 [এআই উত্তর]: \"{ai_reply}\"", flush=True)
+
+            reply_box = self.page_messenger.locator('div[role="textbox"]').first
+            if not reply_box.is_visible():
+                return
+
+            reply_box.click()
+            time.sleep(0.5)
+
+            # টাইপ করা
+            for char in ai_reply:
+                self.page_messenger.keyboard.type(char, delay=random.randint(15, 35))
+            time.sleep(0.8)
+
+            # Send বাটন অথবা Enter
+            send_btn = self.page_messenger.locator('div[aria-label="Send"], button[aria-label="Send"], div[role="button"][aria-label="Send"]').first
+            if send_btn.is_visible():
+                send_btn.click()
+            else:
+                self.page_messenger.keyboard.press("Enter")
+            time.sleep(2)
+
+            print("🚀 মেটা বিজনেস ইনবক্সে এআই উত্তর পাঠানো হয়েছে!\n", flush=True)
+            self.replied_msg_history.add(history_key)
+            send_telegram_alert(sender_name, last_text, ai_reply, event_type="messenger")
 
         except Exception:
             pass
@@ -220,7 +315,7 @@ class MasterDesktopAutomator:
                 return
 
             print(f"\n📩 [মেসেঞ্জার - {sender_name}]: \"{last_text}\"", flush=True)
-            print("🧠 জেমিনি এআই মেসেঞ্জার উত্তর তৈরি করছে...", flush=True)
+            print("🧠 এআই মেসেঞ্জার উত্তর তৈরি করছে...", flush=True)
 
             ai_reply = call_gemini_api(
                 user_message=last_text,

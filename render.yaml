@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: jubayer-ai-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn messenger_bot.server:app
+    envVars:
+      - key: FB_VERIFY_TOKEN
+        value: jubayer_dev_webhook_2026
+      - key: FB_PAGE_ACCESS_TOKEN
+        sync: false
+      - key: GROK_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        value: 8638569113:AAHwY2Rd9Ueyx9kWKAGv6VYDELKnfRdQtEc
+      - key: TELEGRAM_CHAT_ID
+        value: 8273323826
