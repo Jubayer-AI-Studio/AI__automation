@@ -27,7 +27,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.config import GEMINI_API_KEY, GROK_API_KEY
+from src.config import GEMINI_API_KEY, GROK_API_KEY, GROQ_API_KEY
 from messenger_bot.leads_db import save_or_update_lead, extract_contact_info
 
 SYSTEM_PROMPT = """তুমি হলে "জুবায়ের এআই স্টুডিও" (Jubayer AI Studio) এবং জুবায়ের আহমেদ (Jubayer Ahmad)-এর অফিশিয়াল হাইপার-ইন্টেলিজেন্ট এআই অ্যাসিস্ট্যান্ট।
@@ -64,6 +64,47 @@ CANDIDATE_MODELS = [
 ]
 
 
+def call_groq_api(user_message: str, system_prompt: str = SYSTEM_PROMPT, history: list = None, max_tokens: int = 400) -> str:
+    """Groq LPU হাই-স্পিড এআই কল করে সুপার-স্মার্ট ও সাবলীল বাংলা উত্তর তৈরি করে।"""
+    api_key = os.getenv("GROQ_API_KEY", "").strip() or GROQ_API_KEY
+    if not api_key:
+        return ""
+
+    messages = [{"role": "system", "content": system_prompt}]
+    if history:
+        for role, text in history:
+            r = "assistant" if role in ("model", "assistant") else "user"
+            messages.append({"role": r, "content": text})
+    messages.append({"role": "user", "content": user_message})
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    # অতি-শক্তিশালী ওপেনএআই ও কুয়েন মডেল
+    for model_name in ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]:
+        payload = {
+            "messages": messages,
+            "model": model_name,
+            "temperature": 0.7,
+            "max_tokens": max_tokens
+        }
+        try:
+            res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=6.0)
+            if res.status_code == 200:
+                data = res.json()
+                reply = data["choices"][0]["message"]["content"].strip()
+                if reply:
+                    return reply
+            else:
+                print(f"[Groq Warning] Model {model_name} returned status {res.status_code}")
+        except Exception as ex:
+            print(f"[Groq Exception] Model {model_name} failed: {ex}")
+
+    return ""
+
+
 def call_grok_api(user_message: str, system_prompt: str = SYSTEM_PROMPT, history: list = None, max_tokens: int = 400) -> str:
     """xAI Grok API কল করে অতি-উচ্চ বুদ্ধিমত্তাসম্পন্ন (Hyper-Intelligent) উত্তর তৈরি করে।"""
     api_key = os.getenv("GROK_API_KEY", "").strip() or os.getenv("XAI_API_KEY", "").strip() or GROK_API_KEY
@@ -82,7 +123,6 @@ def call_grok_api(user_message: str, system_prompt: str = SYSTEM_PROMPT, history
         "Content-Type": "application/json"
     }
 
-    # xAI Grok মডেলসমূহ (অগ্রাধিকার ভিত্তিতে)
     for model_name in ["grok-2-latest", "grok-beta", "grok-2"]:
         payload = {
             "messages": messages,
@@ -107,7 +147,7 @@ def call_grok_api(user_message: str, system_prompt: str = SYSTEM_PROMPT, history
 
 
 def call_gemini_api(user_message: str, sender_id: str = "default_user", sender_name: str = "client", platform: str = "messenger") -> str:
-    """গ্রোক (xAI) বা জেমিনি এআই এপিআই কল করে জুবায়ের ভাইয়ের অ্যাসিস্ট্যান্ট হিসেবে উত্তর তৈরি করে এবং লিড সেভ করে।"""
+    """Groq, Grok বা Gemini এআই কল করে জুবায়ের ভাইয়ের অ্যাসিস্ট্যান্ট হিসেবে উত্তর তৈরি করে।"""
     # ১. সেন্ট্রাল ডাটাবেজে ক্লায়েন্ট মেসেজ ও লিড সেভ করা
     save_or_update_lead(
         platform=platform,
@@ -120,7 +160,15 @@ def call_gemini_api(user_message: str, sender_id: str = "default_user", sender_n
     history_key = f"{platform}_{sender_id}"
     history = CONVERSATION_HISTORY.get(history_key, [])
 
-    # ৩. Grok AI ট্রাই করা (সর্বোচ্চ অগ্রাধিকার - চরম বুদ্ধিমত্তা)
+    # ৩. Groq LPU ট্রাই করা (১ম অগ্রাধিকার - লাইটনিং ফাস্ট ও সুপার স্মার্ট)
+    groq_reply = call_groq_api(user_message=user_message, system_prompt=SYSTEM_PROMPT, history=history, max_tokens=350)
+    if groq_reply:
+        history.append(("user", user_message))
+        history.append(("assistant", groq_reply))
+        CONVERSATION_HISTORY[history_key] = history[-MAX_HISTORY_LEN:]
+        return groq_reply
+
+    # ৪. xAI Grok ট্রাই করা
     grok_reply = call_grok_api(user_message=user_message, system_prompt=SYSTEM_PROMPT, history=history, max_tokens=350)
     if grok_reply:
         history.append(("user", user_message))
@@ -128,8 +176,9 @@ def call_gemini_api(user_message: str, sender_id: str = "default_user", sender_n
         CONVERSATION_HISTORY[history_key] = history[-MAX_HISTORY_LEN:]
         return grok_reply
 
-    # ৪. Gemini AI ট্রাই করা (ফলব্যাক)
+    # ৫. Gemini AI ট্রাই করা (ফলব্যাক)
     api_key = os.getenv("GEMINI_API_KEY", "").strip() or GEMINI_API_KEY
+
     if api_key:
         contents = []
         for role, text in history:
@@ -256,14 +305,22 @@ def call_comment_ai(commenter_name: str, comment_text: str, post_context: str = 
         user_prompt += f"পোস্ট/ভিডিওর বিষয়: {post_context}\n"
     user_prompt += f"মন্তব্য: {comment_text}\n\nউপযুক্ত, আন্তরিক ও চমৎকার ফেসবুক কমেন্ট রিপ্লাই দিন:"
 
-    # ১. Grok ট্রাই করা
+    # ১. Groq ট্রাই করা
+    groq_reply = call_groq_api(user_message=user_prompt, system_prompt=COMMENT_REPLY_SYSTEM_PROMPT, max_tokens=150)
+    if groq_reply:
+        if (groq_reply.startswith('"') and groq_reply.endswith('"')) or (groq_reply.startswith("'") and groq_reply.endswith("'")):
+            groq_reply = groq_reply[1:-1].strip()
+        return groq_reply
+
+    # ২. Grok ট্রাই করা
     grok_reply = call_grok_api(user_message=user_prompt, system_prompt=COMMENT_REPLY_SYSTEM_PROMPT, max_tokens=150)
     if grok_reply:
         if (grok_reply.startswith('"') and grok_reply.endswith('"')) or (grok_reply.startswith("'") and grok_reply.endswith("'")):
             grok_reply = grok_reply[1:-1].strip()
         return grok_reply
 
-    # ২. Gemini ট্রাই করা
+    # ৩. Gemini ট্রাই করা
+
     api_key = os.getenv("GEMINI_API_KEY", "").strip() or GEMINI_API_KEY
     payload = {
         "system_instruction": {

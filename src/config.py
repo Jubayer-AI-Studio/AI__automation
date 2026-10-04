@@ -37,6 +37,9 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip() or "8273323826"
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip() or "AQ.Ab8RN6JDCgqPoakWFdH2q0aaN2eykJm8rTrplZQ1DyJV25z5cg"
 GROK_API_KEY = os.getenv("GROK_API_KEY", "").strip() or os.getenv("XAI_API_KEY", "").strip()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+
+
 
 # Video specs
 VIDEO_WIDTH = 1080
