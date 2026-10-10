@@ -1,0 +1,3240 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>হাসুনা ওয়ার্ক হাউস — সম্পূর্ণ Frontend Prototype</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:
+    "Noto Sans Bengali",
+    "Segoe UI",
+    Arial,
+    sans-serif;
+    background:#f5f7f6;
+    color:#17201c;
+    line-height:1.6;
+}
+
+:root{
+    --green:#08783f;
+    --green-dark:#045c31;
+    --green-light:#e8f7ef;
+    --red:#d62828;
+    --red-light:#fff0f0;
+    --white:#fff;
+    --gray:#6b756f;
+    --border:#dfe6e1;
+    --shadow:0 8px 25px rgba(0,0,0,.07);
+    --radius:18px;
+}
+
+a{
+    text-decoration:none;
+    color:inherit;
+}
+
+button,
+input,
+select,
+textarea{
+    font:inherit;
+}
+
+.container{
+    width:min(1200px,92%);
+    margin:auto;
+}
+
+.section{
+    padding:70px 0;
+}
+
+.section-title{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.section-title h2{
+    font-size:32px;
+    margin-bottom:10px;
+}
+
+.section-title p{
+    color:var(--gray);
+}
+
+/* ================= HEADER ================= */
+
+header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+}
+
+.navbar{
+    min-height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+    font-size:21px;
+}
+
+.logo-icon{
+    width:43px;
+    height:43px;
+    border-radius:12px;
+    background:linear-gradient(145deg,var(--green),#13a85f);
+    color:white;
+    display:grid;
+    place-items:center;
+    font-size:23px;
+}
+
+.logo span{
+    color:var(--green);
+}
+
+.nav-links{
+    display:flex;
+    gap:22px;
+    align-items:center;
+}
+
+.nav-links a{
+    font-size:14px;
+    color:#37433d;
+}
+
+.nav-links a:hover{
+    color:var(--green);
+}
+
+.nav-actions{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+
+.btn{
+    border:0;
+    cursor:pointer;
+    padding:11px 17px;
+    border-radius:11px;
+    font-weight:700;
+    transition:.2s;
+}
+
+.btn:hover{
+    transform:translateY(-1px);
+}
+
+.btn-green{
+    background:var(--green);
+    color:white;
+}
+
+.btn-red{
+    background:var(--red);
+    color:white;
+}
+
+.btn-outline{
+    background:white;
+    border:1px solid var(--border);
+}
+
+.btn-light{
+    background:var(--green-light);
+    color:var(--green-dark);
+}
+
+.lang{
+    padding:9px 12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:white;
+}
+
+/* ================= HERO ================= */
+
+.hero{
+    background:
+    radial-gradient(circle at 80% 20%,rgba(8,120,63,.12),transparent 30%),
+    linear-gradient(135deg,#ffffff,#eef9f2);
+    padding:75px 0 65px;
+}
+
+.hero-grid{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:50px;
+    align-items:center;
+}
+
+.badge{
+    display:inline-block;
+    padding:7px 13px;
+    border-radius:50px;
+    background:var(--green-light);
+    color:var(--green-dark);
+    font-weight:700;
+    font-size:13px;
+    margin-bottom:15px;
+}
+
+.hero h1{
+    font-size:52px;
+    line-height:1.15;
+    margin-bottom:18px;
+}
+
+.hero h1 span{
+    color:var(--green);
+}
+
+.hero-text{
+    color:var(--gray);
+    font-size:17px;
+    max-width:650px;
+    margin-bottom:25px;
+}
+
+.hero-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.search-box{
+    margin-top:30px;
+    background:white;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:12px;
+    display:flex;
+    gap:10px;
+    box-shadow:var(--shadow);
+}
+
+.search-box input{
+    flex:1;
+    border:0;
+    outline:0;
+    padding:10px;
+}
+
+.voice{
+    width:45px;
+    border:0;
+    border-radius:11px;
+    background:#f1f5f3;
+    cursor:pointer;
+}
+
+.hero-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:25px;
+    padding:25px;
+    box-shadow:var(--shadow);
+}
+
+.hero-card-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.location-card{
+    padding:17px;
+    border-radius:15px;
+    background:var(--green-light);
+    margin-bottom:15px;
+}
+
+.location-card small{
+    color:var(--gray);
+}
+
+.location-card strong{
+    display:block;
+    font-size:19px;
+    margin-top:5px;
+}
+
+/* ================= QUICK ACTION ================= */
+
+.quick-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:22px;
+}
+
+.action-card{
+    background:white;
+    padding:28px;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--border);
+}
+
+.action-card.worker{
+    border-top:5px solid var(--green);
+}
+
+.action-card.employer{
+    border-top:5px solid var(--red);
+}
+
+.action-card h3{
+    font-size:24px;
+    margin-bottom:8px;
+}
+
+.action-card p{
+    color:var(--gray);
+    margin-bottom:20px;
+}
+
+/* ================= LOCATION ================= */
+
+.location-section{
+    background:#fff;
+}
+
+.location-path{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
+}
+
+.path-item{
+    background:#f2f5f3;
+    border:1px solid var(--border);
+    padding:9px 13px;
+    border-radius:10px;
+}
+
+.location-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.location-option{
+    background:white;
+    border:1px solid var(--border);
+    padding:18px;
+    border-radius:14px;
+    cursor:pointer;
+}
+
+.location-option:hover{
+    border-color:var(--green);
+    background:var(--green-light);
+}
+
+.location-option small{
+    color:var(--gray);
+}
+
+/* ================= CATEGORIES ================= */
+
+.category-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}
+
+.category{
+    background:white;
+    border:1px solid var(--border);
+    padding:20px 15px;
+    border-radius:16px;
+    text-align:center;
+    transition:.2s;
+}
+
+.category:hover{
+    transform:translateY(-3px);
+    box-shadow:var(--shadow);
+}
+
+.category-icon{
+    width:52px;
+    height:52px;
+    border-radius:15px;
+    background:var(--green-light);
+    display:grid;
+    place-items:center;
+    margin:0 auto 10px;
+    font-size:25px;
+}
+
+.category p{
+    color:var(--gray);
+    font-size:13px;
+}
+
+/* ================= JOB FILTER ================= */
+
+.filter-bar{
+    background:white;
+    padding:18px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+    margin-bottom:25px;
+}
+
+.filter-bar select,
+.filter-bar input{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+    background:white;
+}
+
+/* ================= JOBS ================= */
+
+.job-layout{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:25px;
+}
+
+.job-list{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.job-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:20px;
+}
+
+.job-header{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.job-title{
+    font-size:19px;
+    font-weight:800;
+}
+
+.job-company{
+    color:var(--gray);
+    font-size:13px;
+}
+
+.job-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:14px 0;
+}
+
+.meta{
+    background:#f3f6f4;
+    padding:6px 9px;
+    border-radius:8px;
+    font-size:12px;
+}
+
+.pay{
+    color:var(--green);
+    font-weight:800;
+}
+
+.job-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+}
+
+.rating{
+    color:#b57900;
+    font-weight:700;
+}
+
+.sidebar-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:20px;
+    margin-bottom:15px;
+}
+
+.sidebar-card h3{
+    margin-bottom:12px;
+}
+
+/* ================= WORKER ================= */
+
+.worker-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.worker-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+}
+
+.avatar{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:linear-gradient(145deg,#d8eee2,#f2f7f4);
+    display:grid;
+    place-items:center;
+    font-size:25px;
+    margin-bottom:13px;
+}
+
+.worker-card h3{
+    margin-bottom:3px;
+}
+
+.worker-location{
+    color:var(--gray);
+    font-size:13px;
+}
+
+.skill-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:14px 0;
+}
+
+.tag{
+    padding:5px 8px;
+    border-radius:7px;
+    background:var(--green-light);
+    color:var(--green-dark);
+    font-size:11px;
+}
+
+/* ================= PROFILE PREVIEW ================= */
+
+.profile{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:22px;
+    overflow:hidden;
+}
+
+.profile-cover{
+    height:130px;
+    background:linear-gradient(120deg,var(--green),#16a160);
+}
+
+.profile-body{
+    padding:25px;
+    margin-top:-50px;
+}
+
+.profile-avatar{
+    width:95px;
+    height:95px;
+    border-radius:50%;
+    background:#fff;
+    border:5px solid white;
+    display:grid;
+    place-items:center;
+    font-size:38px;
+    box-shadow:var(--shadow);
+}
+
+.profile-info{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+    margin-top:15px;
+}
+
+.profile-stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.stat-box{
+    background:#f4f7f5;
+    padding:15px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.stat-box strong{
+    display:block;
+    font-size:22px;
+}
+
+/* ================= RATING ================= */
+
+.review-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:17px;
+}
+
+.review{
+    background:white;
+    border:1px solid var(--border);
+    padding:20px;
+    border-radius:16px;
+}
+
+.review-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.mini-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#e8f1ec;
+    display:grid;
+    place-items:center;
+}
+
+.stars{
+    color:#d38b00;
+}
+
+/* ================= SAFETY ================= */
+
+.safety{
+    background:#fff4f4;
+}
+
+.safety-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.safety-card{
+    background:white;
+    border:1px solid #f1dada;
+    padding:20px;
+    border-radius:15px;
+}
+
+.safety-card h3{
+    margin:8px 0;
+}
+
+.safety-card p{
+    color:var(--gray);
+    font-size:13px;
+}
+
+/* ================= PRIVACY ================= */
+
+.privacy-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+.privacy-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:25px;
+}
+
+.check-list{
+    list-style:none;
+}
+
+.check-list li{
+    margin:10px 0;
+    padding-left:27px;
+    position:relative;
+}
+
+.check-list li:before{
+    content:"✓";
+    position:absolute;
+    left:0;
+    color:var(--green);
+    font-weight:bold;
+}
+
+/* ================= NOTIFICATIONS ================= */
+
+.notification-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.notification{
+    display:flex;
+    gap:13px;
+    padding:15px;
+    border-bottom:1px solid var(--border);
+}
+
+.notification-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:var(--green-light);
+    display:grid;
+    place-items:center;
+}
+
+/* ================= STATS ================= */
+
+.stats-section{
+    background:linear-gradient(135deg,var(--green-dark),var(--green));
+    color:white;
+}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.big-stat{
+    text-align:center;
+    padding:20px;
+}
+
+.big-stat strong{
+    font-size:38px;
+    display:block;
+}
+
+.big-stat span{
+    opacity:.85;
+}
+
+/* ================= POST JOB ================= */
+
+.form-preview{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:25px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+.field label{
+    font-weight:700;
+    font-size:14px;
+}
+
+.field input,
+.field select,
+.field textarea{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    outline:none;
+}
+
+.pay-options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.pay-option{
+    border:1px solid var(--border);
+    padding:9px 13px;
+    border-radius:9px;
+}
+
+.required{
+    color:var(--red);
+}
+
+/* ================= APP SCREENS ================= */
+
+.screen-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.screen{
+    background:#17201c;
+    border-radius:25px;
+    padding:10px;
+    box-shadow:var(--shadow);
+}
+
+.phone{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    min-height:420px;
+}
+
+.phone-top{
+    background:var(--green);
+    color:white;
+    padding:18px;
+}
+
+.phone-body{
+    padding:15px;
+}
+
+.phone-item{
+    padding:12px;
+    background:#f3f6f4;
+    border-radius:11px;
+    margin-bottom:8px;
+    font-size:12px;
+}
+
+/* ================= FAQ ================= */
+
+.faq{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.faq-item{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+}
+
+.faq-item h3{
+    font-size:16px;
+    margin-bottom:7px;
+}
+
+.faq-item p{
+    color:var(--gray);
+    font-size:13px;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+    background:#111a15;
+    color:#dce5df;
+    padding:55px 0 25px;
+}
+
+.footer-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr 1fr;
+    gap:35px;
+}
+
+footer h3{
+    color:white;
+    margin-bottom:13px;
+}
+
+footer p,
+footer li{
+    color:#aebbb3;
+    font-size:13px;
+}
+
+footer ul{
+    list-style:none;
+}
+
+footer li{
+    margin:7px 0;
+}
+
+.footer-bottom{
+    border-top:1px solid #29342e;
+    margin-top:35px;
+    padding-top:20px;
+    text-align:center;
+    font-size:12px;
+    color:#849189;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:900px){
+
+    .nav-links{
+        display:none;
+    }
+
+    .hero-grid,
+    .job-layout,
+    .privacy-grid,
+    .notification-grid{
+        grid-template-columns:1fr;
+    }
+
+    .category-grid,
+    .worker-grid,
+    .review-grid,
+    .safety-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .location-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .screen-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .footer-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .section{
+        padding:50px 0;
+    }
+
+    .hero{
+        padding:50px 0;
+    }
+
+    .hero h1{
+        font-size:35px;
+    }
+
+    .hero-grid{
+        grid-template-columns:1fr;
+    }
+
+    .quick-grid{
+        grid-template-columns:1fr;
+    }
+
+    .category-grid,
+    .worker-grid,
+    .review-grid,
+    .safety-grid,
+    .location-grid{
+        grid-template-columns:1fr;
+    }
+
+    .filter-bar{
+        grid-template-columns:1fr;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .field.full{
+        grid-column:auto;
+    }
+
+    .screen-grid{
+        grid-template-columns:1fr;
+    }
+
+    .footer-grid{
+        grid-template-columns:1fr;
+    }
+
+    .nav-actions .btn-outline{
+        display:none;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<!-- =========================================================
+HEADER
+========================================================= -->
+
+<header>
+
+<div class="container navbar">
+
+<a href="#" class="logo">
+<div class="logo-icon">ক</div>
+<div>
+<span>হাসুনা</span> ওয়ার্ক হাউস
+</div>
+</a>
+
+<nav class="nav-links">
+<a href="#jobs">কাজ খুঁজুন</a>
+<a href="#workers">কর্মী খুঁজুন</a>
+<a href="#categories">কাজের ধরন</a>
+<a href="#safety">নিরাপত্তা</a>
+<a href="#about">আমাদের সম্পর্কে</a>
+</nav>
+
+<div class="nav-actions">
+
+<select class="lang">
+<option>বাংলা</option>
+<option>English</option>
+</select>
+
+<button class="btn btn-outline">লগইন</button>
+
+<button class="btn btn-green">অ্যাকাউন্ট খুলুন</button>
+
+</div>
+
+</div>
+
+</header>
+
+
+<!-- =========================================================
+HERO
+========================================================= -->
+
+<section class="hero">
+
+<div class="container hero-grid">
+
+<div>
+
+<div class="badge">
+🇧🇩 বাংলাদেশের মানুষের জন্য কাজের একটি উন্মুক্ত প্ল্যাটফর্ম
+</div>
+
+<h1>
+কাজ খুঁজুন।<br>
+কাজ দিন।<br>
+<span>এগিয়ে যান।</span>
+</h1>
+
+<p class="hero-text">
+
+আপনি বাংলাদেশের যেকোনো জায়গায় থাকুন—
+আপনার পছন্দের এলাকায় উপযুক্ত বৈধ কাজ খুঁজুন।
+আবার প্রয়োজন হলে আপনার এলাকায় কর্মীও খুঁজে নিন।
+
+</p>
+
+<div class="hero-actions">
+
+<button class="btn btn-green">
+🔎 আমি কাজ খুঁজছি
+</button>
+
+<button class="btn btn-red">
+👷 আমার একজন কর্মী দরকার
+</button>
+
+</div>
+
+
+<div class="search-box">
+
+<input
+type="text"
+placeholder="যেমন: আমার এলাকায় একদিনের কোনো কাজ আছে?"
+>
+
+<button class="voice">
+🎙️
+</button>
+
+<button class="btn btn-green">
+খুঁজুন
+</button>
+
+</div>
+
+</div>
+
+
+<div class="hero-card">
+
+<div class="hero-card-top">
+
+<strong>📍 আপনার পছন্দের এলাকা</strong>
+
+<button class="btn btn-light">পরিবর্তন</button>
+
+</div>
+
+
+<div class="location-card">
+
+<small>বর্তমান নির্বাচিত এলাকা</small>
+
+<strong>ঢাকা → রামপুরা → বনশ্রী</strong>
+
+</div>
+
+
+<div class="location-card">
+
+<small>আরও সংরক্ষিত এলাকা</small>
+
+<strong>চট্টগ্রাম → কুমিল্লা → রাজশাহী</strong>
+
+</div>
+
+
+<div style="margin-top:20px">
+
+<strong>আজ আপনার জন্য</strong>
+
+<div style="display:flex;justify-content:space-between;margin-top:10px">
+
+<span>কাজ পাওয়া গেছে</span>
+
+<b style="color:var(--green)">২৪টি</b>
+
+</div>
+
+<div style="display:flex;justify-content:space-between;margin-top:8px">
+
+<span>নতুন কাজ</span>
+
+<b style="color:var(--red)">৭টি</b>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+QUICK ACTION
+========================================================= -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>আপনি কী করতে চান?</h2>
+
+<p>একটি পথ বেছে নিন</p>
+
+</div>
+
+
+<div class="quick-grid">
+
+<div class="action-card worker">
+
+<h3>👨‍🔧 আমি কাজ খুঁজছি</h3>
+
+<p>
+দৈনিক, অস্থায়ী, পার্টটাইম, ফুলটাইম,
+চুক্তিভিত্তিক বা দক্ষতার কাজ খুঁজুন।
+</p>
+
+<button class="btn btn-green">
+কাজ খুঁজতে শুরু করুন →
+</button>
+
+</div>
+
+
+<div class="action-card employer">
+
+<h3>🏢 আমার একজন কর্মী দরকার</h3>
+
+<p>
+আপনার প্রয়োজন অনুযায়ী আপনার এলাকার
+উপযুক্ত কর্মী খুঁজুন বা কাজের পোস্ট দিন।
+</p>
+
+<button class="btn btn-red">
+কর্মী খুঁজতে শুরু করুন →
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+LOCATION
+========================================================= -->
+
+<section class="section location-section">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>📍 কোথায় কাজ করতে চান?</h2>
+
+<p>
+স্থায়ী বাড়ি নয়—আপনি যেখানে কাজ করতে চান, সেই এলাকা নির্বাচন করুন।
+</p>
+
+</div>
+
+
+<div class="location-path">
+
+<div class="path-item">🇧🇩 বাংলাদেশ</div>
+<span>›</span>
+<div class="path-item">ঢাকা বিভাগ</div>
+<span>›</span>
+<div class="path-item">ঢাকা জেলা</div>
+<span>›</span>
+<div class="path-item">রামপুরা থানা</div>
+<span>›</span>
+<div class="path-item">বনশ্রী</div>
+
+</div>
+
+
+<div class="location-grid">
+
+<div class="location-option">
+<strong>ঢাকা</strong>
+<small>বিভাগ</small>
+</div>
+
+<div class="location-option">
+<strong>চট্টগ্রাম</strong>
+<small>বিভাগ</small>
+</div>
+
+<div class="location-option">
+<strong>রাজশাহী</strong>
+<small>বিভাগ</small>
+</div>
+
+<div class="location-option">
+<strong>খুলনা</strong>
+<small>বিভাগ</small>
+</div>
+
+<div class="location-option">
+<strong>বরিশাল</strong>
+<small>বিভাগ</small>
+</div>
+
+<div class="location-option">
+<strong>সিলেট</strong>
+<small>বিভাগ</small>
+</div>
+
+<div class="location-option">
+<strong>রংপুর</strong>
+<small>বিভাগ</small>
+</div>
+
+<div class="location-option">
+<strong>ময়মনসিংহ</strong>
+<small>বিভাগ</small>
+</div>
+
+</div>
+
+
+<div style="margin-top:25px;padding:20px;background:#f5faf7;border-radius:15px">
+
+<strong>⭐ সংরক্ষিত এলাকা</strong>
+
+<p style="color:var(--gray);margin-top:5px">
+বনশ্রী, মিরপুর, উত্তরা, চট্টগ্রাম শহর
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+CATEGORIES
+========================================================= -->
+
+<section class="section" id="categories">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>কাজের ধরন</h2>
+
+<p>ছোট কাজ থেকে পেশাদার কাজ—সব এক জায়গায়</p>
+
+</div>
+
+
+<div class="category-grid">
+
+<div class="category">
+<div class="category-icon">👷</div>
+<strong>দৈনিক / অস্থায়ী</strong>
+<p>১ দিন, কয়েক দিন বা স্বল্প সময়</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🏪</div>
+<strong>দোকান / ব্যবসা</strong>
+<p>সেলস, ক্যাশিয়ার, সহকারী</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🏠</div>
+<strong>বাসাবাড়ি</strong>
+<p>রান্না, পরিষ্কার, পরিচর্যা</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🛡️</div>
+<strong>নিরাপত্তা</strong>
+<p>গার্ড, নাইট গার্ড, পাহারা</p>
+</div>
+
+<div class="category">
+<div class="category-icon">📚</div>
+<strong>শিক্ষা</strong>
+<p>শিক্ষক, টিউটর, প্রশিক্ষক</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🕌</div>
+<strong>মসজিদ / মাদরাসা</strong>
+<p>ইমাম, মুয়াজ্জিন, শিক্ষক</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🔧</div>
+<strong>কারিগরি</strong>
+<p>ইলেকট্রিশিয়ান, প্লাম্বার, মিস্ত্রি</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🚗</div>
+<strong>ড্রাইভিং / ডেলিভারি</strong>
+<p>ড্রাইভার, ডেলিভারি, হেলপার</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🍽️</div>
+<strong>হোটেল / রেস্টুরেন্ট</strong>
+<p>শেফ, ওয়েটার, কিচেন সহকারী</p>
+</div>
+
+<div class="category">
+<div class="category-icon">💻</div>
+<strong>অফিস / কম্পিউটার</strong>
+<p>ডাটা এন্ট্রি, অপারেটর, সহকারী</p>
+</div>
+
+<div class="category">
+<div class="category-icon">🎨</div>
+<strong>ক্রিয়েটিভ / ডিজাইন</strong>
+<p>গ্রাফিক, ভিডিও, কনটেন্ট</p>
+</div>
+
+<div class="category">
+<div class="category-icon">💼</div>
+<strong>স্থায়ী চাকরি</strong>
+<p>ফুলটাইম ও দীর্ঘমেয়াদি কাজ</p>
+</div>
+
+</div>
+
+<div style="text-align:center;margin-top:25px">
+
+<button class="btn btn-outline">
+আরও কাজের ধরন দেখুন →
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+JOB SEARCH
+========================================================= -->
+
+<section class="section" id="jobs">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>🔎 আপনার এলাকায় পাওয়া কাজ</h2>
+
+<p>ঢাকা → রামপুরা → বনশ্রী</p>
+
+</div>
+
+
+<div class="filter-bar">
+
+<select>
+<option>সব কাজ</option>
+<option>দৈনিক</option>
+<option>অস্থায়ী</option>
+<option>পার্টটাইম</option>
+<option>স্থায়ী</option>
+</select>
+
+<select>
+<option>সব ক্যাটাগরি</option>
+<option>দোকান</option>
+<option>রেস্টুরেন্ট</option>
+<option>কারিগরি</option>
+</select>
+
+<select>
+<option>সময়</option>
+<option>আজ</option>
+<option>এই সপ্তাহ</option>
+</select>
+
+<select>
+<option>পারিশ্রমিক</option>
+<option>৳৫০০</option>
+<option>৳৫০০+</option>
+<option>আলোচনা সাপেক্ষে</option>
+</select>
+
+<button class="btn btn-green">
+ফিল্টার
+</button>
+
+</div>
+
+
+<div class="job-layout">
+
+<div class="job-list">
+
+
+<div class="job-card">
+
+<div class="job-header">
+
+<div>
+<div class="job-title">
+রেস্টুরেন্টে কিচেন সহকারী
+</div>
+
+<div class="job-company">
+একটি স্থানীয় রেস্টুরেন্ট
+</div>
+</div>
+
+<span class="badge">নতুন</span>
+
+</div>
+
+<div class="job-meta">
+
+<span class="meta">📍 বনশ্রী</span>
+<span class="meta">⏰ আজ ৪টা–১০টা</span>
+<span class="meta">👥 ২ জন</span>
+<span class="meta">🍽️ রেস্টুরেন্ট</span>
+
+</div>
+
+<div class="job-footer">
+
+<div class="pay">৳৬০০ / দিন</div>
+
+<div>
+<span class="rating">★ ৪.৭</span>
+<button class="btn btn-light">বিস্তারিত</button>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="job-card">
+
+<div class="job-header">
+
+<div>
+
+<div class="job-title">
+বাসার বৈদ্যুতিক কাজ
+</div>
+
+<div class="job-company">
+ব্যক্তিগত নিয়োগকারী
+</div>
+
+</div>
+
+<span class="badge">আজ</span>
+
+</div>
+
+<div class="job-meta">
+
+<span class="meta">📍 রামপুরা</span>
+<span class="meta">⏰ ২–৩ ঘণ্টা</span>
+<span class="meta">🔧 ইলেকট্রিশিয়ান</span>
+
+</div>
+
+<div class="job-footer">
+
+<div class="pay">আলোচনা সাপেক্ষে</div>
+
+<div>
+
+<span class="rating">★ ৪.৯</span>
+
+<button class="btn btn-light">
+বিস্তারিত
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="job-card">
+
+<div class="job-header">
+
+<div>
+
+<div class="job-title">
+দোকানে সেলস সহকারী
+</div>
+
+<div class="job-company">
+স্থানীয় ব্যবসা প্রতিষ্ঠান
+</div>
+
+</div>
+
+</div>
+
+<div class="job-meta">
+
+<span class="meta">📍 মেরাদিয়া</span>
+<span class="meta">⏰ ফুলটাইম</span>
+<span class="meta">🏪 দোকান</span>
+
+</div>
+
+<div class="job-footer">
+
+<div class="pay">৳১২,০০০–৳১৫,০০০ / মাস</div>
+
+<button class="btn btn-light">
+বিস্তারিত
+</button>
+
+</div>
+
+</div>
+
+
+<div class="job-card">
+
+<div class="job-header">
+
+<div>
+
+<div class="job-title">
+একদিনের মালামাল ওঠানো-নামানো
+</div>
+
+<div class="job-company">
+ব্যক্তিগত নিয়োগকারী
+</div>
+
+</div>
+
+</div>
+
+<div class="job-meta">
+
+<span class="meta">📍 খিলগাঁও</span>
+<span class="meta">⏰ সকাল ৯টা–বিকাল ৪টা</span>
+<span class="meta">👥 ৪ জন</span>
+
+</div>
+
+<div class="job-footer">
+
+<div class="pay">৳৭০০ / দিন</div>
+
+<button class="btn btn-light">
+বিস্তারিত
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div>
+
+<div class="sidebar-card">
+
+<h3>📌 এই এলাকায়</h3>
+
+<p>আজ নতুন কাজ</p>
+
+<h2 style="color:var(--green)">২৪টি</h2>
+
+<hr style="border:0;border-top:1px solid var(--border);margin:15px 0">
+
+<p>নতুন নিয়োগকারী</p>
+
+<h2 style="color:var(--red)">৮ জন</h2>
+
+</div>
+
+
+<div class="sidebar-card">
+
+<h3>🔔 কাজের নোটিফিকেশন</h3>
+
+<p style="color:var(--gray);font-size:13px">
+
+আপনার পছন্দের এলাকায় নতুন কাজ এলে
+আপনাকে জানানো হবে।
+
+</p>
+
+<button class="btn btn-green" style="margin-top:12px">
+নোটিফিকেশন চালু করুন
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+POST JOB
+========================================================= -->
+
+<section class="section" style="background:#eef8f2">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>📢 কাজের পোস্ট দেওয়ার Preview</h2>
+
+<p>প্রয়োজনীয় তথ্য না দিলে পোস্ট প্রকাশ হবে না</p>
+
+</div>
+
+
+<div class="form-preview">
+
+<div class="form-grid">
+
+
+<div class="field full">
+
+<label>কী কাজ? <span class="required">*</span></label>
+
+<input
+placeholder="যেমন: একজন ইলেকট্রিশিয়ান প্রয়োজন"
+/>
+
+</div>
+
+
+<div class="field">
+
+<label>কাজের এলাকা <span class="required">*</span></label>
+
+<select>
+
+<option>ঢাকা → রামপুরা → বনশ্রী</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>কতক্ষণ / কতদিন? <span class="required">*</span></label>
+
+<input
+placeholder="যেমন: ১ দিন / ৫ ঘণ্টা"
+/>
+
+</div>
+
+
+<div class="field">
+
+<label>কতজন কর্মী প্রয়োজন?</label>
+
+<input
+placeholder="যেমন: ২ জন"
+/>
+
+</div>
+
+
+<div class="field">
+
+<label>কাজের ধরন</label>
+
+<select>
+
+<option>দৈনিক / অস্থায়ী</option>
+<option>পার্টটাইম</option>
+<option>ফুলটাইম</option>
+<option>চুক্তিভিত্তিক</option>
+
+</select>
+
+</div>
+
+
+<div class="field full">
+
+<label>পারিশ্রমিকের ধরন <span class="required">*</span></label>
+
+<div class="pay-options">
+
+<div class="pay-option">৳৫০০</div>
+
+<div class="pay-option">৳৩০০–৳৫০০</div>
+
+<div class="pay-option">৳৫০০+</div>
+
+<div class="pay-option">
+আলোচনা সাপেক্ষে
+</div>
+
+</div>
+
+</div>
+
+
+<div class="field full">
+
+<label>যোগাযোগের মাধ্যম <span class="required">*</span></label>
+
+<div class="pay-options">
+
+<div class="pay-option">📞 ফোন</div>
+
+<div class="pay-option">🟢 WhatsApp</div>
+
+<div class="pay-option">📞 ফোন + WhatsApp</div>
+
+</div>
+
+</div>
+
+
+<div class="field full">
+
+<label>অতিরিক্ত বিস্তারিত</label>
+
+<textarea rows="4"
+placeholder="কাজ সম্পর্কে প্রয়োজনীয় তথ্য লিখুন..."></textarea>
+
+</div>
+
+
+<div class="field full">
+
+<label>
+
+☑️ আমি নিশ্চিত করছি যে কাজটি বৈধ এবং কর্মীর কাছ থেকে
+কাজ পাওয়ার জন্য কোনো অগ্রিম টাকা নেওয়া হবে না।
+
+</label>
+
+</div>
+
+
+<div class="field full">
+
+<button class="btn btn-red" style="width:100%">
+📢 কাজের পোস্ট প্রকাশ করুন
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+WORKER SEARCH
+========================================================= -->
+
+<section class="section" id="workers">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>👷 কর্মী খুঁজুন</h2>
+
+<p>আপনার এলাকার দক্ষতা অনুযায়ী কর্মী খুঁজুন</p>
+
+</div>
+
+
+<div class="filter-bar">
+
+<select>
+<option>এলাকা: বনশ্রী</option>
+</select>
+
+<select>
+<option>সব দক্ষতা</option>
+<option>ইলেকট্রিশিয়ান</option>
+<option>প্লাম্বার</option>
+<option>ড্রাইভার</option>
+<option>রাঁধুনি</option>
+</select>
+
+<select>
+<option>কাজের ধরন</option>
+</select>
+
+<select>
+<option>অভিজ্ঞতা</option>
+</select>
+
+<button class="btn btn-green">
+খুঁজুন
+</button>
+
+</div>
+
+
+<div class="worker-grid">
+
+
+<div class="worker-card">
+
+<div class="avatar">👨‍🔧</div>
+
+<h3>মো. রাকিব</h3>
+
+<div class="worker-location">
+📍 রামপুরা, ঢাকা
+</div>
+
+<div class="skill-tags">
+
+<span class="tag">ইলেকট্রিশিয়ান</span>
+<span class="tag">বাসার কাজ</span>
+<span class="tag">৩+ বছর অভিজ্ঞতা</span>
+
+</div>
+
+<div class="rating">★ ৪.৮ (৩২ কাজ)</div>
+
+<button class="btn btn-green" style="width:100%;margin-top:15px">
+প্রোফাইল দেখুন
+</button>
+
+</div>
+
+
+<div class="worker-card">
+
+<div class="avatar">👨‍🍳</div>
+
+<h3>আবু বকর</h3>
+
+<div class="worker-location">
+📍 বনশ্রী, ঢাকা
+</div>
+
+<div class="skill-tags">
+
+<span class="tag">রাঁধুনি</span>
+<span class="tag">রেস্টুরেন্ট</span>
+<span class="tag">৫ বছর অভিজ্ঞতা</span>
+
+</div>
+
+<div class="rating">★ ৪.৯ (৪৭ কাজ)</div>
+
+<button class="btn btn-green" style="width:100%;margin-top:15px">
+প্রোফাইল দেখুন
+</button>
+
+</div>
+
+
+<div class="worker-card">
+
+<div class="avatar">👨‍💻</div>
+
+<h3>সাইফুল</h3>
+
+<div class="worker-location">
+📍 মিরপুর, ঢাকা
+</div>
+
+<div class="skill-tags">
+
+<span class="tag">ডাটা এন্ট্রি</span>
+<span class="tag">কম্পিউটার</span>
+<span class="tag">২ বছর অভিজ্ঞতা</span>
+
+</div>
+
+<div class="rating">★ ৪.৭ (১৮ কাজ)</div>
+
+<button class="btn btn-green" style="width:100%;margin-top:15px">
+প্রোফাইল দেখুন
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+PROFILE
+========================================================= -->
+
+<section class="section" style="background:#eef3f0">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>👤 Worker Profile Preview</h2>
+
+<p>ব্যক্তিগত গোপনীয়তা বজায় রেখে প্রয়োজনীয় তথ্য</p>
+
+</div>
+
+
+<div class="profile">
+
+<div class="profile-cover"></div>
+
+<div class="profile-body">
+
+<div class="profile-avatar">👨‍🔧</div>
+
+<div class="profile-info">
+
+<div>
+
+<h2>মো. রাকিব</h2>
+
+<p style="color:var(--gray)">
+📍 বর্তমানে কাজ করতে চান: রামপুরা, ঢাকা
+</p>
+
+<div class="skill-tags">
+
+<span class="tag">ইলেকট্রিশিয়ান</span>
+<span class="tag">ফ্যান</span>
+<span class="tag">লাইট</span>
+<span class="tag">ওয়্যারিং</span>
+
+</div>
+
+<p style="margin-top:15px">
+
+দক্ষতা:
+বাসাবাড়ির বৈদ্যুতিক কাজ, লাইট, ফ্যান,
+সুইচ, ছোটখাটো ওয়্যারিং ইত্যাদি।
+
+</p>
+
+</div>
+
+
+<div>
+
+<div class="profile-stats">
+
+<div class="stat-box">
+
+<strong>৪.৮</strong>
+
+<span>রেটিং</span>
+
+</div>
+
+<div class="stat-box">
+
+<strong>৩২</strong>
+
+<span>সম্পন্ন কাজ</span>
+
+</div>
+
+<div class="stat-box">
+
+<strong>৩+</strong>
+
+<span>বছর অভিজ্ঞতা</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div style="margin-top:25px;padding:18px;background:#f6f8f7;border-radius:14px">
+
+<strong>🔒 গোপনীয়তা</strong>
+
+<p style="color:var(--gray);font-size:13px;margin-top:5px">
+
+আগে কোথায় কাজ করেছেন, কত টাকা আয় করেছেন,
+এ ধরনের ব্যক্তিগত বিস্তারিত ইতিহাস সাধারণভাবে
+সবার সামনে দেখানো হবে না।
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+RATING
+========================================================= -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>⭐ Rating & Review</h2>
+
+<p>সম্পন্ন কাজের পর দুই পক্ষই একে অপরকে রেট করতে পারবে</p>
+
+</div>
+
+
+<div class="review-grid">
+
+
+<div class="review">
+
+<div class="review-head">
+
+<div class="mini-avatar">👨</div>
+
+<div>
+
+<strong>নিয়োগকারী</strong>
+
+<div class="stars">★★★★★</div>
+
+</div>
+
+</div>
+
+<p>
+“সময়মতো এসেছেন এবং কাজ ভালোভাবে করেছেন।”
+</p>
+
+</div>
+
+
+<div class="review">
+
+<div class="review-head">
+
+<div class="mini-avatar">👩</div>
+
+<div>
+
+<strong>কর্মী</strong>
+
+<div class="stars">★★★★★</div>
+
+</div>
+
+</div>
+
+<p>
+“কাজের আগে পারিশ্রমিক ও সময় পরিষ্কারভাবে জানানো হয়েছিল।”
+</p>
+
+</div>
+
+
+<div class="review">
+
+<div class="review-head">
+
+<div class="mini-avatar">👨</div>
+
+<div>
+
+<strong>নিয়োগকারী</strong>
+
+<div class="stars">★★★★☆</div>
+
+</div>
+
+</div>
+
+<p>
+“ভালো ব্যবহার এবং কাজের অভিজ্ঞতা ছিল।”
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+SAFETY
+========================================================= -->
+
+<section class="section safety" id="safety">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>🛡️ নিরাপত্তা ও বিশ্বাস</h2>
+
+<p>কাজ খোঁজা এবং কাজ দেওয়ার সময় নিরাপদ থাকার জন্য</p>
+
+</div>
+
+
+<div class="safety-grid">
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">🚫</div>
+
+<h3>অগ্রিম টাকা নয়</h3>
+
+<p>
+কাজ পাওয়ার জন্য কর্মীর কাছ থেকে
+অগ্রিম টাকা চাওয়া নিষিদ্ধ।
+</p>
+
+</div>
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">🚨</div>
+
+<h3>Report</h3>
+
+<p>
+ভুয়া কাজ, প্রতারণা, হয়রানি বা
+অন্যায় আচরণ রিপোর্ট করা যাবে।
+</p>
+
+</div>
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">🚫</div>
+
+<h3>Block</h3>
+
+<p>
+সমস্যাজনক ব্যক্তি বা নিয়োগকারীকে
+ব্লক করা যাবে।
+</p>
+
+</div>
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">✅</div>
+
+<h3>Verification</h3>
+
+<p>
+প্রয়োজন অনুযায়ী যাচাইকৃত
+প্রোফাইলের সুবিধা রাখা যাবে।
+</p>
+
+</div>
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">🔐</div>
+
+<h3>Privacy</h3>
+
+<p>
+ব্যক্তিগত কাজের ইতিহাস
+সবার সামনে প্রকাশ করা হবে না।
+</p>
+
+</div>
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">⚖️</div>
+
+<h3>বৈধ কাজ</h3>
+
+<p>
+অবৈধ বা ক্ষতিকর কাজের পোস্ট
+অনুমোদিত হবে না।
+</p>
+
+</div>
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">👶</div>
+
+<h3>বয়স নিরাপত্তা</h3>
+
+<p>
+শিশু ও কিশোরদের জন্য বয়স-উপযোগী
+নিরাপদ কাজের নিয়ম থাকবে।
+</p>
+
+</div>
+
+
+<div class="safety-card">
+
+<div style="font-size:28px">🤝</div>
+
+<h3>Dispute Support</h3>
+
+<p>
+কাজ বা পারিশ্রমিক নিয়ে সমস্যায়
+অভিযোগ ও সহায়তার ব্যবস্থা।
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+PRIVACY
+========================================================= -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>🔒 Privacy Center</h2>
+
+<p>ব্যবহারকারী কী প্রকাশ করবেন, তার ওপর নিয়ন্ত্রণ</p>
+
+</div>
+
+
+<div class="privacy-grid">
+
+
+<div class="privacy-card">
+
+<h3>যা আপনি নিয়ন্ত্রণ করতে পারবেন</h3>
+
+<ul class="check-list">
+
+<li>কোন এলাকায় কাজ করতে চান</li>
+
+<li>কোন দক্ষতা দেখাবেন</li>
+
+<li>কাজের জন্য যোগাযোগের মাধ্যম</li>
+
+<li>প্রোফাইলের দৃশ্যমানতা</li>
+
+<li>কাজের নোটিফিকেশন</li>
+
+<li>সংরক্ষিত এলাকা</li>
+
+</ul>
+
+</div>
+
+
+<div class="privacy-card">
+
+<h3>যা সাধারণভাবে প্রকাশ করা হবে না</h3>
+
+<ul class="check-list">
+
+<li>আপনার সম্পূর্ণ কাজের ইতিহাস</li>
+
+<li>কোথায় কোথায় কাজ করেছেন</li>
+
+<li>ব্যক্তিগত আয় ইতিহাস</li>
+
+<li>অপ্রয়োজনীয় ব্যক্তিগত তথ্য</li>
+
+<li>ব্যক্তিগত যোগাযোগ তথ্যের অনিয়ন্ত্রিত প্রকাশ</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+NOTIFICATIONS
+========================================================= -->
+
+<section class="section" style="background:#f0f7f3">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>🔔 Notifications</h2>
+
+<p>আপনার পছন্দ অনুযায়ী নতুন কাজের খবর</p>
+
+</div>
+
+
+<div class="notification-grid">
+
+
+<div class="privacy-card">
+
+<h3>আজকের নোটিফিকেশন</h3>
+
+
+<div class="notification">
+
+<div class="notification-icon">💼</div>
+
+<div>
+
+<strong>নতুন কাজ</strong>
+
+<p style="color:var(--gray);font-size:12px">
+বনশ্রীতে একজন কিচেন সহকারী প্রয়োজন।
+</p>
+
+</div>
+
+</div>
+
+
+<div class="notification">
+
+<div class="notification-icon">📍</div>
+
+<div>
+
+<strong>আপনার এলাকায় নতুন কাজ</strong>
+
+<p style="color:var(--gray);font-size:12px">
+রামপুরায় ৩টি নতুন কাজ এসেছে।
+</p>
+
+</div>
+
+</div>
+
+
+<div class="notification">
+
+<div class="notification-icon">⭐</div>
+
+<div>
+
+<strong>নতুন Review</strong>
+
+<p style="color:var(--gray);font-size:12px">
+আপনার সম্পন্ন কাজের জন্য নতুন রেটিং এসেছে।
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="privacy-card">
+
+<h3>Notification Settings</h3>
+
+<p style="margin:12px 0">
+☑️ আমার নির্বাচিত এলাকায় নতুন কাজ
+</p>
+
+<p style="margin:12px 0">
+☑️ আমার দক্ষতার সাথে মিলে এমন কাজ
+</p>
+
+<p style="margin:12px 0">
+☑️ নতুন নিয়োগকারীর অনুরোধ
+</p>
+
+<p style="margin:12px 0">
+☐ প্রচারণামূলক নোটিফিকেশন
+</p>
+
+<button class="btn btn-green" style="margin-top:10px">
+সেটিংস সংরক্ষণ
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+OPEN SOURCE / COMMUNITY
+========================================================= -->
+
+<section class="section" id="about">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>🌱 একটি উন্মুক্ত উদ্যোগ</h2>
+
+<p>ব্যবহারকারীর কাছ থেকে কাজ পাওয়ার জন্য টাকা নেওয়া নয়</p>
+
+</div>
+
+
+<div class="privacy-grid">
+
+
+<div class="privacy-card">
+
+<h3>💚 আমাদের নীতি</h3>
+
+<ul class="check-list">
+
+<li>কাজ খুঁজতে টাকা নয়</li>
+
+<li>কাজের জন্য আবেদন করতে টাকা নয়</li>
+
+<li>কর্মী নিবন্ধনে বাধ্যতামূলক ফি নয়</li>
+
+<li>কাজের ওপর কমিশন নয়</li>
+
+<li>ব্যক্তিগত তথ্য বিক্রি নয়</li>
+
+<li>Open-source ভিত্তিক উন্নয়ন</li>
+
+</ul>
+
+</div>
+
+
+<div class="privacy-card">
+
+<h3>🤝 কীভাবে টিকে থাকবে?</h3>
+
+<p style="color:var(--gray)">
+
+সার্ভার, নিরাপত্তা, ডেটাবেস, নোটিফিকেশন,
+মডারেশন ও রক্ষণাবেক্ষণের মতো খরচের জন্য
+দান, অনুদান, CSR, NGO, প্রতিষ্ঠান,
+বিশ্ববিদ্যালয় ও কমিউনিটি সহযোগিতার মতো
+স্বচ্ছ উৎস ব্যবহার করা যেতে পারে।
+
+</p>
+
+<button class="btn btn-outline" style="margin-top:18px">
+Open-source সম্পর্কে জানুন →
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+STATS
+========================================================= -->
+
+<section class="section stats-section">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>📊 প্ল্যাটফর্মের সামগ্রিক চিত্র</h2>
+
+<p style="color:#d5e8dc">
+ব্যক্তিগত তথ্য নয়—শুধু সামগ্রিক পরিসংখ্যান
+</p>
+
+</div>
+
+
+<div class="stats-grid">
+
+<div class="big-stat">
+
+<strong>০+</strong>
+
+<span>নিবন্ধিত কর্মী</span>
+
+</div>
+
+<div class="big-stat">
+
+<strong>০+</strong>
+
+<span>নিয়োগকারী</span>
+
+</div>
+
+<div class="big-stat">
+
+<strong>০+</strong>
+
+<span>কাজের পোস্ট</span>
+
+</div>
+
+<div class="big-stat">
+
+<strong>৳০</strong>
+
+<span>মোট রিপোর্টেড পেমেন্ট</span>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+APP SCREEN PREVIEW
+========================================================= -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>📱 ভিতরের Frontend Screens-এর Preview</h2>
+
+<p>এগুলো শুধু UI ধারণা—কোনো বাস্তব functionality নেই</p>
+
+</div>
+
+
+<div class="screen-grid">
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>🏠 Home</strong>
+
+<p style="font-size:11px">
+কাজ খুঁজুন বা কর্মী খুঁজুন
+</p>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+🔎 আমার এলাকায় কাজ খুঁজুন
+</div>
+
+<div class="phone-item">
+📍 বনশ্রী, ঢাকা
+</div>
+
+<div class="phone-item">
+👷 আমি কাজ খুঁজছি
+</div>
+
+<div class="phone-item">
+🏢 কর্মী প্রয়োজন
+</div>
+
+<div class="phone-item">
+🔔 নতুন কাজ: ৭টি
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>🔎 কাজ খুঁজুন</strong>
+
+<p style="font-size:11px">
+এলাকা + কাজের ধরন
+</p>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+📍 ঢাকা → রামপুরা
+</div>
+
+<div class="phone-item">
+🍽️ কিচেন সহকারী
+</div>
+
+<div class="phone-item">
+💰 ৳৬০০ / দিন
+</div>
+
+<div class="phone-item">
+⏰ আজ
+</div>
+
+<div class="phone-item">
+⭐ ৪.৭
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>👷 Worker Profile</strong>
+
+<p style="font-size:11px">
+দক্ষতা ও Rating
+</p>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+👨‍🔧 মো. রাকিব
+</div>
+
+<div class="phone-item">
+📍 রামপুরা
+</div>
+
+<div class="phone-item">
+🔧 ইলেকট্রিশিয়ান
+</div>
+
+<div class="phone-item">
+⭐ ৪.৮
+</div>
+
+<div class="phone-item">
+🔒 ব্যক্তিগত ইতিহাস গোপন
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>📢 Post Job</strong>
+
+<p style="font-size:11px">
+কাজের তথ্য দিন
+</p>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+কী কাজ? *
+</div>
+
+<div class="phone-item">
+📍 কোথায়? *
+</div>
+
+<div class="phone-item">
+⏰ কতক্ষণ? *
+</div>
+
+<div class="phone-item">
+💰 পারিশ্রমিক *
+</div>
+
+<div class="phone-item">
+📞 যোগাযোগ *
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>📍 Location</strong>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+🇧🇩 বাংলাদেশ
+</div>
+
+<div class="phone-item">
+ঢাকা বিভাগ
+</div>
+
+<div class="phone-item">
+ঢাকা জেলা
+</div>
+
+<div class="phone-item">
+রামপুরা থানা
+</div>
+
+<div class="phone-item">
+বনশ্রী
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>⭐ Reviews</strong>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+★★★★★
+<br>
+সময়মতো কাজ করেছেন।
+</div>
+
+<div class="phone-item">
+★★★★★
+<br>
+ভালো ব্যবহার।
+</div>
+
+<div class="phone-item">
+★★★★☆
+<br>
+কাজ সন্তোষজনক।
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>🛡️ Safety Center</strong>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+🚫 অগ্রিম টাকা নয়
+</div>
+
+<div class="phone-item">
+🚨 Report
+</div>
+
+<div class="phone-item">
+🚫 Block
+</div>
+
+<div class="phone-item">
+🔐 Privacy
+</div>
+
+<div class="phone-item">
+⚖️ Dispute
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="screen">
+
+<div class="phone">
+
+<div class="phone-top">
+
+<strong>⚙️ Settings</strong>
+
+</div>
+
+<div class="phone-body">
+
+<div class="phone-item">
+🌐 বাংলা / English
+</div>
+
+<div class="phone-item">
+🔔 Notifications
+</div>
+
+<div class="phone-item">
+🔒 Privacy
+</div>
+
+<div class="phone-item">
+🎙️ Voice Search
+</div>
+
+<div class="phone-item">
+📶 Low Data Mode
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+FAQ
+========================================================= -->
+
+<section class="section" style="background:#f0f4f2">
+
+<div class="container">
+
+<div class="section-title">
+
+<h2>❓ সাধারণ প্রশ্ন</h2>
+
+</div>
+
+
+<div class="faq">
+
+
+<div class="faq-item">
+
+<h3>আমি কি অন্য এলাকায় গিয়ে কাজ খুঁজতে পারব?</h3>
+
+<p>
+হ্যাঁ। আপনার কাজের এলাকা যেকোনো সময় পরিবর্তন করার
+ব্যবস্থা থাকবে।
+</p>
+
+</div>
+
+
+<div class="faq-item">
+
+<h3>কাজ খুঁজতে কি টাকা লাগবে?</h3>
+
+<p>
+এই ধারণা অনুযায়ী কাজ খোঁজা বা আবেদন করার জন্য
+ব্যবহারকারীর কাছ থেকে টাকা নেওয়া হবে না।
+</p>
+
+</div>
+
+
+<div class="faq-item">
+
+<h3>আমি কি একদিনের কাজ দিতে পারব?</h3>
+
+<p>
+হ্যাঁ। দৈনিক, একদিনের, কয়েকদিনের,
+পার্টটাইম ও অন্যান্য সময়ভিত্তিক কাজ থাকবে।
+</p>
+
+</div>
+
+
+<div class="faq-item">
+
+<h3>আমার কাজের ইতিহাস কি সবাই দেখতে পারবে?</h3>
+
+<p>
+ব্যক্তিগত কাজের বিস্তারিত ইতিহাস
+সাধারণভাবে প্রকাশ না করার নীতি থাকবে।
+</p>
+
+</div>
+
+
+<div class="faq-item">
+
+<h3>OTP কি বাধ্যতামূলক?</h3>
+
+<p>
+প্রতিটি ব্যবহারকারীর জন্য সব কাজেই OTP বাধ্যতামূলক
+করার পরিবর্তে প্রয়োজন অনুযায়ী verification ব্যবস্থা
+রাখার ধারণা রয়েছে।
+</p>
+
+</div>
+
+
+<div class="faq-item">
+
+<h3>ভুয়া কাজ দেখলে কী করব?</h3>
+
+<p>
+Report ও Block ব্যবস্থা ব্যবহার করা যাবে।
+</p>
+
+</div>
+
+
+<div class="faq-item">
+
+<h3>পারিশ্রমিক নির্দিষ্ট না থাকলে?</h3>
+
+<p>
+“আলোচনা সাপেক্ষে” নির্বাচন করা যাবে।
+কাজ শুরুর আগে দুই পক্ষের পারিশ্রমিক পরিষ্কারভাবে
+সম্মত হওয়া উচিত।
+</p>
+
+</div>
+
+
+<div class="faq-item">
+
+<h3>ভয়েস দিয়ে কাজ খুঁজতে পারব?</h3>
+
+<p>
+Frontend-এ Voice Search-এর ব্যবস্থা রাখা হবে,
+যাতে টাইপ করতে অসুবিধা হলেও ব্যবহার করা সহজ হয়।
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+FOOTER
+========================================================= -->
+
+<footer>
+
+<div class="container">
+
+<div class="footer-grid">
+
+
+<div>
+
+<div class="logo" style="color:white;margin-bottom:15px">
+
+<div class="logo-icon">ক</div>
+
+<div>
+<span>হাসুনা</span> ওয়ার্ক হাউস
+</div>
+
+</div>
+
+<p>
+
+বাংলাদেশের যেকোনো মানুষের জন্য
+যেকোনো এলাকায় বৈধ ও উপযুক্ত কাজ
+খোঁজা এবং কর্মী খুঁজে পাওয়ার
+একটি উন্মুক্ত প্ল্যাটফর্মের ধারণা।
+
+</p>
+
+</div>
+
+
+<div>
+
+<h3>কাজ</h3>
+
+<ul>
+
+<li>কাজ খুঁজুন</li>
+<li>কাজের ক্যাটাগরি</li>
+<li>নতুন কাজ</li>
+<li>সংরক্ষিত এলাকা</li>
+<li>Job Alerts</li>
+
+</ul>
+
+</div>
+
+
+<div>
+
+<h3>কর্মী</h3>
+
+<ul>
+
+<li>কর্মী খুঁজুন</li>
+<li>Worker Profile</li>
+<li>Rating</li>
+<li>Verification</li>
+<li>Report</li>
+
+</ul>
+
+</div>
+
+
+<div>
+
+<h3>সহায়তা</h3>
+
+<ul>
+
+<li>Safety Center</li>
+<li>Privacy</li>
+<li>FAQ</li>
+<li>যোগাযোগ</li>
+<li>Community</li>
+
+</ul>
+
+</div>
+
+</div>
+
+
+<div class="footer-bottom">
+
+© 2026 হাসুনা ওয়ার্ক হাউস —
+Frontend Concept / Prototype
+
+</div>
+
+</div>
+
+</footer>
+
+
+</body>
+</html>

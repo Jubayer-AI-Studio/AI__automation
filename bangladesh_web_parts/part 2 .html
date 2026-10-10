@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Assunnah Works House</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800;900&display=swap');
+
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --green:#006A4E;
+    --green-dark:#004D3A;
+    --green-light:#008B63;
+
+    --red:#E21F2F;
+    --red-dark:#B91625;
+
+    --cream:#FFFDF7;
+    --white:#FFFFFF;
+
+    --text:#15382D;
+    --muted:#71827B;
+    --border:#E4ECE8;
+
+    --soft-green:#EAF8F2;
+    --soft-red:#FFF0EE;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+    min-height:100%;
+    font-family:"Noto Sans Bengali",Arial,sans-serif;
+    background:#DDE9E3;
+    color:var(--text);
+}
+
+button,
+input,
+textarea,
+select{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    width:min(440px,100%);
+    min-height:100vh;
+    margin:auto;
+    background:var(--cream);
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 0 45px rgba(0,50,35,.20);
+}
+
+/* =====================================================
+   START SCREEN
+===================================================== */
+
+#startScreen{
+    min-height:100vh;
+
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(255,255,255,.98) 0%,
+            rgba(245,255,250,.94) 24%,
+            rgba(0,106,78,.15) 53%,
+            transparent 70%
+        ),
+        linear-gradient(
+            145deg,
+            #004D3A 0%,
+            #006A4E 45%,
+            #00543F 100%
+        );
+
+    color:white;
+
+    padding:20px 18px 25px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-weight:900;
+    font-size:20px;
+}
+
+.brand-logo{
+    width:44px;
+    height:44px;
+
+    border-radius:14px;
+
+    background:var(--red);
+
+    display:grid;
+    place-items:center;
+
+    font-size:22px;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.28);
+}
+
+.top-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.language{
+    border:1px solid rgba(255,255,255,.3);
+    background:rgba(255,255,255,.12);
+    color:white;
+
+    padding:8px 11px;
+
+    border-radius:12px;
+
+    font-size:10px;
+}
+
+.start-title{
+    text-align:center;
+
+    font-size:26px;
+    font-weight:900;
+
+    margin-top:27px;
+    margin-bottom:5px;
+}
+
+.start-subtitle{
+    text-align:center;
+
+    font-size:11px;
+
+    opacity:.82;
+
+    line-height:1.7;
+}
+
+/* MAP */
+
+.map-area{
+    width:310px;
+    height:340px;
+
+    margin:3px auto 0;
+
+    position:relative;
+}
+
+.map{
+    position:absolute;
+
+    left:50%;
+    top:8px;
+
+    transform:translateX(-50%);
+
+    width:210px;
+    height:315px;
+
+    filter:
+        drop-shadow(
+            0 18px 18px rgba(0,40,28,.42)
+        );
+}
+
+.map svg{
+    width:100%;
+    height:100%;
+}
+
+.division{
+    fill:#00845E;
+
+    stroke:#DFFFF1;
+    stroke-width:1.5;
+
+    transition:.2s;
+}
+
+.division:hover{
+    fill:var(--red);
+    cursor:pointer;
+}
+
+.division.active{
+    fill:var(--red);
+}
+
+.map-label{
+    position:absolute;
+
+    background:rgba(255,255,255,.94);
+
+    color:var(--green);
+
+    padding:4px 7px;
+
+    border-radius:8px;
+
+    font-size:9px;
+    font-weight:800;
+
+    box-shadow:
+        0 3px 10px rgba(0,50,35,.18);
+}
+
+.rangpur{
+    top:50px;
+    right:3px;
+}
+
+.sylhet{
+    top:92px;
+    right:-3px;
+}
+
+.mymensingh{
+    top:135px;
+    right:-10px;
+}
+
+.chattogram{
+    top:220px;
+    right:-7px;
+}
+
+.dhaka{
+    top:150px;
+    left:13px;
+}
+
+.rajshahi{
+    top:98px;
+    left:-3px;
+}
+
+.khulna{
+    top:177px;
+    left:-6px;
+}
+
+.barisal{
+    top:230px;
+    left:28px;
+}
+
+.map-hint{
+    text-align:center;
+
+    font-size:10px;
+
+    opacity:.85;
+
+    margin-top:-3px;
+}
+
+/* SEARCH */
+
+.start-search{
+    margin-top:12px;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:5px;
+
+    display:flex;
+
+    box-shadow:
+        0 9px 25px rgba(0,40,28,.25);
+}
+
+.start-search input{
+    flex:1;
+
+    border:0;
+    outline:0;
+
+    padding:10px;
+
+    font-size:11px;
+
+    color:var(--text);
+}
+
+.start-search button{
+    width:43px;
+
+    border:0;
+
+    background:var(--red);
+
+    color:white;
+
+    border-radius:12px;
+
+    font-size:17px;
+}
+
+.start-bottom{
+    text-align:center;
+
+    font-size:9px;
+
+    opacity:.65;
+
+    margin-top:12px;
+}
+
+/* =====================================================
+   LOCATION SCOPE
+===================================================== */
+
+#scopeScreen{
+    display:none;
+
+    min-height:100vh;
+
+    padding:22px 18px;
+
+    background:
+        radial-gradient(
+            circle at top right,
+            #DDF6EB,
+            transparent 45%
+        ),
+        linear-gradient(
+            160deg,
+            #F2FFF9,
+            #FFFDF7 60%,
+            #FFF1EF
+        );
+}
+
+.scope-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.back-btn{
+    width:40px;
+    height:40px;
+
+    border:0;
+
+    border-radius:12px;
+
+    background:var(--soft-green);
+
+    color:var(--green);
+
+    font-size:22px;
+}
+
+.scope-title{
+    font-size:18px;
+    font-weight:800;
+}
+
+.scope-hero{
+    text-align:center;
+
+    margin:38px 0 24px;
+}
+
+.scope-flag{
+    font-size:42px;
+}
+
+.scope-hero h1{
+    font-size:23px;
+
+    margin:7px 0 5px;
+}
+
+.scope-hero p{
+    font-size:11px;
+
+    color:var(--muted);
+}
+
+.scope-options{
+    display:grid;
+    gap:14px;
+}
+
+.scope-card{
+    width:100%;
+
+    border:0;
+
+    border-radius:22px;
+
+    min-height:145px;
+
+    padding:21px;
+
+    text-align:left;
+
+    color:white;
+
+    position:relative;
+
+    overflow:hidden;
+
+    box-shadow:
+        0 10px 25px rgba(0,60,40,.14);
+}
+
+.scope-card::after{
+    content:"";
+
+    position:absolute;
+
+    width:120px;
+    height:120px;
+
+    border-radius:50%;
+
+    right:-35px;
+    bottom:-45px;
+
+    background:rgba(255,255,255,.10);
+}
+
+.scope-global{
+    background:
+        linear-gradient(
+            135deg,
+            var(--green-dark),
+            var(--green-light)
+        );
+}
+
+.scope-local{
+    background:
+        linear-gradient(
+            135deg,
+            var(--red-dark),
+            var(--red)
+        );
+}
+
+.scope-icon{
+    font-size:31px;
+}
+
+.scope-card strong{
+    display:block;
+
+    font-size:17px;
+
+    margin-top:7px;
+}
+
+.scope-card span{
+    display:block;
+
+    font-size:10px;
+
+    opacity:.86;
+
+    line-height:1.7;
+
+    margin-top:4px;
+}
+
+.scope-note{
+    text-align:center;
+
+    color:var(--muted);
+
+    font-size:10px;
+
+    line-height:1.7;
+
+    margin-top:20px;
+}
+
+/* =====================================================
+   MAIN APP
+===================================================== */
+
+#mainScreen{
+    display:none;
+
+    min-height:100vh;
+
+    padding-bottom:80px;
+}
+
+.main-header{
+    color:white;
+
+    padding:17px;
+
+    border-radius:0 0 27px 27px;
+
+    background:
+        radial-gradient(
+            circle at 90% 0%,
+            rgba(255,255,255,.12),
+            transparent 35%
+        ),
+        linear-gradient(
+            140deg,
+            #004D3A,
+            #006A4E
+        );
+}
+
+.header-row{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+}
+
+.header-brand{
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    font-weight:900;
+
+    font-size:17px;
+}
+
+.header-logo{
+    width:38px;
+    height:38px;
+
+    border-radius:12px;
+
+    background:var(--red);
+
+    display:grid;
+
+    place-items:center;
+
+    font-size:18px;
+}
+
+.header-buttons{
+    display:flex;
+    gap:7px;
+}
+
+.circle-btn{
+    width:38px;
+    height:38px;
+
+    border:1px solid rgba(255,255,255,.2);
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.1);
+
+    color:white;
+}
+
+.area-box{
+    margin-top:14px;
+
+    background:rgba(255,255,255,.1);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    border-radius:14px;
+
+    padding:9px 11px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+}
+
+.area-box small{
+    display:block;
+
+    font-size:8px;
+
+    opacity:.7;
+}
+
+.area-box b{
+    font-size:11px;
+}
+
+.main-title{
+    font-size:23px;
+
+    line-height:1.35;
+
+    font-weight:900;
+
+    margin:16px 0 6px;
+}
+
+.main-sub{
+    font-size:10px;
+
+    opacity:.82;
+}
+
+.search-box{
+    margin-top:13px;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:4px;
+
+    display:flex;
+}
+
+.search-box input{
+    flex:1;
+
+    border:0;
+
+    outline:0;
+
+    padding:10px;
+
+    font-size:11px;
+}
+
+.search-box button{
+    width:42px;
+
+    border:0;
+
+    background:var(--red);
+
+    color:white;
+
+    border-radius:11px;
+}
+
+/* MAIN CONTENT */
+
+.content{
+    padding:16px;
+}
+
+.quick-actions{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+}
+
+.quick{
+    border:0;
+
+    border-radius:17px;
+
+    padding:15px;
+
+    text-align:left;
+
+    min-height:110px;
+}
+
+.find-work{
+    background:var(--soft-green);
+
+    color:var(--green);
+}
+
+.need-worker{
+    background:var(--soft-red);
+
+    color:var(--red-dark);
+}
+
+.quick-icon{
+    font-size:27px;
+}
+
+.quick strong{
+    display:block;
+
+    font-size:14px;
+
+    margin-top:7px;
+}
+
+.quick small{
+    font-size:9px;
+
+    opacity:.7;
+}
+
+.section-title{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin:21px 2px 10px;
+}
+
+.section-title b{
+    font-size:15px;
+}
+
+.section-title a{
+    color:var(--green);
+
+    font-size:10px;
+
+    font-weight:800;
+}
+
+.categories{
+    display:flex;
+
+    gap:8px;
+
+    overflow:auto;
+
+    padding-bottom:3px;
+}
+
+.category{
+    min-width:75px;
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    padding:9px 6px;
+
+    text-align:center;
+
+    font-size:9px;
+}
+
+.category span{
+    display:block;
+
+    font-size:19px;
+
+    margin-bottom:4px;
+}
+
+.job-card{
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-radius:16px;
+
+    padding:13px;
+
+    margin:9px 0;
+
+    box-shadow:
+        0 4px 13px rgba(0,50,35,.06);
+}
+
+.job-top{
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:8px;
+}
+
+.job-title{
+    font-size:12px;
+
+    font-weight:800;
+}
+
+.pay{
+    color:var(--green);
+
+    font-size:11px;
+
+    font-weight:900;
+}
+
+.job-meta{
+    color:var(--muted);
+
+    font-size:9px;
+
+    line-height:1.8;
+
+    margin-top:5px;
+}
+
+.tag{
+    display:inline-block;
+
+    background:var(--soft-green);
+
+    color:var(--green);
+
+    border-radius:7px;
+
+    padding:3px 7px;
+
+    font-size:8px;
+
+    margin-top:6px;
+}
+
+.safety-box{
+    margin-top:15px;
+
+    padding:11px;
+
+    border-radius:14px;
+
+    border:1px solid var(--border);
+
+    background:
+        linear-gradient(
+            135deg,
+            #F0FAF5,
+            #FFF3F1
+        );
+
+    font-size:9px;
+
+    line-height:1.7;
+}
+
+/* =====================================================
+   INNER PAGES
+===================================================== */
+
+.inner-page{
+    display:none;
+
+    min-height:100vh;
+
+    padding-bottom:85px;
+
+    background:var(--cream);
+}
+
+.page-header{
+    padding:18px 16px 10px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+.page-header h2{
+    font-size:19px;
+
+    margin:0;
+}
+
+.inner-back{
+    width:39px;
+    height:39px;
+
+    border:0;
+
+    border-radius:12px;
+
+    background:var(--soft-green);
+
+    color:var(--green);
+
+    font-size:21px;
+}
+
+.panel{
+    margin:8px 16px;
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-radius:16px;
+
+    padding:14px;
+}
+
+.location-select{
+    padding:11px;
+
+    background:#F2F9F5;
+
+    border-radius:11px;
+
+    font-size:10px;
+}
+
+.filters{
+    display:flex;
+
+    gap:7px;
+
+    overflow:auto;
+
+    margin-top:10px;
+}
+
+.filter{
+    white-space:nowrap;
+
+    border:1px solid var(--border);
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:7px 10px;
+
+    font-size:9px;
+}
+
+.filter.active{
+    background:var(--green);
+
+    border-color:var(--green);
+
+    color:white;
+}
+
+/* FORM */
+
+.form-label{
+    display:block;
+
+    font-size:10px;
+
+    font-weight:800;
+
+    margin:12px 0 5px;
+}
+
+.form-control{
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #DDE7E2;
+
+    border-radius:10px;
+
+    outline:none;
+
+    font-size:10px;
+
+    background:white;
+}
+
+textarea.form-control{
+    min-height:75px;
+
+    resize:vertical;
+}
+
+.submit-btn{
+    width:100%;
+
+    margin-top:15px;
+
+    padding:12px;
+
+    border:0;
+
+    border-radius:11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--green),
+            var(--green-light)
+        );
+
+    color:white;
+
+    font-weight:800;
+
+    font-size:11px;
+}
+
+/* PROFILE */
+
+.profile{
+    text-align:center;
+
+    padding:20px 16px;
+}
+
+.avatar{
+    width:72px;
+    height:72px;
+
+    margin:auto;
+
+    border-radius:23px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--green),
+            var(--red)
+        );
+
+    display:grid;
+
+    place-items:center;
+
+    color:white;
+
+    font-size:27px;
+
+    font-weight:900;
+}
+
+.profile-menu{
+    margin-top:17px;
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-radius:16px;
+
+    overflow:hidden;
+
+    text-align:left;
+}
+
+.profile-menu button{
+    width:100%;
+
+    border:0;
+
+    border-bottom:1px solid var(--border);
+
+    background:white;
+
+    padding:14px;
+
+    font-size:10px;
+
+    color:var(--text);
+
+    text-align:left;
+}
+
+.profile-menu button:last-child{
+    border-bottom:0;
+}
+
+.profile-menu span{
+    float:right;
+
+    color:#91A39B;
+}
+
+/* =====================================================
+   BOTTOM NAV
+===================================================== */
+
+.bottom-nav{
+    display:none;
+
+    position:fixed;
+
+    z-index:100;
+
+    bottom:0;
+
+    width:min(440px,100%);
+
+    height:73px;
+
+    background:white;
+
+    border-top:1px solid var(--border);
+
+    box-shadow:
+        0 -8px 25px rgba(0,50,35,.10);
+
+    grid-template-columns:repeat(5,1fr);
+}
+
+.nav-btn{
+    border:0;
+
+    background:white;
+
+    color:#81918B;
+
+    font-size:8px;
+}
+
+.nav-btn strong{
+    display:block;
+
+    font-size:19px;
+
+    margin-bottom:3px;
+}
+
+.nav-btn.active{
+    color:var(--green);
+
+    font-weight:800;
+}
+
+.nav-post strong{
+    width:42px;
+    height:42px;
+
+    line-height:42px;
+
+    margin:-7px auto 2px;
+
+    border-radius:50%;
+
+    background:var(--red);
+
+    color:white;
+
+    font-size:24px;
+
+    box-shadow:
+        0 6px 15px rgba(226,31,47,.35);
+}
+
+@media(min-width:700px){
+
+    body{
+        padding:25px 0;
+    }
+
+    .app{
+        border-radius:25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- =====================================================
+     START SCREEN
+===================================================== -->
+
+<section id="startScreen">
+
+    <div class="top-bar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                🤝
+            </div>
+
+            Assunnah Works House
+
+        </div>
+
+        <button class="language">
+            বাংলা / EN
+        </button>
+
+    </div>
+
+
+    <div class="start-title">
+        আপনি কোথায় কাজ করবেন?
+    </div>
+
+    <div class="start-subtitle">
+        বাংলাদেশের মানচিত্র থেকে আপনার পছন্দের জায়গা নির্বাচন করুন
+    </div>
+
+
+    <div class="map-area">
+
+        <div class="map">
+
+            <!-- Stylized Bangladesh map -->
+
+            <svg viewBox="0 0 180 285">
+
+                <!-- Rangpur -->
+                <path
+                    class="division"
+                    onclick="selectDivision('রংপুর')"
+                    d="M62 8 L105 13 L122 36 L107 61 L77 57 L53 42 Z"
+                />
+
+                <!-- Rajshahi -->
+                <path
+                    class="division"
+                    onclick="selectDivision('রাজশাহী')"
+                    d="M25 43 L53 42 L77 57 L72 87 L40 94 L15 76 Z"
+                />
+
+                <!-- Mymensingh -->
+                <path
+                    class="division"
+                    onclick="selectDivision('ময়মনসিংহ')"
+                    d="M107 61 L137 48 L156 72 L139 99 L109 94 L91 78 Z"
+                />
+
+                <!-- Sylhet -->
+                <path
+                    class="division"
+                    onclick="selectDivision('সিলেট')"
+                    d="M137 48 L167 57 L176 91 L154 111 L139 99 L156 72 Z"
+                />
+
+                <!-- Dhaka -->
+                <path
+                    class="division"
+                    onclick="selectDivision('ঢাকা')"
+                    d="M72 87 L91 78 L109 94 L112 126 L88 145 L62 126 L53 104 Z"
+                />
+
+                <!-- Khulna -->
+                <path
+                    class="division"
+                    onclick="selectDivision('খুলনা')"
+                    d="M15 76 L40 94 L53 104 L62 126 L48 160 L22 153 L5 120 Z"
+                />
+
+                <!-- Barishal -->
+                <path
+                    class="division"
+                    onclick="selectDivision('বরিশাল')"
+                    d="M62 126 L88 145 L101 171 L83 199 L58 178 L48 160 Z"
+                />
+
+                <!-- Chattogram -->
+                <path
+                    class="division"
+                    onclick="selectDivision('চট্টগ্রাম')"
+                    d="M112 126 L139 99 L154 111 L166 145 L151 181 L130 225 L109 244 L99 211 L101 171 Z"
+                />
+
+            </svg>
+
+        </div>
+
+
+        <div class="map-label rangpur">
+            রংপুর
+        </div>
+
+        <div class="map-label sylhet">
+            সিলেট
+        </div>
+
+        <div class="map-label mymensingh">
+            ময়মনসিংহ
+        </div>
+
+        <div class="map-label chattogram">
+            চট্টগ্রাম
+        </div>
+
+        <div class="map-label dhaka">
+            ঢাকা
+        </div>
+
+        <div class="map-label rajshahi">
+            রাজশাহী
+        </div>
+
+        <div class="map-label khulna">
+            খুলনা
+        </div>
+
+        <div class="map-label barisal">
+            বরিশাল
+        </div>
+
+    </div>
+
+
+    <div class="map-hint">
+        👆 মানচিত্রে বিভাগে চাপুন অথবা নিচে লিখে খুঁজুন
+    </div>
+
+
+    <div class="start-search">
+
+        <input
+            id="divisionInput"
+            type="text"
+            placeholder="যেমন: ঢাকা, চট্টগ্রাম, রামপুরা..."
+        >
+
+        <button onclick="searchArea()">
+            🔎
+        </button>
+
+    </div>
+
+
+    <div class="start-bottom">
+        বাংলাদেশের যেকোনো জায়গায় কাজ খোঁজা ও কাজ দেওয়ার সহজ প্ল্যাটফর্ম
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SCOPE SCREEN
+===================================================== -->
+
+<section id="scopeScreen">
+
+    <div class="scope-head">
+
+        <button
+            class="back-btn"
+            onclick="backToStart()"
+        >
+            ‹
+        </button>
+
+        <div class="scope-title">
+            কাজের পরিধি নির্বাচন করুন
+        </div>
+
+    </div>
+
+
+    <div class="scope-hero">
+
+        <div class="scope-flag">
+            🇧🇩
+        </div>
+
+        <h1>
+            আপনার পোস্ট কোথায় দেখা যাবে?
+        </h1>
+
+        <p>
+            আপনার প্রয়োজন অনুযায়ী একটি অপশন বেছে নিন
+        </p>
+
+    </div>
+
+
+    <div class="scope-options">
+
+        <button
+            class="scope-card scope-global"
+            onclick="openMain('global')"
+        >
+
+            <div class="scope-icon">
+                🌍
+            </div>
+
+            <strong>
+                পুরো বাংলাদেশে
+            </strong>
+
+            <span>
+                আপনার পোস্ট বাংলাদেশের যেকোনো এলাকার উপযুক্ত মানুষ দেখতে পারবে।
+            </span>
+
+        </button>
+
+
+        <button
+            class="scope-card scope-local"
+            onclick="openMain('local')"
+        >
+
+            <div class="scope-icon">
+                📍
+            </div>
+
+            <strong>
+                নির্দিষ্ট এলাকায়
+            </strong>
+
+            <span>
+                আপনি যে জায়গা নির্বাচন করবেন, পোস্টটি সেই এলাকার মানুষের কাছে দেখানো হবে।
+            </span>
+
+        </button>
+
+    </div>
+
+
+    <div class="scope-note">
+        💡 পরে চাইলে কাজের এলাকা ও পোস্টের পরিধি পরিবর্তন করা যাবে।
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     MAIN HOME
+===================================================== -->
+
+<section id="mainScreen">
+
+<header class="main-header">
+
+    <div class="header-row">
+
+        <div class="header-brand">
+
+            <div class="header-logo">
+                🤝
+            </div>
+
+            Assunnah Works House
+
+        </div>
+
+
+        <div class="header-buttons">
+
+            <button class="circle-btn">
+                🔔
+            </button>
+
+            <button
+                class="circle-btn"
+                onclick="openPage('profile')"
+            >
+                ☰
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="area-box">
+
+        <div>
+
+            <small>
+                নির্বাচিত কাজের এলাকা
+            </small>
+
+            <b id="selectedArea">
+                📍 বাংলাদেশ
+            </b>
+
+        </div>
+
+        <button
+            class="circle-btn"
+            onclick="backToStart()"
+        >
+            ⌄
+        </button>
+
+    </div>
+
+
+    <div class="main-title">
+        কাজ খুঁজুন।<br>
+        কাজ দিন। এগিয়ে যান।
+    </div>
+
+
+    <div class="main-sub">
+        দেশের যেকোনো এলাকায় বৈধ ও উপযুক্ত কাজের সঙ্গে মানুষের সংযোগ।
+    </div>
+
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            placeholder="কাজের নাম লিখুন বা 🎙️ বলুন"
+        >
+
+        <button
+            onclick="openPage('jobs')"
+        >
+            🔎
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="content">
+
+    <div class="quick-actions">
+
+        <button
+            class="quick find-work"
+            onclick="openPage('jobs')"
+        >
+
+            <div class="quick-icon">
+                🔎
+            </div>
+
+            <strong>
+                আমি কাজ খুঁজছি
+            </strong>
+
+            <small>
+                আমার এলাকার কাজ দেখুন
+            </small>
+
+        </button>
+
+
+        <button
+            class="quick need-worker"
+            onclick="openPage('post')"
+        >
+
+            <div class="quick-icon">
+                ➕
+            </div>
+
+            <strong>
+                আমার একজন কর্মী দরকার
+            </strong>
+
+            <small>
+                সহজে কাজের পোস্ট দিন
+            </small>
+
+        </button>
+
+    </div>
+
+
+    <div class="section-title">
+
+        <b>
+            জনপ্রিয় কাজ
+        </b>
+
+        <a onclick="openPage('jobs')">
+            সব দেখুন →
+        </a>
+
+    </div>
+
+
+    <div class="categories">
+
+        <div class="category">
+            <span>🔧</span>
+            কারিগরি
+        </div>
+
+        <div class="category">
+            <span>🍳</span>
+            হোটেল
+        </div>
+
+        <div class="category">
+            <span>🚚</span>
+            ডেলিভারি
+        </div>
+
+        <div class="category">
+            <span>🛡️</span>
+            নিরাপত্তা
+        </div>
+
+        <div class="category">
+            <span>📚</span>
+            শিক্ষা
+        </div>
+
+    </div>
+
+
+    <div class="section-title">
+
+        <b>
+            এই এলাকায় নতুন কাজ
+        </b>
+
+        <a onclick="openPage('jobs')">
+            আরও →
+        </a>
+
+    </div>
+
+
+    <div class="job-card">
+
+        <div class="job-top">
+
+            <div class="job-title">
+                হোটেলে কিচেন হেল্পার
+            </div>
+
+            <div class="pay">
+                ৳৬০০/দিন
+            </div>
+
+        </div>
+
+        <div class="job-meta">
+            📍 ঢাকা · ⏱️ ১ দিন · 👥 ২ জন · 📞 কল/WhatsApp
+        </div>
+
+        <span class="tag">
+            আজই দরকার
+        </span>
+
+    </div>
+
+
+    <div class="job-card">
+
+        <div class="job-top">
+
+            <div class="job-title">
+                বাসার বৈদ্যুতিক কাজ
+            </div>
+
+            <div class="pay">
+                ৳৮০০–৳১,২০০
+            </div>
+
+        </div>
+
+        <div class="job-meta">
+            📍 ঢাকা · ⏱️ ৩–৪ ঘণ্টা · 👥 ১ জন
+        </div>
+
+        <span class="tag">
+            কারিগরি
+        </span>
+
+    </div>
+
+
+    <div class="safety-box">
+
+        🛡️ <b>নিরাপত্তা:</b>
+        কাজ পাওয়ার আগে কাউকে টাকা দেবেন না।
+        সন্দেহজনক পোস্ট রিপোর্ট করুন।
+
+    </div>
+
+</main>
+
+</section>
+
+
+<!-- =====================================================
+     JOB PAGE
+===================================================== -->
+
+<section id="jobsPage" class="inner-page">
+
+    <div class="page-header">
+
+        <button
+            class="inner-back"
+            onclick="goHome()"
+        >
+            ‹
+        </button>
+
+        <h2>
+            কাজ খুঁজুন
+        </h2>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="location-select">
+
+            📍
+            <span id="jobsLocation">
+                বাংলাদেশ
+            </span>
+
+            <span style="float:right;color:#006A4E">
+                পরিবর্তন
+            </span>
+
+        </div>
+
+
+        <div class="search-box"
+             style="box-shadow:none;border:1px solid #E4ECE8">
+
+            <input
+                placeholder="কাজ লিখুন বা 🎙️ বলুন"
+            >
+
+            <button>
+                🎙️
+            </button>
+
+        </div>
+
+
+        <div class="filters">
+
+            <button class="filter active">
+                সব
+            </button>
+
+            <button class="filter">
+                আজ
+            </button>
+
+            <button class="filter">
+                অস্থায়ী
+            </button>
+
+            <button class="filter">
+                পার্ট-টাইম
+            </button>
+
+            <button class="filter">
+                স্থায়ী
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel"
+         style="background:#F8FCFA;border:0">
+
+        <div class="job-card">
+
+            <div class="job-top">
+                <div class="job-title">
+                    কিচেন হেল্পার
+                </div>
+
+                <div class="pay">
+                    ৳৬০০/দিন
+                </div>
+            </div>
+
+            <div class="job-meta">
+                📍 ঢাকা · ১ দিন · ২ জন · 📞 কল/WhatsApp
+            </div>
+
+        </div>
+
+
+        <div class="job-card">
+
+            <div class="job-top">
+                <div class="job-title">
+                    ইলেকট্রিশিয়ান
+                </div>
+
+                <div class="pay">
+                    ৳৮০০–৳১,২০০
+                </div>
+            </div>
+
+            <div class="job-meta">
+                📍 ঢাকা · ৩–৪ ঘণ্টা · ১ জন
+            </div>
+
+        </div>
+
+
+        <div class="job-card">
+
+            <div class="job-top">
+                <div class="job-title">
+                    দোকানের বিক্রয়কর্মী
+                </div>
+
+                <div class="pay">
+                    আলোচনা সাপেক্ষে
+                </div>
+            </div>
+
+            <div class="job-meta">
+                📍 ঢাকা · পার্ট-টাইম · ১ জন
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     POST PAGE
+===================================================== -->
+
+<section id="postPage" class="inner-page">
+
+    <div class="page-header">
+
+        <button
+            class="inner-back"
+            onclick="goHome()"
+        >
+            ‹
+        </button>
+
+        <h2>
+            কাজের পোস্ট দিন
+        </h2>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="safety-box"
+             style="margin:0">
+
+            📌 প্রয়োজনীয় তথ্য পূরণ না করলে
+            পোস্ট প্রকাশ হবে না।
+
+        </div>
+
+
+        <form
+            onsubmit="event.preventDefault();alert('ডেমো: পোস্টটি প্রকাশের আগে যাচাই ধাপে যাবে।')"
+        >
+
+            <label class="form-label">
+                কী কাজ? *
+            </label>
+
+            <input
+                class="form-control"
+                required
+                placeholder="যেমন: কিচেন হেল্পার"
+            >
+
+
+            <label class="form-label">
+                কোথায়? *
+            </label>
+
+            <input
+                class="form-control"
+                required
+                placeholder="বিভাগ / জেলা / উপজেলা / এলাকা"
+            >
+
+
+            <label class="form-label">
+                কতক্ষণ / কতদিন? *
+            </label>
+
+            <input
+                class="form-control"
+                required
+                placeholder="যেমন: ১ দিন, সকাল ৯টা–বিকাল ৫টা"
+            >
+
+
+            <label class="form-label">
+                কতজন কর্মী? *
+            </label>
+
+            <input
+                class="form-control"
+                type="number"
+                min="1"
+                required
+                placeholder="১"
+            >
+
+
+            <label class="form-label">
+                পারিশ্রমিকের ধরন *
+            </label>
+
+            <select
+                class="form-control"
+                required
+            >
+
+                <option value="">
+                    নির্বাচন করুন
+                </option>
+
+                <option>
+                    ৳৫০০
+                </option>
+
+                <option>
+                    ৳৩০০–৳৫০০
+                </option>
+
+                <option>
+                    ৳৫০০+
+                </option>
+
+                <option>
+                    আলোচনা সাপেক্ষে
+                </option>
+
+            </select>
+
+
+            <label class="form-label">
+                যোগাযোগ *
+            </label>
+
+            <select
+                class="form-control"
+                required
+            >
+
+                <option>
+                    ফোন কল + WhatsApp
+                </option>
+
+                <option>
+                    শুধু ফোন কল
+                </option>
+
+                <option>
+                    শুধু WhatsApp
+                </option>
+
+            </select>
+
+
+            <label class="form-label">
+                কাজের বিস্তারিত
+            </label>
+
+            <textarea
+                class="form-control"
+                placeholder="কাজের প্রয়োজনীয় তথ্য লিখুন"
+            ></textarea>
+
+
+            <button
+                class="submit-btn"
+                type="submit"
+            >
+                পোস্ট প্রকাশের জন্য এগিয়ে যান
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     NOTIFICATION
+===================================================== -->
+
+<section id="notificationPage" class="inner-page">
+
+    <div class="page-header">
+
+        <h2>
+            🔔 নোটিফিকেশন
+        </h2>
+
+    </div>
+
+
+    <div class="content">
+
+        <div class="job-card">
+
+            <div class="job-title">
+                নতুন কাজ পাওয়া গেছে
+            </div>
+
+            <div class="job-meta">
+                আপনার নির্বাচিত এলাকায় নতুন একটি কাজ এসেছে।
+            </div>
+
+        </div>
+
+
+        <div class="job-card">
+
+            <div class="job-title">
+                আপনার পোস্টে আগ্রহী একজন
+            </div>
+
+            <div class="job-meta">
+                কর্মীর প্রোফাইল দেখতে ট্যাপ করুন।
+            </div>
+
+        </div>
+
+
+        <div class="job-card">
+
+            <div class="job-title">
+                ⭐ কাজ শেষ হলে রেটিং দিন
+            </div>
+
+            <div class="job-meta">
+                কাজ সম্পন্ন হওয়ার পরে উভয় পক্ষ
+                একে অপরকে রেট করতে পারবে।
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PROFILE
+===================================================== -->
+
+<section id="profilePage" class="inner-page">
+
+    <div class="page-header">
+
+        <button
+            class="inner-back"
+            onclick="goHome()"
+        >
+            ‹
+        </button>
+
+        <h2>
+            প্রোফাইল
+        </h2>
+
+    </div>
+
+
+    <div class="profile">
+
+        <div class="avatar">
+            আ
+        </div>
+
+        <h3>
+            আমার প্রোফাইল
+        </h3>
+
+        <div style="font-size:10px;color:#71827B">
+            Assunnah Works House
+        </div>
+
+
+        <div class="profile-menu">
+
+            <button>
+                👤 আমার প্রোফাইল
+                <span>›</span>
+            </button>
+
+            <button>
+                📍 সংরক্ষিত এলাকা
+                <span>›</span>
+            </button>
+
+            <button>
+                📝 আমার পোস্ট
+                <span>›</span>
+            </button>
+
+            <button>
+                ⭐ রেটিং ও রিভিউ
+                <span>›</span>
+            </button>
+
+            <button>
+                🔒 গোপনীয়তা
+                <span>›</span>
+            </button>
+
+            <button>
+                🛡️ নিরাপত্তা ও রিপোর্ট
+                <span>›</span>
+            </button>
+
+            <button>
+                🌐 ভাষা
+                <span>›</span>
+            </button>
+
+            <button>
+                ⚙️ সেটিংস
+                <span>›</span>
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+
+<nav
+    id="bottomNav"
+    class="bottom-nav"
+>
+
+    <button
+        class="nav-btn active"
+        data-page="main"
+        onclick="goHome()"
+    >
+        <strong>⌂</strong>
+        হোম
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="jobs"
+        onclick="openPage('jobs')"
+    >
+        <strong>⌕</strong>
+        কাজ
+    </button>
+
+
+    <button
+        class="nav-btn nav-post"
+        data-page="post"
+        onclick="openPage('post')"
+    >
+        <strong>+</strong>
+        পোস্ট
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="notification"
+        onclick="openPage('notification')"
+    >
+        <strong>♧</strong>
+        নোটিফাই
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="profile"
+        onclick="openPage('profile')"
+    >
+        <strong>◯</strong>
+        প্রোফাইল
+    </button>
+
+</nav>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   APP STATE
+===================================================== */
+
+let selectedPlace = "বাংলাদেশ";
+let selectedScope = "";
+
+
+/* =====================================================
+   SCREEN HELPERS
+===================================================== */
+
+function hideAll(){
+
+    document.getElementById("startScreen").style.display="none";
+
+    document.getElementById("scopeScreen").style.display="none";
+
+    document.getElementById("mainScreen").style.display="none";
+
+    document.getElementById("jobsPage").style.display="none";
+
+    document.getElementById("postPage").style.display="none";
+
+    document.getElementById("notificationPage").style.display="none";
+
+    document.getElementById("profilePage").style.display="none";
+
+}
+
+
+/* =====================================================
+   SELECT DIVISION
+===================================================== */
+
+function selectDivision(name){
+
+    selectedPlace = name;
+
+    document.getElementById("selectedArea").innerText =
+        "📍 " + name + " বিভাগ";
+
+    document.getElementById("jobsLocation").innerText =
+        name + " বিভাগ";
+
+    hideAll();
+
+    document.getElementById("scopeScreen").style.display="block";
+
+    window.scrollTo(0,0);
+}
+
+
+/* =====================================================
+   SEARCH PLACE
+===================================================== */
+
+function searchArea(){
+
+    const input =
+        document.getElementById("divisionInput");
+
+    const value =
+        input.value.trim();
+
+    if(!value){
+
+        alert("একটি বিভাগ বা এলাকার নাম লিখুন।");
+
+        return;
+    }
+
+    selectedPlace = value;
+
+    document.getElementById("selectedArea").innerText =
+        "📍 " + value;
+
+    document.getElementById("jobsLocation").innerText =
+        value;
+
+    hideAll();
+
+    document.getElementById("scopeScreen").style.display="block";
+
+    window.scrollTo(0,0);
+}
+
+
+/* =====================================================
+   BACK TO MAP
+===================================================== */
+
+function backToStart(){
+
+    hideAll();
+
+    document.getElementById("startScreen").style.display="flex";
+
+    document.getElementById("bottomNav").style.display="none";
+
+    window.scrollTo(0,0);
+}
+
+
+/* =====================================================
+   OPEN MAIN APP
+===================================================== */
+
+function openMain(scope){
+
+    selectedScope = scope;
+
+    hideAll();
+
+    document.getElementById("mainScreen").style.display="block";
+
+    document.getElementById("bottomNav").style.display="grid";
+
+    window.scrollTo(0,0);
+
+}
+
+
+/* =====================================================
+   OPEN INNER PAGE
+===================================================== */
+
+function openPage(page){
+
+    hideAll();
+
+    document.getElementById("bottomNav").style.display="grid";
+
+
+    if(page==="jobs"){
+
+        document.getElementById("jobsPage").style.display="block";
+
+    }
+
+
+    if(page==="post"){
+
+        document.getElementById("postPage").style.display="block";
+
+    }
+
+
+    if(page==="notification"){
+
+        document.getElementById("notificationPage").style.display="block";
+
+    }
+
+
+    if(page==="profile"){
+
+        document.getElementById("profilePage").style.display="block";
+
+    }
+
+
+    updateNav(page);
+
+    window.scrollTo(0,0);
+
+}
+
+
+/* =====================================================
+   HOME
+===================================================== */
+
+function goHome(){
+
+    hideAll();
+
+    document.getElementById("mainScreen").style.display="block";
+
+    document.getElementById("bottomNav").style.display="grid";
+
+    updateNav("main");
+
+    window.scrollTo(0,0);
+
+}
+
+
+/* =====================================================
+   BOTTOM NAV ACTIVE
+===================================================== */
+
+function updateNav(page){
+
+    document.querySelectorAll(".nav-btn")
+        .forEach(button=>{
+
+            button.classList.remove("active");
+
+            if(button.dataset.page===page){
+
+                button.classList.add("active");
+
+            }
+
+        });
+
+}
+
+</script>
+
+</body>
+</html>

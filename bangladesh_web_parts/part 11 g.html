@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Assunnah Works House - দেশব্যাপী কর্মসংস্থান প্ল্যাটফর্ম</title>
+  
+  <!-- Google Fonts: Hind Siliguri & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Map Engine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    :root {
+      --bd-green: #046A38;
+      --bd-green-dark: #024724;
+      --bd-green-light: #0d8247;
+      --bd-red: #DA291C;
+      --bd-red-dark: #9e1a10;
+      --bd-gold: #F59E0B;
+      --surface-glass: rgba(255, 255, 255, 0.92);
+      --surface-card: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #475569;
+      --border-subtle: rgba(4, 106, 56, 0.15);
+      --shadow-premium: 0 10px 25px -5px rgba(2, 71, 36, 0.12), 0 8px 10px -6px rgba(2, 71, 36, 0.08);
+      --shadow-elevation: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #F1F5F9;
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cinematic Header */
+    header {
+      background: linear-gradient(135deg, var(--bd-green-dark) 0%, var(--bd-green) 100%);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      border-bottom: 2px solid rgba(218, 41, 28, 0.4);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 12px rgba(218, 41, 28, 0.5);
+    }
+
+    .brand-logo::after {
+      content: '';
+      width: 22px;
+      height: 22px;
+      background: var(--bd-red);
+      border-radius: 50%;
+    }
+
+    .brand-title h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-title p {
+      font-size: 0.72rem;
+      color: #A7F3D0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mode-toggle {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 4px;
+      border-radius: 30px;
+      display: flex;
+      cursor: pointer;
+    }
+
+    .mode-btn {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: white;
+      border: none;
+      background: transparent;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: var(--bd-red);
+      box-shadow: 0 2px 8px rgba(218, 41, 28, 0.4);
+    }
+
+    /* Main App Layout */
+    .app-viewport {
+      flex: 1;
+      display: flex;
+      position: relative;
+      height: calc(100vh - 60px);
+      overflow: hidden;
+    }
+
+    /* Map Section */
+    #map-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: #E2E8F0;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+
+    /* Location Breadcrumb Overlay */
+    .map-overlay-nav {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 500;
+      background: var(--surface-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-premium);
+      max-width: 90%;
+      overflow-x: auto;
+    }
+
+    .breadcrumb-item {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--bd-green-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .breadcrumb-item:hover {
+      color: var(--bd-red);
+    }
+
+    .breadcrumb-separator {
+      color: #94A3B8;
+      font-size: 0.75rem;
+    }
+
+    .level-badge {
+      background: linear-gradient(135deg, var(--bd-green) 0%, var(--bd-green-light) 100%);
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: 6px;
+    }
+
+    /* Map Level Actions Bar */
+    .map-level-actions {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+      background: var(--surface-glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 30px;
+      padding: 6px 12px;
+      display: flex;
+      gap: 8px;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .action-btn-pill {
+      background: white;
+      border: 1px solid #CBD5E1;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .action-btn-pill.primary {
+      background: var(--bd-green);
+      color: white;
+      border-color: var(--bd-green);
+    }
+
+    .action-btn-pill:hover {
+      border-color: var(--bd-red);
+      color: var(--bd-red);
+    }
+
+    .action-btn-pill.primary:hover {
+      background: var(--bd-green-dark);
+      color: white;
+    }
+
+    /* Side Panel / Bottom Sheet (Mobile Responsive) */
+    .content-panel {
+      width: 440px;
+      height: 100%;
+      background: var(--surface-card);
+      z-index: 600;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 25px rgba(0, 0, 0, 0.08);
+      transition: transform 0.35s ease-in-out;
+    }
+
+    .panel-header {
+      padding: 16px;
+      border-bottom: 1px solid #E2E8F0;
+      background: #FAFBFB;
+    }
+
+    .search-box-wrap {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .search-input-field {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: white;
+      border: 1.5px solid #CBD5E1;
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      gap: 8px;
+    }
+
+    .search-input-field:focus-within {
+      border-color: var(--bd-green);
+      box-shadow: 0 0 0 3px rgba(4, 106, 56, 0.1);
+    }
+
+    .search-input-field input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+
+    .voice-btn {
+      background: none;
+      border: none;
+      color: var(--bd-red);
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .filter-scroll-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .filter-scroll-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-chip {
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-chip.active {
+      background: var(--bd-green);
+      color: white;
+      border-color: var(--bd-green);
+    }
+
+    /* Jobs List Scrollable Area */
+    .jobs-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #F8FAFC;
+    }
+
+    .area-summary-banner {
+      background: linear-gradient(135deg, rgba(4, 106, 56, 0.08) 0%, rgba(218, 41, 28, 0.04) 100%);
+      border: 1px solid rgba(4, 106, 56, 0.2);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .area-summary-banner h3 {
+      font-size: 0.95rem;
+      color: var(--bd-green-dark);
+    }
+
+    .area-summary-banner span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Premium Job Card */
+    .job-card {
+      background: white;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .job-card:hover {
+      border-color: var(--bd-green);
+      box-shadow: 0 8px 16px -4px rgba(4, 106, 56, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .job-card.featured {
+      border-left: 4px solid var(--bd-red);
+    }
+
+    .job-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .job-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-verified {
+      background: #E0F2FE;
+      color: #0284C7;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .badge-halal {
+      background: #DCFCE7;
+      color: var(--bd-green);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    .job-salary {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--bd-red);
+    }
+
+    .job-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .job-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .job-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px dashed #E2E8F0;
+      font-size: 0.78rem;
+    }
+
+    .contact-badge-btn {
+      background: var(--bd-green);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .contact-badge-btn:hover {
+      background: var(--bd-green-dark);
+    }
+
+    /* Post Job Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: white;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      border-radius: var(--radius-lg);
+      overflow-y: auto;
+      box-shadow: var(--shadow-elevation);
+      position: relative;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, var(--bd-green-dark), var(--bd-green));
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-group label span.req {
+      color: var(--bd-red);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #CBD5E1;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--bd-green);
+      box-shadow: 0 0 0 3px rgba(4, 106, 56, 0.1);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .form-policy-note {
+      font-size: 0.78rem;
+      color: #64748B;
+      background: #F8FAFC;
+      border-left: 3px solid var(--bd-green);
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+
+    .btn-submit-job {
+      width: 100%;
+      background: var(--bd-red);
+      color: white;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-submit-job:hover {
+      background: var(--bd-red-dark);
+    }
+
+    /* Custom Leaflet Tooltip / Label */
+    .leaflet-polygon-label {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--bd-green);
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--bd-green-dark);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      white-space: nowrap;
+    }
+
+    /* Bottom Navigation for Mobile */
+    .mobile-nav-bar {
+      display: none;
+      background: white;
+      border-top: 1px solid #E2E8F0;
+      padding: 8px 12px;
+      justify-content: space-around;
+      z-index: 1000;
+    }
+
+    .mob-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .mob-nav-item.active {
+      color: var(--bd-green);
+      font-weight: 700;
+    }
+
+    /* Mobile Responsive Breakpoints */
+    @media (max-width: 900px) {
+      .app-viewport {
+        flex-direction: column;
+      }
+      .content-panel {
+        width: 100%;
+        height: 50%;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+      }
+      #map-container {
+        height: 50%;
+      }
+      .mobile-nav-bar {
+        display: flex;
+      }
+      .map-level-actions {
+        bottom: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cinematic Top Bar -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-logo" title="Assunnah Works House Logo"></div>
+      <div class="brand-title">
+        <h1>Assunnah Works House <span style="font-size: 0.75rem; background: var(--bd-red); color: white; padding: 2px 6px; border-radius: 4px;">PWA</span></h1>
+        <p>সরাসরি কর্মসংস্থান ও বিশ্বস্ত সেবা নেটওয়ার্ক</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Worker / Employer Mode Switcher -->
+      <div class="mode-toggle" id="modeSwitch">
+        <button class="mode-btn active" id="btnWorkerMode" onclick="switchMode('worker')">কাজ খুঁজছি</button>
+        <button class="mode-btn" id="btnEmployerMode" onclick="switchMode('employer')">কর্মী দরকার</button>
+      </div>
+      
+      <button class="action-btn-pill primary" onclick="openPostJobModal()" style="padding: 6px 12px;">
+        <i data-feather="plus-circle" style="width: 16px; height: 16px;"></i>
+        <span>কাজের বিজ্ঞপ্তি দিন</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Workspace Viewport -->
+  <div class="app-viewport">
+    
+    <!-- Map Region -->
+    <div id="map-container">
+      <!-- Breadcrumb Navigation on Map -->
+      <div class="map-overlay-nav" id="mapBreadcrumb">
+        <div class="breadcrumb-item" onclick="resetToCountryLevel()">
+          <i data-feather="globe" style="width: 14px; height: 14px;"></i> বাংলাদেশ
+        </div>
+        <span class="level-badge" id="currentLevelBadge">জাতীয় ম্যাপ</span>
+      </div>
+
+      <!-- Action Floating Bar -->
+      <div class="map-level-actions">
+        <button class="action-btn-pill" onclick="stayAtCurrentLevel()">
+          <i data-feather="check" style="width: 14px; height: 14px; color: var(--bd-green);"></i>
+          <span>এই অঞ্চলেই ফিল্টার করুন</span>
+        </button>
+        <button class="action-btn-pill" id="btnResetMap" onclick="resetToCountryLevel()">
+          <i data-feather="rotate-ccw" style="width: 14px; height: 14px;"></i>
+          <span>শুরুতে ফিরুন</span>
+        </button>
+      </div>
+
+      <!-- The Map Core Engine -->
+      <div id="map"></div>
+    </div>
+
+    <!-- Jobs / Workers Detail Panel -->
+    <div class="content-panel" id="contentPanel">
+      <div class="panel-header">
+        <div class="search-box-wrap">
+          <div class="search-input-field">
+            <i data-feather="search" style="width: 16px; height: 16px; color: #64748B;"></i>
+            <input type="text" id="keywordSearch" placeholder="কী কাজ খুঁজছেন? (ইলেকট্রিশিয়ান, ড্রাইভার, শিক্ষক...)" onkeyup="filterJobs()">
+            <button class="voice-btn" title="ভয়েস সার্চ" onclick="triggerVoiceSearch()">
+              <i data-feather="mic" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Scroll Filters -->
+        <div class="filter-scroll-bar" id="categoryFilters">
+          <div class="filter-chip active" onclick="selectCategory('all', this)">সব কাজ</div>
+          <div class="filter-chip" onclick="selectCategory('skilled', this)">কারিগর/টেকনিশিয়ান</div>
+          <div class="filter-chip" onclick="selectCategory('religious', this)">ইমাম / মুয়াজ্জিন / শিক্ষক</div>
+          <div class="filter-chip" onclick="selectCategory('daily', this)">দৈনিক মজুরি</div>
+          <div class="filter-chip" onclick="selectCategory('office', this)">অফিস / একাউন্টিং</div>
+          <div class="filter-chip" onclick="selectCategory('domestic', this)">বাসাবাড়ি / সেবা</div>
+        </div>
+      </div>
+
+      <!-- Realtime Area Context Summary -->
+      <div class="jobs-container" id="jobsListContainer">
+        <div class="area-summary-banner">
+          <div>
+            <h3 id="currentAreaNameHeading">সমগ্র বাংলাদেশ</h3>
+            <span id="currentAreaMeta">৮ বিভাগ • ৬৪ জেলা অন্তর্ভুক্ত</span>
+          </div>
+          <span style="background: var(--bd-green); color: white; font-weight: 700; padding: 4px 8px; border-radius: 8px; font-size: 0.8rem;" id="totalJobsCounter">১২৪টি কর্মসুযোগ</span>
+        </div>
+
+        <!-- Rendered Job Cards -->
+        <div id="dynamicJobsListing" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <div class="mobile-nav-bar">
+    <button class="mob-nav-item active" onclick="setMobileTab('map')">
+      <i data-feather="map-pin" style="width: 18px; height: 18px;"></i>
+      <span>ম্যাপ</span>
+    </button>
+    <button class="mob-nav-item" onclick="setMobileTab('jobs')">
+      <i data-feather="briefcase" style="width: 18px; height: 18px;"></i>
+      <span>কাজের তালিকা</span>
+    </button>
+    <button class="mob-nav-item" onclick="openPostJobModal()">
+      <i data-feather="plus-circle" style="width: 18px; height: 18px; color: var(--bd-red);"></i>
+      <span>পোস্ট করুন</span>
+    </button>
+    <button class="mob-nav-item" onclick="alert('আপনার সেভ করা কাজসমূহ সুরক্ষিত আছে।')">
+      <i data-feather="bookmark" style="width: 18px; height: 18px;"></i>
+      <span>সংরক্ষিত</span>
+    </button>
+  </div>
+
+  <!-- Verified Post Job Modal Dialog -->
+  <div class="modal-backdrop" id="postJobModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size: 1.1rem; font-weight: 700;">নতুন কাজের বিবরণ দিন (সরাসরি নিয়োগ)</h3>
+        <button onclick="closePostJobModal()" style="background: none; border: none; color: white; cursor: pointer;">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      
+      <form class="modal-body" onsubmit="handleJobPublish(event)">
+        <div class="form-policy-note">
+          <strong>শর্ত ও নিরাপত্তা:</strong> কোনো বেআইনি কাজ, প্রতারণামূলক অফার বা অপ্রাপ্তবয়স্কদের ঝুঁকিযুক্ত কাজের পোস্ট সম্পূর্ণ নিষিদ্ধ।
+        </div>
+
+        <div class="form-group">
+          <label>১. কাজের পদবী ও ধরন <span class="req">*</span></label>
+          <input type="text" class="form-control" id="postTitle" required placeholder="উদাঃ অভিজ্ঞ ইলেকট্রিশিয়ান বা মাদ্রাসার নূরানী শিক্ষক">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>ক্যাটাগরি <span class="req">*</span></label>
+            <select class="form-control" id="postCategory" required>
+              <option value="skilled">টেকনিশিয়ান ও ট্রেড ওয়ার্কার</option>
+              <option value="religious">ইমাম / মুয়াজ্জিন / শিক্ষক</option>
+              <option value="daily">দৈনিক মজুরি / ডেলিভারি</option>
+              <option value="office">অফিস / ডাটা এন্ট্রি / হিসাব</option>
+              <option value="domestic">গৃহস্থালি / কুক / ড্রাইভার</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>কাজের সময়সীমা <span class="req">*</span></label>
+            <select class="form-control" id="postType" required>
+              <option value="ফুল-টাইম">ফুল-টাইম</option>
+              <option value="পার্ট-টাইম">পার্ট-টাইম</option>
+              <option value="দৈনিক ভিত্তিক">দৈনিক ভিত্তিক</option>
+              <option value="চুক্তিভিত্তিক">চুক্তিভিত্তিক</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>২. কাজের অবস্থান (বিভাগ, জেলা ও উপজেলা) <span class="req">*</span></label>
+          <input type="text" class="form-control" id="postLocation" required placeholder="উদাঃ মিরপুর-১০, ঢাকা উত্তর সিটি করপোরেশন / ফুলবাড়িয়া, ময়মনসিংহ">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>৩. কর্মীর সংখ্যা <span class="req">*</span></label>
+            <input type="number" min="1" value="1" class="form-control" id="postWorkerCount" required>
+          </div>
+          <div class="form-group">
+            <label>৪. বেতন / মজুরি <span class="req">*</span></label>
+            <input type="text" class="form-control" id="postSalary" required placeholder="উদাঃ ১৫,০০০ - ১৮,০০০ টাকা অথবা আলোচনা সাপেক্ষে">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>৫. যোগাযোগের মোবাইল নম্বর / হোয়াটসঅ্যাপ <span class="req">*</span></label>
+          <input type="tel" class="form-control" id="postPhone" required placeholder="০১৭১XXXXXXXX">
+        </div>
+
+        <div class="form-group">
+          <label>৬. কাজের দায়িত্ব ও পূর্ণ বিবরণ <span class="req">*</span></label>
+          <textarea class="form-control" id="postDesc" rows="3" required placeholder="কাজের সুনির্দিষ্ট দায়িত্ব, প্রয়োজনীয় দক্ষতা ও কাজের পরিবেশ সম্পর্কে লিখুন..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit-job">বিজ্ঞপ্তি তাৎক্ষণিক প্রকাশ করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       ১. অথেনটিক প্রশাসনিক তথ্য কাঠামো (NO FAKE NAMES)
+       ========================================================================= */
+    const BANGLADESH_HIERARCHY = {
+      "dhaka": {
+        bn: "ঢাকা বিভাগ",
+        lat: 23.8103, lng: 90.4125, zoom: 9,
+        bounds: [[24.4, 89.6], [23.1, 91.1]],
+        districts: {
+          "dhaka_d": {
+            bn: "ঢাকা জেলা",
+            lat: 23.8103, lng: 90.4125, zoom: 11,
+            bounds: [[23.95, 90.20], [23.65, 90.55]],
+            upazilas: {
+              "mirpur": { bn: "মিরপুর", lat: 23.807, lng: 90.368, unions: ["সেকশন ১", "সেকশন ১০", "সেকশন ১১", "পাইকপাড়া"] },
+              "dhanmondi": { bn: "ধানমন্ডি", lat: 23.746, lng: 90.374, unions: ["রোড ১-১৫", "শংকর", "রায়েরবাজার"] },
+              "savar": { bn: "সাভার", lat: 23.848, lng: 90.257, unions: ["আমিনবাজার", "তেঁতুলঝোড়া", "ভাকুর্তা", "বিরুলিয়া"] },
+              "dhamrai": { bn: "ধামরাই", lat: 23.918, lng: 90.208, unions: ["আমতা", "বাইশাকান্দা", "কুশুরা", "সোমভাগ"] }
+            }
+          },
+          "gazipur": {
+            bn: "গাজীপুর",
+            lat: 24.0023, lng: 90.4264, zoom: 11,
+            bounds: [[24.25, 90.20], [23.85, 90.65]],
+            upazilas: {
+              "joydebpur": { bn: "গাজীপুর সদর", lat: 24.00, lng: 90.42, unions: ["বাড়িয়া", "কাউলতিয়া"] },
+              "kaliakair": { bn: "কালিয়াকৈর", lat: 24.07, lng: 90.22, unions: ["ফুলবাড়িয়া", "চাপাইর", "বোয়ালী"] },
+              "sreepur": { bn: "শ্রীপুর", lat: 24.20, lng: 90.47, unions: ["মাওনা", "তেলিহাটি", "বর্মি"] }
+            }
+          },
+          "narayanganj": {
+            bn: "নারায়ণগঞ্জ",
+            lat: 23.6238, lng: 90.5000, zoom: 11,
+            bounds: [[23.78, 90.40], [23.50, 90.70]],
+            upazilas: {
+              "sonargaon": { bn: "সোনারগাঁও", lat: 23.65, lng: 90.60, unions: ["বারদী", "বৈদ্যেরবাজার", "নোয়াগাঁও"] },
+              "rupganj": { bn: "রূপগঞ্জ", lat: 23.79, lng: 90.53, unions: ["মুড়াপাড়া", "ভুলতা", "গোলাকান্দাইল"] }
+            }
+          }
+        }
+      },
+      "chattogram": {
+        bn: "চট্টগ্রাম বিভাগ",
+        lat: 22.3569, lng: 91.7832, zoom: 8,
+        bounds: [[23.7, 91.0], [21.0, 92.6]],
+        districts: {
+          "chattogram_d": {
+            bn: "চট্টগ্রাম জেলা",
+            lat: 22.3569, lng: 91.7832, zoom: 11,
+            bounds: [[22.8, 91.5], [21.9, 92.1]],
+            upazilas: {
+              "panchlaish": { bn: "পাঁচলাইশ", lat: 22.36, lng: 91.82, unions: ["মুরাদপুর", "ষোলশহর", "চকবাজার"] },
+              "hathazari": { bn: "হাটহাজারী", lat: 22.50, lng: 91.80, unions: ["ফতেপুর", "মেখল", "মির্জাপুর"] },
+              "sitakunda": { bn: "সীতাকুণ্ড", lat: 22.61, lng: 91.66, unions: ["বারবকুন্ড", "কুমিরা", "বাঁশবাড়িয়া"] }
+            }
+          },
+          "cumilla": {
+            bn: "কুমিল্লা",
+            lat: 23.4682, lng: 91.1788, zoom: 11,
+            bounds: [[23.8, 90.8], [23.1, 91.4]],
+            upazilas: {
+              "cumilla_sadar": { bn: "আদর্শ সদর", lat: 23.46, lng: 91.18, unions: ["কালিরবাজার", "আমতলী", "জগন্নাথপুর"] },
+              "daudkandi": { bn: "দাউদকান্দি", lat: 23.53, lng: 90.72, unions: ["ইলিয়টগঞ্জ", "মারুকা", "জিংলাতলী"] }
+            }
+          },
+          "coxsbazar": {
+            bn: "কক্সবাজার",
+            lat: 21.4272, lng: 92.0058, zoom: 10,
+            bounds: [[21.9, 91.7], [20.8, 92.4]],
+            upazilas: {
+              "cox_sadar": { bn: "কক্সবাজার সদর", lat: 21.43, lng: 92.00, unions: ["ঝিলংজা", "পিএমখালী", "খুরুশকুল"] },
+              "teknaf": { bn: "টেকনাফ", lat: 20.86, lng: 92.29, unions: ["সাবরাং", "বাহারছড়া", "হ্নীলা"] }
+            }
+          }
+        }
+      },
+      "rajshahi": {
+        bn: "রাজশাহী বিভাগ",
+        lat: 24.3745, lng: 88.6042, zoom: 8,
+        bounds: [[25.2, 88.0], [23.8, 89.8]],
+        districts: {
+          "rajshahi_d": {
+            bn: "রাজশাহী জেলা",
+            lat: 24.3745, lng: 88.6042, zoom: 11,
+            bounds: [[24.7, 88.3], [24.1, 88.9]],
+            upazilas: {
+              "boalia": { bn: "বোয়ালিয়া", lat: 24.36, lng: 88.60, unions: ["রামচন্দ্রপুর", "সাহেব বাজার"] },
+              "paba": { bn: "পবা", lat: 24.43, lng: 88.58, unions: ["হুজুরীপাড়া", "দামকুড়া", "হরিয়ান"] }
+            }
+          },
+          "bogura": {
+            bn: "বগুড়া",
+            lat: 24.8465, lng: 89.3777, zoom: 11,
+            bounds: [[25.1, 89.1], [24.5, 89.7]],
+            upazilas: {
+              "bogura_sadar": { bn: "বগুড়া সদর", lat: 24.85, lng: 89.37, unions: ["ফাপোর", "নামুজা", "শাখাহার"] },
+              "sherpur": { bn: "শেরপুর", lat: 24.67, lng: 89.41, unions: ["কুসুম্বী", "গাড়ীদহ", "মির্জাপুর"] }
+            }
+          }
+        }
+      },
+      "khulna": {
+        bn: "খুলনা বিভাগ",
+        lat: 22.8456, lng: 89.5403, zoom: 8,
+        bounds: [[23.9, 88.6], [21.5, 89.9]],
+        districts: {
+          "khulna_d": {
+            bn: "খুলনা জেলা",
+            lat: 22.8456, lng: 89.5403, zoom: 11,
+            bounds: [[23.1, 89.2], [22.2, 89.8]],
+            upazilas: {
+              "khalishpur": { bn: "খালিশপুর", lat: 22.86, lng: 89.53, unions: ["মুজগুন্নী", "বয়রা"] },
+              "dumuria": { bn: "ডুমুরিয়া", lat: 22.80, lng: 89.42, unions: ["ধামালিয়া", "রংপুর", "খর্নিয়া"] }
+            }
+          }
+        }
+      },
+      "sylhet": {
+        bn: "সিলেট বিভাগ",
+        lat: 24.8949, lng: 91.8687, zoom: 8,
+        bounds: [[25.2, 91.0], [24.1, 92.5]],
+        districts: {
+          "sylhet_d": {
+            bn: "সিলেট জেলা",
+            lat: 24.8949, lng: 91.8687, zoom: 11,
+            bounds: [[25.1, 91.6], [24.6, 92.2]],
+            upazilas: {
+              "sylhet_sadar": { bn: "সিলেট সদর", lat: 24.89, lng: 91.87, unions: ["মোগলগাঁও", "কান্দিগাঁও", "টুকরবাজার"] },
+              "beanibazar": { bn: "বিয়ানীবাজার", lat: 24.82, lng: 92.15, unions: ["কুড়ারবাজার", "শেওলা", "মুড়িয়া"] }
+            }
+          }
+        }
+      },
+      "barishal": {
+        bn: "বরিশাল বিভাগ",
+        lat: 22.7010, lng: 90.3535, zoom: 8,
+        bounds: [[23.1, 89.8], [21.7, 90.8]],
+        districts: {
+          "barishal_d": {
+            bn: "বরিশাল জেলা",
+            lat: 22.7010, lng: 90.3535, zoom: 11,
+            bounds: [[23.0, 90.1], [22.4, 90.6]],
+            upazilas: {
+              "barishal_sadar": { bn: "বরিশাল সদর", lat: 22.70, lng: 90.36, unions: ["রায়পাশা", "কাশীপুর", "চরকাউয়া"] }
+            }
+          }
+        }
+      },
+      "rangpur": {
+        bn: "রংপুর বিভাগ",
+        lat: 25.7439, lng: 89.2752, zoom: 8,
+        bounds: [[26.4, 88.0], [25.1, 89.8]],
+        districts: {
+          "rangpur_d": {
+            bn: "রংপুর জেলা",
+            lat: 25.7439, lng: 89.2752, zoom: 11,
+            bounds: [[25.9, 89.0], [25.4, 89.5]],
+            upazilas: {
+              "rangpur_sadar": { bn: "রংপুর সদর", lat: 25.75, lng: 89.27, unions: ["পাগলাপীর", "হরিদেবপুর", "চন্দনপাট"] }
+            }
+          }
+        }
+      },
+      "mymensingh": {
+        bn: "ময়মনসিংহ বিভাগ",
+        lat: 24.7471, lng: 90.4203, zoom: 8,
+        bounds: [[25.2, 89.6], [24.2, 91.0]],
+        districts: {
+          "mymensingh_d": {
+            bn: "ময়মনসিংহ জেলা",
+            lat: 24.7471, lng: 90.4203, zoom: 11,
+            bounds: [[25.1, 90.1], [24.4, 90.7]],
+            upazilas: {
+              "mymensingh_sadar": { bn: "ময়মনসিংহ সদর", lat: 24.75, lng: 90.42, unions: ["বোররচর", "পরানগঞ্জ", "সিরতা"] },
+              "muktagachha": { bn: "মুক্তাগাছা", lat: 24.77, lng: 90.26, unions: ["তারাটি", "ঘোগা", "কুমারগাতা"] }
+            }
+          }
+        }
+      }
+    };
+
+    /* =========================================================================
+       ২. রিয়েলিস্টিক কাজ ও কর্মীর ডাটাবেজ (Strictly Halal & Legal)
+       ========================================================================= */
+    const SAMPLE_JOBS = [
+      {
+        id: 1,
+        title: "অভিজ্ঞ মসজিদ খতিব ও পেশ ইমাম",
+        category: "religious",
+        division: "dhaka", district: "dhaka_d", upazila: "dhanmondi",
+        locationText: "ধানমন্ডি লেক জামে মসজিদ, ঢাকা",
+        salary: "২৫,০০০ - ৩০,০০০ ৳/মাস",
+        type: "ফুল-টাইম",
+        workersNeeded: 1,
+        contact: "০১৭৮৮XXXXXX (মুতাওয়াল্লি)",
+        verified: true,
+        halalBadge: "ধর্মীয় ও শিক্ষা",
+        postedAgo: "২ ঘণ্টা আগে",
+        desc: "দাওরায়ে হাদিস উত্তীর্ণ এবং সহীহ কিরাত জানা সুন্নাত অনুসারী পেশ ইমাম আবশ্যক। থাকা ও খাবারের সুব্যবস্থা রয়েছে।"
+      },
+      {
+        id: 2,
+        title: "বাসাবাড়ির এসি ও ফ্রিজ সার্ভিস টেকনিশিয়ান",
+        category: "skilled",
+        division: "dhaka", district: "dhaka_d", upazila: "mirpur",
+        locationText: "মিরপুর-১০ গোলচত্বর, ঢাকা",
+        salary: "১,২০০ ৳/দৈনিক",
+        type: "দৈনিক ভিত্তিক",
+        workersNeeded: 2,
+        contact: "০১৯১১XXXXXX",
+        verified: true,
+        halalBadge: "দক্ষ কারিগর",
+        postedAgo: "১ দিন আগে",
+        desc: "ইনভার্টার এসি ইন্সটলেশন ও পাইপলাইন ওয়্যারিং-এ পারদর্শী ২ জন দক্ষ টেকনিশিয়ান প্রয়োজন। নিরাপত্তা ইকুইপমেন্ট প্রদান করা হবে।"
+      },
+      {
+        id: 3,
+        title: "আবাসিক মাদ্রাসার নূরানী ও নাজেরা শিক্ষক",
+        category: "religious",
+        division: "chattogram", district: "chattogram_d", upazila: "hathazari",
+        locationText: "হাটহাজারী পৌরসভা, চট্টগ্রাম",
+        salary: "১৫,০০০ ৳/মাস",
+        type: "ফুল-টাইম",
+        workersNeeded: 2,
+        contact: "০১৮১২XXXXXX",
+        verified: true,
+        halalBadge: "হিফজুল কুরআন",
+        postedAgo: "৪ ঘণ্টা আগে",
+        desc: "ছোট বাচ্চাদের মায়া ও স্নেহের সাথে নুরানী পদ্ধতিতে কোরআন শিক্ষা দিতে সক্ষম মুয়াল্লিম প্রয়োজন।"
+      },
+      {
+        id: 4,
+        title: "পাইকারি কাপড়ের শোরুম সেলসম্যান ও হিসাবরক্ষক",
+        category: "office",
+        division: "dhaka", district: "narayanganj", upazila: "rupganj",
+        locationText: "ভুলতা গাউছিয়া মার্কেট, নারায়ণগঞ্জ",
+        salary: "১৮,০০০ ৳/মাস",
+        type: "ফুল-টাইম",
+        workersNeeded: 3,
+        contact: "০১৬৭৭XXXXXX",
+        verified: false,
+        halalBadge: "ব্যবসা প্রতিষ্ঠান",
+        postedAgo: "৩ দিন আগে",
+        desc: "কম্পিউটারে এক্সেল ও ট্যালি সফটওয়্যারে স্টক ও ইনভয়েস ট্র্যাকিং করতে জানতে হবে। সততা অপরিহার্য।"
+      },
+      {
+        id: 5,
+        title: "কৃষি খামার ও ডেইরি ফার্ম সহকারী",
+        category: "daily",
+        division: "mymensingh", district: "mymensingh_d", upazila: "muktagachha",
+        locationText: "মুক্তাগাছা, ময়মনসিংহ",
+        salary: "৭০০ ৳/দৈনিক + খাবার",
+        type: "দৈনিক ভিত্তিক",
+        workersNeeded: 4,
+        contact: "০১৭৩৩XXXXXX",
+        verified: true,
+        halalBadge: "কৃষি ও পশুপালন",
+        postedAgo: "৫ ঘণ্টা আগে",
+        desc: "গরুর খামার পরিচর্যা ও দুধ দোয়ানোর কাজে অভিজ্ঞ ভাই প্রয়োজন। স্বাস্থ্যসম্মত আবাসিক ব্যবস্থা আছে।"
+      },
+      {
+        id: 6,
+        title: "ফ্ল্যাট বিল্ডিংয়ের জন্য স্যানিটারি ও প্লাম্বার",
+        category: "skilled",
+        division: "rajshahi", district: "bogura", upazila: "bogura_sadar",
+        locationText: "বগুড়া শহর, বগুড়া",
+        salary: "আলোচনা সাপেক্ষে",
+        type: "চুক্তিভিত্তিক",
+        workersNeeded: 1,
+        contact: "০১৫২১XXXXXX",
+        verified: true,
+        halalBadge: "নির্মাণ ও প্লাম্বিং",
+        postedAgo: "১ দিন আগে",
+        desc: "৬ তলা নতুন ভবনের সম্পূর্ণ বাথরুম ফিটিংস ও সেন্ট্রাল ওয়াটার লাইন কাজের জন্য চুক্তিভিত্তিক মিস্ত্রি প্রয়োজন।"
+      }
+    ];
+
+    /* =========================================================================
+       ৩. স্টেট ম্যানেজমেন্ট ও ম্যাপ ইঞ্জিন
+       ========================================================================= */
+    let currentLevel = 'country'; // 'country' -> 'division' -> 'district' -> 'upazila'
+    let selectedDivisionKey = null;
+    let selectedDistrictKey = null;
+    let selectedUpazilaKey = null;
+    let activeCategory = 'all';
+    let currentMode = 'worker'; // 'worker' | 'employer'
+
+    // ম্যাপ ইনিশিয়ালাইজেশন (Centered on Bangladesh)
+    const map = L.map('map', {
+      zoomControl: false,
+      attributionControl: false
+    }).setView([23.8103, 90.4125], 7);
+
+    // ক্লিন লাইট টাইল লেয়ার
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      maxZoom: 18,
+      subdomains: 'abcd'
+    }).addTo(map);
+
+    // জুম কন্ট্রোল ডানদিকে সেট
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    let currentLayerGroup = L.layerGroup().addTo(map);
+
+    // রিজিয়ন পলিগন ড্রয়িং ফাংশন
+    function drawDivisions() {
+      currentLayerGroup.clearLayers();
+      
+      Object.keys(BANGLADESH_HIERARCHY).forEach(divKey => {
+        const divData = BANGLADESH_HIERARCHY[divKey];
+        const bounds = divData.bounds;
+        
+        // বাউন্ডিং বক্স দিয়ে মসৃণ পলিগন ক্রিয়েশন
+        const polygon = L.rectangle(bounds, {
+          color: '#046A38',
+          weight: 2,
+          fillColor: '#046A38',
+          fillOpacity: 0.12,
+          dashArray: '4, 4'
+        }).addTo(currentLayerGroup);
+
+        // ক্লিক ইন্টার‍্যাকশন -> ড্রিল ডাউন
+        polygon.on('click', () => {
+          navigateToDivision(divKey);
+        });
+
+        // হোভার ইফেক্ট
+        polygon.on('mouseover', function() {
+          this.setStyle({
+            fillColor: '#DA291C',
+            fillOpacity: 0.25,
+            weight: 3,
+            color: '#DA291C'
+          });
+        });
+
+        polygon.on('mouseout', function() {
+          this.setStyle({
+            fillColor: '#046A38',
+            fillOpacity: 0.12,
+            weight: 2,
+            color: '#046A38'
+          });
+        });
+
+        // ম্যাপের ভেতরে স্থায়ী ও স্পষ্ট বাংলা নাম লেবেল
+        L.marker([divData.lat, divData.lng], {
+          icon: L.divIcon({
+            className: 'leaflet-polygon-label',
+            html: `<span>📍 ${divData.bn}</span>`,
+            iconSize: [110, 24],
+            iconAnchor: [55, 12]
+          })
+        }).addTo(currentLayerGroup).on('click', () => navigateToDivision(divKey));
+      });
+    }
+
+    function drawDistricts(divKey) {
+      currentLayerGroup.clearLayers();
+      const divData = BANGLADESH_HIERARCHY[divKey];
+      if (!divData || !divData.districts) return;
+
+      Object.keys(divData.districts).forEach(distKey => {
+        const distData = divData.districts[distKey];
+        const bounds = distData.bounds;
+
+        const polygon = L.rectangle(bounds, {
+          color: '#DA291C',
+          weight: 2,
+          fillColor: '#046A38',
+          fillOpacity: 0.18
+        }).addTo(currentLayerGroup);
+
+        polygon.on('click', () => {
+          navigateToDistrict(distKey);
+        });
+
+        polygon.on('mouseover', function() {
+          this.setStyle({ fillColor: '#DA291C', fillOpacity: 0.35 });
+        });
+        polygon.on('mouseout', function() {
+          this.setStyle({ fillColor: '#046A38', fillOpacity: 0.18 });
+        });
+
+        L.marker([distData.lat, distData.lng], {
+          icon: L.divIcon({
+            className: 'leaflet-polygon-label',
+            html: `<span>🏙️ ${distData.bn}</span>`,
+            iconSize: [100, 24],
+            iconAnchor: [50, 12]
+          })
+        }).addTo(currentLayerGroup).on('click', () => navigateToDistrict(distKey));
+      });
+    }
+
+    function drawUpazilas(divKey, distKey) {
+      currentLayerGroup.clearLayers();
+      const distData = BANGLADESH_HIERARCHY[divKey].districts[distKey];
+      if (!distData || !distData.upazilas) return;
+
+      Object.keys(distData.upazilas).forEach(upzKey => {
+        const upzData = distData.upazilas[upzKey];
+        
+        // লোকাল সার্কেল রিপ্রেজেন্টেশন
+        const marker = L.circleMarker([upzData.lat, upzData.lng], {
+          radius: 20,
+          color: '#046A38',
+          weight: 3,
+          fillColor: '#DA291C',
+          fillOpacity: 0.4
+        }).addTo(currentLayerGroup);
+
+        marker.on('click', () => {
+          navigateToUpazila(upzKey);
+        });
+
+        L.marker([upzData.lat, upzData.lng], {
+          icon: L.divIcon({
+            className: 'leaflet-polygon-label',
+            html: `<span>📌 ${upzData.bn}</span>`,
+            iconSize: [90, 22],
+            iconAnchor: [45, -14]
+          })
+        }).addTo(currentLayerGroup).on('click', () => navigateToUpazila(upzKey));
+      });
+    }
+
+    /* =========================================================================
+       ৪. নেভিগেশন ও ড্রিল-ডাউন লজিক (Non-blocking, flexible hierarchy)
+       ========================================================================= */
+    function navigateToDivision(divKey) {
+      selectedDivisionKey = divKey;
+      selectedDistrictKey = null;
+      selectedUpazilaKey = null;
+      currentLevel = 'division';
+
+      const divData = BANGLADESH_HIERARCHY[divKey];
+      map.flyTo([divData.lat, divData.lng], divData.zoom, { duration: 1.2 });
+      drawDistricts(divKey);
+      updateBreadcrumb();
+      renderJobListings();
+    }
+
+    function navigateToDistrict(distKey) {
+      selectedDistrictKey = distKey;
+      selectedUpazilaKey = null;
+      currentLevel = 'district';
+
+      const distData = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[distKey];
+      map.flyTo([distData.lat, distData.lng], distData.zoom, { duration: 1.0 });
+      drawUpazilas(selectedDivisionKey, distKey);
+      updateBreadcrumb();
+      renderJobListings();
+    }
+
+    function navigateToUpazila(upzKey) {
+      selectedUpazilaKey = upzKey;
+      currentLevel = 'upazila';
+
+      const upzData = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[selectedDistrictKey].upazilas[upzKey];
+      map.flyTo([upzData.lat, upzData.lng], 13, { duration: 0.8 });
+      updateBreadcrumb();
+      renderJobListings();
+    }
+
+    function resetToCountryLevel() {
+      selectedDivisionKey = null;
+      selectedDistrictKey = null;
+      selectedUpazilaKey = null;
+      currentLevel = 'country';
+
+      map.flyTo([23.8103, 90.4125], 7, { duration: 1.2 });
+      drawDivisions();
+      updateBreadcrumb();
+      renderJobListings();
+    }
+
+    function stayAtCurrentLevel() {
+      // ইউজার যেকোনো লেভেলে সন্তুষ্ট থাকলে জোর করে গভীরে যাওয়ার প্রয়োজন নেই
+      let name = "সমগ্র বাংলাদেশ";
+      if(selectedUpazilaKey) {
+        name = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[selectedDistrictKey].upazilas[selectedUpazilaKey].bn;
+      } else if(selectedDistrictKey) {
+        name = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[selectedDistrictKey].bn;
+      } else if(selectedDivisionKey) {
+        name = BANGLADESH_HIERARCHY[selectedDivisionKey].bn;
+      }
+      alert(`আপনি '${name}' অঞ্চলে সীমাবদ্ধ থেকে কাজ খুঁজছেন। নিচে এই এলাকার তালিকা সাজানো হয়েছে।`);
+    }
+
+    function updateBreadcrumb() {
+      const container = document.getElementById('mapBreadcrumb');
+      const badge = document.getElementById('currentLevelBadge');
+      
+      let html = `<div class="breadcrumb-item" onclick="resetToCountryLevel()"><i data-feather="globe" style="width: 14px; height: 14px;"></i> বাংলাদেশ</div>`;
+
+      if (selectedDivisionKey) {
+        const divBn = BANGLADESH_HIERARCHY[selectedDivisionKey].bn;
+        html += `<span class="breadcrumb-separator">/</span><div class="breadcrumb-item" onclick="navigateToDivision('${selectedDivisionKey}')">${divBn}</div>`;
+        badge.innerText = "বিভাগীয় ম্যাপ";
+      }
+
+      if (selectedDistrictKey) {
+        const distBn = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[selectedDistrictKey].bn;
+        html += `<span class="breadcrumb-separator">/</span><div class="breadcrumb-item" onclick="navigateToDistrict('${selectedDistrictKey}')">${distBn}</div>`;
+        badge.innerText = "জেলা ম্যাপ";
+      }
+
+      if (selectedUpazilaKey) {
+        const upzBn = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[selectedDistrictKey].upazilas[selectedUpazilaKey].bn;
+        html += `<span class="breadcrumb-separator">/</span><div class="breadcrumb-item" style="color: var(--bd-red);">${upzBn}</div>`;
+        badge.innerText = "উপজেলা / থানা ম্যাপ";
+      }
+
+      if (!selectedDivisionKey) {
+        badge.innerText = "জাতীয় ম্যাপ";
+      }
+
+      container.innerHTML = html;
+      container.appendChild(badge);
+      feather.replace();
+    }
+
+    /* =========================================================================
+       ৫. জব ও ওয়ার্কার ডাটা রেন্ডারিং
+       ========================================================================= */
+    function renderJobListings() {
+      const listContainer = document.getElementById('dynamicJobsListing');
+      const areaHeading = document.getElementById('currentAreaNameHeading');
+      const areaMeta = document.getElementById('currentAreaMeta');
+      const totalCounter = document.getElementById('totalJobsCounter');
+      const searchKeyword = document.getElementById('keywordSearch').value.toLowerCase().trim();
+
+      // ফিল্টারিং লজিক
+      let filtered = SAMPLE_JOBS.filter(job => {
+        // লোকেশন ফিল্টার
+        if (selectedDivisionKey && job.division !== selectedDivisionKey) return false;
+        if (selectedDistrictKey && job.district !== selectedDistrictKey) return false;
+        if (selectedUpazilaKey && job.upazila !== selectedUpazilaKey) return false;
+
+        // ক্যাটাগরি ফিল্টার
+        if (activeCategory !== 'all' && job.category !== activeCategory) return false;
+
+        // কীওয়ার্ড ফিল্টার
+        if (searchKeyword) {
+          const matchTitle = job.title.toLowerCase().includes(searchKeyword);
+          const matchDesc = job.desc.toLowerCase().includes(searchKeyword);
+          const matchLoc = job.locationText.toLowerCase().includes(searchKeyword);
+          if (!matchTitle && !matchDesc && !matchLoc) return false;
+        }
+
+        return true;
+      });
+
+      // হেডিং আপডেট
+      if (selectedUpazilaKey) {
+        const u = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[selectedDistrictKey].upazilas[selectedUpazilaKey];
+        areaHeading.innerText = `${u.bn} অঞ্চল`;
+        areaMeta.innerText = `ইউনিয়ন/ওয়ার্ডে সরাসরি কাজ ও নিয়োগ`;
+      } else if (selectedDistrictKey) {
+        const d = BANGLADESH_HIERARCHY[selectedDivisionKey].districts[selectedDistrictKey];
+        areaHeading.innerText = `${d.bn} জেলা`;
+        areaMeta.innerText = `উপজেলা ভিত্তিক কর্মসংস্থান ফিল্টার সক্রিয়`;
+      } else if (selectedDivisionKey) {
+        const div = BANGLADESH_HIERARCHY[selectedDivisionKey];
+        areaHeading.innerText = `${div.bn}`;
+        areaMeta.innerText = `সকল জেলা ও উপজেলা অন্তর্ভুক্ত`;
+      } else {
+        areaHeading.innerText = `সমগ্র বাংলাদেশ`;
+        areaMeta.innerText = `৮ বিভাগ • ৬৪ জেলা অন্তর্ভুক্ত`;
+      }
+
+      totalCounter.innerText = `${filtered.length}টি কর্মসুযোগ`;
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: #64748B;">
+            <i data-feather="inbox" style="width: 44px; height: 44px; stroke-width: 1.5; color: #94A3B8; margin-bottom: 8px;"></i>
+            <h4 style="font-size: 1rem; color: #1E293B;">এই অঞ্চলে কোনো পোস্ট পাওয়া যায়নি</h4>
+            <p style="font-size: 0.8rem; margin-top: 4px;">আপনি প্রথম ব্যক্তি হিসেবে এখানে বিজ্ঞাপনের আবেদন করতে পারেন।</p>
+          </div>
+        `;
+        feather.replace();
+        return;
+      }
+
+      listContainer.innerHTML = filtered.map(job => `
+        <div class="job-card ${job.id === 1 ? 'featured' : ''}" onclick="showJobDetail(${job.id})">
+          <div class="job-card-header">
+            <div>
+              <div class="job-title">
+                ${job.title}
+                ${job.verified ? '<span class="badge-verified"><i data-feather="check-circle" style="width:10px;height:10px;"></i> ভেরিফাইড</span>' : ''}
+              </div>
+              <span class="badge-halal" style="margin-top: 4px; display: inline-block;">${job.halalBadge}</span>
+            </div>
+            <div class="job-salary">${job.salary}</div>
+          </div>
+
+          <p style="font-size: 0.82rem; color: #334155; margin-bottom: 10px; line-height: 1.4;">
+            ${job.desc.length > 80 ? job.desc.substring(0, 80) + '...' : job.desc}
+          </p>
+
+          <div class="job-meta-row">
+            <div class="job-meta-item">
+              <i data-feather="map-pin" style="width: 13px; height: 13px; color: var(--bd-red);"></i>
+              <span>${job.locationText}</span>
+            </div>
+            <div class="job-meta-item">
+              <i data-feather="clock" style="width: 13px; height: 13px; color: #64748B;"></i>
+              <span>${job.type}</span>
+            </div>
+            <div class="job-meta-item">
+              <i data-feather="users" style="width: 13px; height: 13px; color: #64748B;"></i>
+              <span>${job.workersNeeded} জন কর্মী</span>
+            </div>
+          </div>
+
+          <div class="job-footer">
+            <span style="color: #94A3B8;">${job.postedAgo}</span>
+            <button class="contact-badge-btn" onclick="event.stopPropagation(); callContact('${job.contact}')">
+              <i data-feather="phone-call" style="width: 13px; height: 13px;"></i>
+              যোগাযোগ করুন
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      feather.replace();
+    }
+
+    /* =========================================================================
+       ৬. ইউজার ইন্টারেকশন ও ফর্ম হ্যান্ডলার
+       ========================================================================= */
+    function selectCategory(cat, element) {
+      activeCategory = cat;
+      document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      renderJobListings();
+    }
+
+    function filterJobs() {
+      renderJobListings();
+    }
+
+    function triggerVoiceSearch() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'bn-BD';
+        recognition.start();
+        
+        recognition.onresult = function(event) {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById('keywordSearch').value = transcript;
+          renderJobListings();
+        };
+      } else {
+        alert("আপনার ব্রাউজারে সরাসরি ভয়েস সার্চ সমর্থিত নয়। মাইক্রোফোন পারমিশন চেক করুন।");
+      }
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnWorkerMode').classList.toggle('active', mode === 'worker');
+      document.getElementById('btnEmployerMode').classList.toggle('active', mode === 'employer');
+      
+      const keywordInput = document.getElementById('keywordSearch');
+      if (mode === 'employer') {
+        keywordInput.placeholder = "অভিজ্ঞ কর্মী বা কারিগর খুঁজুন (ইলেকট্রিশিয়ান, ড্রাইভার, রাজমিস্ত্রি...)";
+      } else {
+        keywordInput.placeholder = "কী কাজ খুঁজছেন? (ইলেকট্রিশিয়ান, ড্রাইভার, শিক্ষক...)";
+      }
+    }
+
+    function showJobDetail(id) {
+      const job = SAMPLE_JOBS.find(j => j.id === id);
+      if (!job) return;
+      alert(`[কাজের বিবরণী]\n\nপদবী: ${job.title}\nঅবস্থান: ${job.locationText}\nবেতন: ${job.salary}\nমেয়াদ: ${job.type}\nবিবরণ: ${job.desc}\nযোগাযোগ: ${job.contact}`);
+    }
+
+    function callContact(phone) {
+      window.location.href = `tel:${phone.split(' ')[0]}`;
+    }
+
+    function openPostJobModal() {
+      document.getElementById('postJobModal').style.display = 'flex';
+    }
+
+    function closePostJobModal() {
+      document.getElementById('postJobModal').style.display = 'none';
+    }
+
+    function handleJobPublish(e) {
+      e.preventDefault();
+      
+      const title = document.getElementById('postTitle').value;
+      const category = document.getElementById('postCategory').value;
+      const type = document.getElementById('postType').value;
+      const location = document.getElementById('postLocation').value;
+      const count = document.getElementById('postWorkerCount').value;
+      const salary = document.getElementById('postSalary').value;
+      const phone = document.getElementById('postPhone').value;
+      const desc = document.getElementById('postDesc').value;
+
+      // নতুন জব অবজেক্ট তৈরি (ডিফল্টভাবে ঢাকা ডিভিশন বা সিলেক্টেড ডিভিশনে পুশ)
+      const newJob = {
+        id: Date.now(),
+        title: title,
+        category: category,
+        division: selectedDivisionKey || "dhaka",
+        district: selectedDistrictKey || "dhaka_d",
+        upazila: selectedUpazilaKey || "mirpur",
+        locationText: location,
+        salary: salary,
+        type: type,
+        workersNeeded: count,
+        contact: phone,
+        verified: true,
+        halalBadge: "সরাসরি নিয়োগ",
+        postedAgo: "এইমাত্র",
+        desc: desc
+      };
+
+      SAMPLE_JOBS.unshift(newJob);
+      closePostJobModal();
+      renderJobListings();
+      alert("আপনার কাজের বিজ্ঞাপনটি যাচাই সাপেক্ষে সফলভাবে উন্মুক্ত প্ল্যাটফর্মে প্রকাশ করা হয়েছে।");
+    }
+
+    function setMobileTab(tab) {
+      document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('active'));
+      if(tab === 'map') {
+        document.getElementById('map-container').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        document.getElementById('contentPanel').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // উইন্ডো লোড হলে ম্যাপ ও লেআউট সেটআপ
+    window.onload = () => {
+      drawDivisions();
+      renderJobListings();
+      feather.replace();
+    };
+  </script>
+</body>
+</html>

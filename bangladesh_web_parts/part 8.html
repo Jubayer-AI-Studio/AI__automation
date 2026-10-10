@@ -1,0 +1,3791 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
+
+<title>Assunnah Works House — Bangladesh GIS</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+
+    font-family:
+    "Noto Sans Bengali",
+    "Noto Sans",
+    Arial,
+    sans-serif;
+
+    background:#eef8f2;
+}
+
+body{
+    color:#14372a;
+}
+
+#app{
+    width:100%;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+
+    background:
+    radial-gradient(
+        circle at 20% 15%,
+        rgba(0,106,78,.18),
+        transparent 28%
+    ),
+    radial-gradient(
+        circle at 85% 85%,
+        rgba(230,30,55,.12),
+        transparent 28%
+    ),
+    linear-gradient(
+        135deg,
+        #f7fffb,
+        #e7f5ed
+    );
+}
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+#map{
+    position:absolute;
+    inset:0;
+    z-index:1;
+
+    background:
+    radial-gradient(
+        circle,
+        #f9fffc 0%,
+        #e7f5ed 70%,
+        #d8ede1 100%
+    );
+}
+
+.leaflet-container{
+    background:#e7f5ed;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+
+    position:absolute;
+
+    top:15px;
+    left:18px;
+    right:18px;
+
+    height:68px;
+
+    z-index:1000;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:8px 16px;
+
+    border-radius:21px;
+
+    background:
+    rgba(255,255,255,.89);
+
+    backdrop-filter:blur(18px);
+
+    border:
+    1px solid
+    rgba(255,255,255,.95);
+
+    box-shadow:
+    0 13px 40px
+    rgba(0,65,40,.17);
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.flag{
+    width:45px;
+    height:29px;
+
+    border-radius:6px;
+
+    background:#006a4e;
+
+    position:relative;
+}
+
+.flag::after{
+    content:"";
+
+    position:absolute;
+
+    width:15px;
+    height:15px;
+
+    left:15px;
+    top:7px;
+
+    border-radius:50%;
+
+    background:#f42a41;
+}
+
+.brand h1{
+    margin:0;
+
+    font-size:18px;
+    font-weight:900;
+
+    color:#07533c;
+}
+
+.brand p{
+    margin:2px 0 0;
+
+    font-size:10px;
+
+    color:#75837d;
+}
+
+.home{
+    border:0;
+
+    padding:10px 14px;
+
+    border-radius:12px;
+
+    background:#006a4e;
+
+    color:white;
+
+    font-size:11px;
+
+    font-weight:900;
+
+    cursor:pointer;
+}
+
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.panel{
+
+    position:absolute;
+
+    z-index:1000;
+
+    left:18px;
+    top:96px;
+
+    width:360px;
+
+    max-height:
+    calc(100vh - 114px);
+
+    overflow:auto;
+
+    padding:17px;
+
+    border-radius:22px;
+
+    background:
+    rgba(255,255,255,.92);
+
+    backdrop-filter:blur(20px);
+
+    border:
+    1px solid
+    rgba(255,255,255,.95);
+
+    box-shadow:
+    0 20px 55px
+    rgba(0,65,40,.20);
+}
+
+.panel::-webkit-scrollbar{
+    width:5px;
+}
+
+.panel::-webkit-scrollbar-thumb{
+    background:#b7d7c6;
+    border-radius:10px;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.panel-title{
+    font-size:19px;
+    font-weight:900;
+    color:#07553e;
+}
+
+.panel-sub{
+    margin-top:3px;
+    font-size:10px;
+    color:#7b8782;
+}
+
+
+/* =========================================================
+   BREADCRUMB
+========================================================= */
+
+.breadcrumb{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+
+    gap:4px;
+
+    margin:
+    13px 0 10px;
+}
+
+.crumb{
+    border:0;
+
+    padding:6px 8px;
+
+    border-radius:8px;
+
+    background:#edf7f2;
+
+    color:#07553e;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    cursor:pointer;
+}
+
+.crumb.current{
+    background:#006a4e;
+    color:white;
+}
+
+.crumb-arrow{
+    color:#a4b0aa;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search{
+    width:100%;
+
+    padding:12px 13px;
+
+    border-radius:13px;
+
+    border:
+    1px solid
+    #dce9e2;
+
+    outline:none;
+
+    background:#fbfffd;
+
+    color:#153b2d;
+
+    font-size:12px;
+}
+
+.search:focus{
+    border-color:#62a88d;
+
+    box-shadow:
+    0 0 0 3px
+    rgba(0,106,78,.08);
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.actions{
+    display:grid;
+
+    grid-template-columns:
+    1fr 1fr;
+
+    gap:8px;
+
+    margin-top:9px;
+}
+
+.action{
+    border:0;
+
+    padding:11px;
+
+    border-radius:12px;
+
+    font-size:11px;
+
+    font-weight:900;
+
+    cursor:pointer;
+}
+
+.green{
+    background:#006a4e;
+    color:white;
+}
+
+.red{
+    background:#f7e5e8;
+    color:#ad1e34;
+}
+
+
+/* =========================================================
+   LOCATION CARD
+========================================================= */
+
+.location-card{
+
+    margin-top:14px;
+
+    padding:13px;
+
+    border-radius:16px;
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(0,106,78,.10),
+        rgba(244,42,65,.06)
+    );
+
+    border:
+    1px solid
+    rgba(0,106,78,.09);
+}
+
+.location-small{
+    font-size:9px;
+    color:#7d8a84;
+}
+
+.location-name{
+    margin-top:3px;
+
+    font-size:17px;
+
+    line-height:1.4;
+
+    font-weight:900;
+
+    color:#064d39;
+}
+
+.location-type{
+    margin-top:3px;
+
+    font-size:9px;
+
+    color:#718078;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats{
+    display:flex;
+    gap:7px;
+
+    margin-top:9px;
+}
+
+.stat{
+    flex:1;
+
+    text-align:center;
+
+    padding:8px;
+
+    background:white;
+
+    border-radius:10px;
+
+    border:
+    1px solid
+    #e2ebe5;
+}
+
+.stat strong{
+    display:block;
+
+    font-size:15px;
+
+    color:#006a4e;
+}
+
+.stat span{
+    font-size:8px;
+
+    color:#7e8a84;
+}
+
+
+/* =========================================================
+   LIST
+========================================================= */
+
+.list-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin:
+    15px 0 8px;
+
+    font-size:12px;
+
+    font-weight:900;
+
+    color:#174a37;
+}
+
+.list{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+}
+
+.list-item{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border:
+    1px solid
+    #e0eae4;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    padding:10px;
+
+    cursor:pointer;
+
+    transition:.16s;
+}
+
+.list-item:hover{
+    transform:translateY(-1px);
+
+    border-color:#8fc3a7;
+
+    box-shadow:
+    0 7px 16px
+    rgba(0,70,40,.09);
+}
+
+.item-left{
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    min-width:0;
+}
+
+.dot{
+    width:9px;
+    height:9px;
+
+    flex:none;
+
+    border-radius:50%;
+}
+
+.item-text{
+    min-width:0;
+}
+
+.main-name{
+
+    display:block;
+
+    font-size:11px;
+
+    font-weight:900;
+
+    color:#214e3c;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+}
+
+.secondary{
+
+    display:block;
+
+    margin-top:2px;
+
+    font-size:8px;
+
+    color:#89958f;
+}
+
+.arrow{
+    color:#9ca9a3;
+
+    font-size:16px;
+}
+
+
+/* =========================================================
+   IMPORTANT MAP LABELS
+========================================================= */
+
+/*
+    এলাকার নাম বড়
+    প্রশাসনিক পরিচয় ছোট
+*/
+
+.map-label{
+
+    background:
+    rgba(255,255,255,.94)
+    !important;
+
+    border:
+    1px solid
+    rgba(0,106,78,.28)
+    !important;
+
+    color:#073f2f
+    !important;
+
+    border-radius:8px
+    !important;
+
+    padding:
+    3px 7px
+    !important;
+
+    font-weight:900
+    !important;
+
+    box-shadow:
+    0 3px 12px
+    rgba(0,60,40,.14);
+
+    white-space:nowrap;
+
+    text-align:center;
+}
+
+.map-label::before{
+    display:none !important;
+}
+
+
+/* DIVISION */
+
+.label-division{
+
+    font-size:16px !important;
+
+    padding:
+    5px 10px
+    !important;
+
+    border-radius:10px
+    !important;
+
+    background:
+    rgba(255,255,255,.96)
+    !important;
+
+    border:
+    2px solid
+    rgba(0,106,78,.30)
+    !important;
+}
+
+
+/* DISTRICT */
+
+.label-district{
+    font-size:12px !important;
+}
+
+
+/* UPAZILA */
+
+.label-upazila{
+    font-size:10px !important;
+}
+
+
+/* UNION */
+
+.label-union{
+    font-size:8px !important;
+
+    padding:
+    2px 4px
+    !important;
+}
+
+
+/* CITY AREA */
+
+.label-city{
+
+    font-size:11px !important;
+
+    color:#9a1e31
+    !important;
+
+    border-color:
+    rgba(190,35,60,.30)
+    !important;
+
+    background:
+    rgba(255,250,251,.96)
+    !important;
+}
+
+
+/* WARD */
+
+.label-ward{
+
+    font-size:9px !important;
+
+    background:
+    rgba(255,255,255,.90)
+    !important;
+
+    color:#5b6a63
+    !important;
+}
+
+
+/* =========================================================
+   COLOR LEGEND
+========================================================= */
+
+.legend{
+
+    position:absolute;
+
+    z-index:900;
+
+    right:18px;
+    bottom:18px;
+
+    padding:12px 14px;
+
+    border-radius:14px;
+
+    background:
+    rgba(255,255,255,.89);
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:
+    0 10px 30px
+    rgba(0,60,40,.14);
+
+    font-size:9px;
+
+    color:#68756f;
+}
+
+.legend-row{
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    margin:4px 0;
+}
+
+.legend-color{
+
+    width:12px;
+    height:12px;
+
+    border-radius:4px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:5000;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+    rgba(245,253,249,.96);
+
+    backdrop-filter:blur(10px);
+
+    transition:.4s;
+}
+
+.loading.hide{
+
+    opacity:0;
+
+    pointer-events:none;
+}
+
+.loading-box{
+    text-align:center;
+}
+
+.loading-flag{
+
+    width:66px;
+    height:43px;
+
+    margin:auto;
+
+    border-radius:9px;
+
+    background:#006a4e;
+
+    position:relative;
+}
+
+.loading-flag::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:22px;
+    height:22px;
+
+    left:22px;
+    top:10px;
+
+    border-radius:50%;
+
+    background:#f42a41;
+}
+
+.loading h2{
+
+    margin:
+    14px 0 4px;
+
+    color:#07553e;
+
+    font-size:20px;
+}
+
+.loading p{
+
+    margin:0;
+
+    font-size:11px;
+
+    color:#77847e;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:800px){
+
+    .header{
+
+        top:7px;
+        left:7px;
+        right:7px;
+
+        height:55px;
+
+        padding:
+        6px 9px;
+
+        border-radius:15px;
+    }
+
+    .flag{
+
+        width:37px;
+        height:24px;
+    }
+
+    .flag::after{
+
+        width:13px;
+        height:13px;
+
+        left:12px;
+        top:6px;
+    }
+
+    .brand h1{
+        font-size:13px;
+    }
+
+    .brand p{
+        display:none;
+    }
+
+    .home{
+        padding:
+        8px 10px;
+
+        font-size:9px;
+    }
+
+
+    /*
+        মোবাইলে bottom sheet
+    */
+
+    .panel{
+
+        left:7px;
+        right:7px;
+        bottom:7px;
+
+        top:auto;
+
+        width:auto;
+
+        max-height:40vh;
+
+        padding:12px;
+
+        border-radius:18px;
+    }
+
+    .panel-title{
+        font-size:15px;
+    }
+
+    .panel-sub{
+        font-size:9px;
+    }
+
+    .location-name{
+        font-size:14px;
+    }
+
+    .legend{
+        display:none;
+    }
+
+
+    .label-division{
+        font-size:11px !important;
+    }
+
+    .label-district{
+        font-size:9px !important;
+    }
+
+    .label-upazila{
+        font-size:8px !important;
+    }
+
+    .label-union{
+        font-size:7px !important;
+    }
+
+    .label-city{
+        font-size:9px !important;
+    }
+
+    .label-ward{
+        font-size:7px !important;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+========================================================= */
+
+@media(max-width:430px){
+
+    .panel{
+        max-height:37vh;
+    }
+
+    .location-card{
+        padding:9px;
+    }
+
+    .actions{
+        gap:5px;
+    }
+
+    .action{
+        padding:9px 5px;
+        font-size:9px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div id="app">
+
+
+<!-- ======================================================
+     MAP
+======================================================= -->
+
+<div id="map"></div>
+
+
+<!-- ======================================================
+     HEADER
+======================================================= -->
+
+<div class="header">
+
+    <div class="brand">
+
+        <div class="flag"></div>
+
+        <div>
+
+            <h1>
+                Assunnah Works House
+            </h1>
+
+            <p>
+                বাংলাদেশের কাজের এলাকার ইন্টার‍্যাক্টিভ ম্যাপ
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="home"
+        onclick="goHome()">
+
+        🇧🇩 বাংলাদেশ
+
+    </button>
+
+</div>
+
+
+<!-- ======================================================
+     PANEL
+======================================================= -->
+
+<div class="panel">
+
+
+    <div class="panel-title">
+        📍 কাজের এলাকা নির্বাচন
+    </div>
+
+    <div class="panel-sub">
+        ম্যাপের ভিতরের এলাকার নাম দেখে নির্বাচন করুন
+    </div>
+
+
+    <div
+        id="breadcrumb"
+        class="breadcrumb">
+    </div>
+
+
+    <input
+        id="search"
+        class="search"
+        placeholder="🔎 এলাকার নাম খুঁজুন..."
+    >
+
+
+    <div class="actions">
+
+        <button
+            class="action green"
+            onclick="stayHere()">
+
+            ✓ এখানেই থাকুন
+
+        </button>
+
+
+        <button
+            class="action red"
+            onclick="goBack()">
+
+            ← পিছনে
+
+        </button>
+
+    </div>
+
+
+    <div class="location-card">
+
+        <div class="location-small">
+            বর্তমান এলাকা
+        </div>
+
+        <div
+            id="currentName"
+            class="location-name">
+
+            🇧🇩 পুরো বাংলাদেশ
+
+        </div>
+
+        <div
+            id="currentType"
+            class="location-type">
+
+            দেশ
+
+        </div>
+
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <strong id="count">
+                    8
+                </strong>
+
+                <span>
+                    বিভাগ
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong id="nextCount">
+                    64
+                </strong>
+
+                <span>
+                    পরের স্তর
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="list-header">
+
+        <span id="listTitle">
+            বাংলাদেশের বিভাগ
+        </span>
+
+        <span id="resultCount">
+            8
+        </span>
+
+    </div>
+
+
+    <div
+        id="list"
+        class="list">
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     LEGEND
+======================================================= -->
+
+<div class="legend">
+
+    <div class="legend-row">
+
+        <span
+            class="legend-color"
+            style="background:#9fd5b9">
+        </span>
+
+        বিভাগ
+
+    </div>
+
+
+    <div class="legend-row">
+
+        <span
+            class="legend-color"
+            style="background:#c0e4d0">
+        </span>
+
+        জেলা
+
+    </div>
+
+
+    <div class="legend-row">
+
+        <span
+            class="legend-color"
+            style="background:#dcefe5">
+        </span>
+
+        উপজেলা
+
+    </div>
+
+
+    <div class="legend-row">
+
+        <span
+            class="legend-color"
+            style="background:#f0f7f3">
+        </span>
+
+        ইউনিয়ন
+
+    </div>
+
+
+    <div class="legend-row">
+
+        <span
+            class="legend-color"
+            style="background:#f2d9de">
+        </span>
+
+        শহরের পরিচিত এলাকা
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     LOADING
+======================================================= -->
+
+<div
+    id="loading"
+    class="loading">
+
+    <div class="loading-box">
+
+        <div class="loading-flag"></div>
+
+        <h2>
+            Assunnah Works House
+        </h2>
+
+        <p>
+            বাংলাদেশের প্রশাসনিক ম্যাপ প্রস্তুত হচ্ছে...
+        </p>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+
+
+<script>
+
+/* =========================================================
+   MAP
+========================================================= */
+
+const map =
+L.map(
+    "map",
+    {
+        zoomControl:true,
+        minZoom:5,
+        maxZoom:16
+    }
+);
+
+map.setView(
+    [23.685,90.356],
+    6
+);
+
+
+/* =========================================================
+   DATA SOURCES
+========================================================= */
+
+const URLS = {
+
+    division:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/bgd_admin1.geojson",
+
+    district:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/bgd_admin2.geojson",
+
+    upazila:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/bgd_admin3.geojson",
+
+    union:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/geoBoundaries-BGD-ADM4_simplified.geojson"
+
+};
+
+
+const NAME_URL =
+"https://iqbalhasandev.github.io/bangladesh-geo-json/bangladesh-geo.json";
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let hierarchy = [];
+
+let geo = {};
+
+let layers = {};
+
+let currentLevel =
+"division";
+
+let currentParent =
+null;
+
+let history = [];
+
+
+/* =========================================================
+   COLORS
+========================================================= */
+
+const COLORS = {
+
+    division:[
+        "#8fcfb0",
+        "#a4d9bd",
+        "#78c6a1",
+        "#b8e3ca",
+        "#91d2b3",
+        "#a9ddc2",
+        "#82c9a5",
+        "#c0e7d1"
+    ],
+
+    district:[
+        "#b9dfca",
+        "#c8e7d5",
+        "#add9bf",
+        "#d4eddf",
+        "#b3ddc6"
+    ],
+
+    upazila:[
+        "#d7ece0",
+        "#e1f1e7",
+        "#cfe8da"
+    ],
+
+    union:[
+        "#edf6f1",
+        "#f4f9f6",
+        "#e8f3ed"
+    ]
+
+};
+
+
+/* =========================================================
+   NAME INDEX
+========================================================= */
+
+const index = {
+
+    division:new Map(),
+    district:new Map(),
+    upazila:new Map(),
+    union:new Map()
+
+};
+
+
+function norm(x){
+
+    return String(x || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[.,'’"()/_-]/g," ")
+        .replace(/\s+/g," ")
+        .replace(/barisal/g,"barishal")
+        .replace(/chittagong/g,"chattogram")
+        .replace(/comilla/g,"cumilla")
+        .replace(/bogra/g,"bogura")
+        .replace(/jessore/g,"jashore");
+
+}
+
+
+function addIndex(level,item){
+
+    if(!item) return;
+
+    if(item.name){
+
+        index[level].set(
+            norm(item.name),
+            item
+        );
+
+    }
+
+    if(item.bn_name){
+
+        index[level].set(
+            norm(item.bn_name),
+            item
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD ADMIN NAMES
+========================================================= */
+
+async function loadNames(){
+
+    const response =
+    await fetch(NAME_URL);
+
+    hierarchy =
+    await response.json();
+
+
+    hierarchy.forEach(
+        division => {
+
+            addIndex(
+                "division",
+                division
+            );
+
+
+            (division.districts || [])
+            .forEach(
+                district => {
+
+                    addIndex(
+                        "district",
+                        district
+                    );
+
+
+                    (district.upazilas || [])
+                    .forEach(
+                        upazila => {
+
+                            addIndex(
+                                "upazila",
+                                upazila
+                            );
+
+
+                            (upazila.unions || [])
+                            .forEach(
+                                union => {
+
+                                    addIndex(
+                                        "union",
+                                        union
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   GEOJSON NAME
+========================================================= */
+
+function rawGeoName(feature){
+
+    const p =
+    feature.properties || {};
+
+    const keys = [
+
+        "shapeName",
+        "ShapeName",
+
+        "NAME_1",
+        "NAME_2",
+        "NAME_3",
+        "NAME_4",
+
+        "NAME",
+
+        "name",
+
+        "Name",
+
+        "ADM1_EN",
+        "ADM2_EN",
+        "ADM3_EN",
+        "ADM4_EN",
+
+        "ADM1_NAME",
+        "ADM2_NAME",
+        "ADM3_NAME",
+        "ADM4_NAME"
+
+    ];
+
+
+    for(
+        const key of keys
+    ){
+
+        if(
+            p[key] &&
+            String(p[key]).trim()
+        ){
+
+            return String(
+                p[key]
+            ).trim();
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================================================
+   MATCH ADMIN NAME
+========================================================= */
+
+function matchName(
+    level,
+    feature
+){
+
+    const p =
+    feature.properties || {};
+
+
+    for(
+        const key of Object.keys(p)
+    ){
+
+        const value =
+        p[key];
+
+
+        if(
+            typeof value !== "string"
+        ){
+
+            continue;
+
+        }
+
+
+        const found =
+        index[level].get(
+            norm(value)
+        );
+
+
+        if(found){
+
+            return found;
+
+        }
+
+    }
+
+
+    const raw =
+    rawGeoName(feature);
+
+
+    if(raw){
+
+        return index[level].get(
+            norm(raw)
+        ) || null;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   FINAL ADMIN NAME
+========================================================= */
+
+function getAdminName(
+    level,
+    feature
+){
+
+    const match =
+    matchName(
+        level,
+        feature
+    );
+
+
+    if(match){
+
+        return (
+            match.bn_name ||
+            match.name
+        );
+
+    }
+
+
+    return rawGeoName(
+        feature
+    );
+
+}
+
+
+/* =========================================================
+   CITY / DHAKA AREA DATABASE
+========================================================= */
+
+/*
+    এখানে Ward নম্বরকে বড় করে দেখানো হবে না।
+
+    পরিচিত এলাকার নামকে প্রধান label করা হবে।
+*/
+
+
+const DHAKA_AREAS = {
+
+    DNCC:{
+
+        "1":[
+            "উত্তরা মডেল টাউন",
+            "উত্তরা সেক্টর ১–১০",
+            "আব্দুল্লাপুর",
+            "ফায়দাবাদ"
+        ],
+
+        "2":[
+            "মিরপুর-১২",
+            "কালশী",
+            "ইসিবি এলাকা"
+        ],
+
+        "3":[
+            "মিরপুর-১০",
+            "মিরপুর-১১"
+        ],
+
+        "4":[
+            "মিরপুর-১৩",
+            "মিরপুর-১৪",
+            "বাইশটেকি"
+        ],
+
+        "5":[
+            "মিরপুর-১১",
+            "পল্লবী"
+        ],
+
+        "6":[
+            "পল্লবী",
+            "মিরপুর-৬",
+            "মিরপুর-৭"
+        ],
+
+        "7":[
+            "মিরপুর-২",
+            "রূপনগর",
+            "সরকারি হাউজিং এস্টেট"
+        ],
+
+        "8":[
+            "মিরপুর-১",
+            "বক্সনগর",
+            "চিড়িয়াখানা এলাকা"
+        ],
+
+        "9":[
+            "গোলারটেক",
+            "বাগবাড়ী",
+            "গাবতলী"
+        ],
+
+        "10":[
+            "গাবতলী",
+            "মিরপুর কলোনি",
+            "দারুস সালাম"
+        ],
+
+        "11":[
+            "পাইকপাড়া",
+            "কল্যাণপুর এলাকা"
+        ],
+
+        "12":[
+            "আহমেদনগর",
+            "শাহ আলী"
+        ],
+
+        "18":[
+            "বারিধারা",
+            "শাহজাদপুর"
+        ],
+
+        "19":[
+            "গুলশান",
+            "বনানী"
+        ],
+
+        "20":[
+            "মহাখালী",
+            "নিকেতন"
+        ],
+
+        "21":[
+            "বাড্ডা"
+        ],
+
+        "22":[
+            "পূর্ব রামপুরা",
+            "উলন",
+            "পশ্চিম হাজীপাড়া"
+        ],
+
+        "23":[
+            "খিলগাঁও বি-জোন",
+            "পূর্ব হাজীপাড়া",
+            "চৌধুরীপাড়া"
+        ],
+
+        "24":[
+            "তেজগাঁও শিল্প এলাকা",
+            "কুনিপাড়া"
+        ],
+
+        "25":[
+            "আজরাতপাড়া",
+            "রাসুলবাগ",
+            "তেজগাঁও"
+        ],
+
+        "35":[
+            "বড় মগবাজার",
+            "ইস্কাটন"
+        ],
+
+        "36":[
+            "নয়াটোলা"
+        ]
+
+    },
+
+
+    DSCC:{
+
+        "1":[
+            "যাত্রাবাড়ী",
+            "ধলপুর"
+        ],
+
+        "2":[
+            "ডেমরা",
+            "সারুলিয়া"
+        ],
+
+        "3":[
+            "মাতুয়াইল"
+        ],
+
+        "5":[
+            "জুরাইন",
+            "দনিয়া"
+        ],
+
+        "6":[
+            "গেন্ডারিয়া"
+        ],
+
+        "7":[
+            "শ্যামপুর"
+        ],
+
+        "8":[
+            "কদমতলী"
+        ],
+
+        "9":[
+            "পোস্তগোলা"
+        ],
+
+        "10":[
+            "সূত্রাপুর"
+        ],
+
+        "11":[
+            "বাংলাশ"
+        ],
+
+        "12":[
+            "কোতোয়ালি"
+        ],
+
+        "13":[
+            "লালবাগ"
+        ],
+
+        "14":[
+            "কামরাঙ্গীরচর"
+        ],
+
+        "15":[
+            "হাজারীবাগ"
+        ],
+
+        "16":[
+            "ধানমন্ডি"
+        ],
+
+        "17":[
+            "ধানমন্ডি",
+            "কলাবাগান"
+        ],
+
+        "18":[
+            "নিউ মার্কেট"
+        ],
+
+        "19":[
+            "আজিমপুর"
+        ],
+
+        "20":[
+            "নীলক্ষেত"
+        ],
+
+        "21":[
+            "শাহবাগ"
+        ],
+
+        "22":[
+            "রমনা"
+        ],
+
+        "23":[
+            "মতিঝিল"
+        ],
+
+        "24":[
+            "ফকিরাপুল"
+        ],
+
+        "25":[
+            "পল্টন"
+        ],
+
+        "26":[
+            "খিলগাঁও"
+        ],
+
+        "27":[
+            "বাসাবো"
+        ],
+
+        "28":[
+            "সবুজবাগ"
+        ],
+
+        "29":[
+            "মুগদা"
+        ],
+
+        "30":[
+            "মাদারটেক"
+        ],
+
+        "31":[
+            "শাহজাহানপুর"
+        ],
+
+        "32":[
+            "মালিবাগ"
+        ],
+
+        "33":[
+            "মগবাজার"
+        ],
+
+        "34":[
+            "হাতিরঝিল"
+        ],
+
+        "35":[
+            "ইস্কাটন"
+        ],
+
+        "36":[
+            "সিদ্ধেশ্বরী"
+        ],
+
+        "37":[
+            "কাকরাইল"
+        ],
+
+        "38":[
+            "শান্তিনগর"
+        ],
+
+        "39":[
+            "আরামবাগ"
+        ],
+
+        "40":[
+            "সেগুনবাগিচা"
+        ],
+
+        "41":[
+            "গোপীবাগ"
+        ],
+
+        "42":[
+            "ওয়ারী"
+        ],
+
+        "43":[
+            "টিকাটুলি"
+        ],
+
+        "44":[
+            "দয়াগঞ্জ"
+        ],
+
+        "45":[
+            "নারিন্দা"
+        ],
+
+        "46":[
+            "ইংলিশ রোড"
+        ],
+
+        "47":[
+            "নবাবপুর"
+        ],
+
+        "48":[
+            "জনসন রোড"
+        ],
+
+        "49":[
+            "চকবাজার"
+        ],
+
+        "50":[
+            "বকশীবাজার"
+        ],
+
+        "51":[
+            "লালবাগ"
+        ],
+
+        "52":[
+            "কামরাঙ্গীরচর"
+        ],
+
+        "53":[
+            "বেড়িবাঁধ এলাকা"
+        ],
+
+        "54":[
+            "রসুলপুর"
+        ],
+
+        "55":[
+            "ইসলামবাগ"
+        ],
+
+        "56":[
+            "সদরঘাট"
+        ],
+
+        "57":[
+            "ওয়াইজঘাট"
+        ],
+
+        "58":[
+            "ফরাশগঞ্জ"
+        ],
+
+        "59":[
+            "মিটফোর্ড"
+        ],
+
+        "60":[
+            "বাবুবাজার"
+        ]
+
+    }
+
+};
+
+
+/* =========================================================
+   FIND WARD NUMBER
+========================================================= */
+
+function wardNumber(
+    feature
+){
+
+    const p =
+    feature.properties || {};
+
+
+    const keys = [
+
+        "ward_no",
+        "Ward_No",
+        "WARD_NO",
+        "ward",
+        "Ward",
+        "WARD",
+        "name",
+        "NAME",
+        "shapeName",
+        "ShapeName"
+
+    ];
+
+
+    for(
+        const key of keys
+    ){
+
+        const value =
+        p[key];
+
+
+        if(
+            value === undefined ||
+            value === null
+        ){
+
+            continue;
+
+        }
+
+
+        const text =
+        String(value);
+
+
+        const match =
+        text.match(
+            /(\d+)/
+        );
+
+
+        if(match){
+
+            return match[1];
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   CITY TYPE
+========================================================= */
+
+function cityType(
+    feature
+){
+
+    const p =
+    feature.properties || {};
+
+
+    const text =
+    Object.values(p)
+    .join(" ")
+    .toLowerCase();
+
+
+    if(
+        text.includes("north") ||
+        text.includes("dncc")
+    ){
+
+        return "DNCC";
+
+    }
+
+
+    if(
+        text.includes("south") ||
+        text.includes("dscc")
+    ){
+
+        return "DSCC";
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   SMART CITY NAME
+========================================================= */
+
+function smartCityName(
+    feature
+){
+
+    const city =
+    cityType(
+        feature
+    );
+
+
+    const ward =
+    wardNumber(
+        feature
+    );
+
+
+    if(
+        city &&
+        ward &&
+        DHAKA_AREAS[city] &&
+        DHAKA_AREAS[city][ward]
+    ){
+
+        return DHAKA_AREAS[city][ward]
+            .join(" • ");
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   NEXT LEVEL
+========================================================= */
+
+function nextLevel(
+    level
+){
+
+    if(level === "division")
+        return "district";
+
+    if(level === "district")
+        return "upazila";
+
+    if(level === "upazila")
+        return "union";
+
+    return null;
+
+}
+
+
+/* =========================================================
+   LABEL ZOOM
+========================================================= */
+
+function labelVisible(
+    level
+){
+
+    const zoom =
+    map.getZoom();
+
+
+    if(level === "division")
+        return true;
+
+    if(level === "district")
+        return zoom >= 6;
+
+    if(level === "upazila")
+        return zoom >= 7;
+
+    if(level === "union")
+        return zoom >= 9;
+
+    return false;
+
+}
+
+
+/* =========================================================
+   STYLE
+========================================================= */
+
+function styleRegion(
+    level,
+    indexNo
+){
+
+    return {
+
+        color:
+        level === "division"
+        ? "#006a4e"
+        : "#579276",
+
+        weight:
+        level === "division"
+        ? 2.7
+        : level === "district"
+        ? 1.8
+        : level === "upazila"
+        ? 1.15
+        : .75,
+
+        fillColor:
+        COLORS[level]
+        [indexNo %
+        COLORS[level].length],
+
+        fillOpacity:
+        level === "division"
+        ? .82
+        : level === "district"
+        ? .70
+        : level === "upazila"
+        ? .58
+        : .40
+
+    };
+
+}
+
+
+/* =========================================================
+   ADD LABEL
+========================================================= */
+
+function addLabel(
+    level,
+    layer,
+    feature
+){
+
+    /*
+        For city/ward-like geometry,
+        try known area names first.
+    */
+
+    const cityName =
+    smartCityName(
+        feature
+    );
+
+
+    if(cityName){
+
+        layer.bindTooltip(
+            cityName,
+            {
+                permanent:true,
+                direction:"center",
+                className:"map-label label-city",
+                opacity:.97
+            }
+        );
+
+        return;
+
+    }
+
+
+    const name =
+    getAdminName(
+        level,
+        feature
+    );
+
+
+    if(!name)
+        return;
+
+
+    let cls =
+    "map-label ";
+
+
+    if(level === "division")
+        cls += "label-division";
+
+    else if(level === "district")
+        cls += "label-district";
+
+    else if(level === "upazila")
+        cls += "label-upazila";
+
+    else
+        cls += "label-union";
+
+
+    layer.bindTooltip(
+        name,
+        {
+            permanent:
+            labelVisible(level),
+
+            direction:"center",
+
+            className:cls,
+
+            opacity:.97
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LOAD GEO
+========================================================= */
+
+async function loadGeo(
+    level
+){
+
+    if(geo[level])
+        return geo[level];
+
+
+    const response =
+    await fetch(
+        URLS[level]
+    );
+
+
+    if(!response.ok){
+
+        throw new Error(
+            "Boundary loading failed"
+        );
+
+    }
+
+
+    geo[level] =
+    await response.json();
+
+
+    return geo[level];
+
+}
+
+
+/* =========================================================
+   CHILDREN
+========================================================= */
+
+function findChildren(
+    parent,
+    collection
+){
+
+    if(!parent){
+
+        return collection.features;
+
+    }
+
+
+    const result = [];
+
+
+    collection.features.forEach(
+        child => {
+
+            try{
+
+                const point =
+                turf.pointOnFeature(
+                    child
+                );
+
+
+                if(
+                    turf.booleanPointInPolygon(
+                        point,
+                        parent
+                    )
+                ){
+
+                    result.push(
+                        child
+                    );
+
+                }
+
+            }
+            catch(error){
+
+                try{
+
+                    const point =
+                    turf.centroid(
+                        child
+                    );
+
+
+                    if(
+                        turf.booleanPointInPolygon(
+                            point,
+                            parent
+                        )
+                    ){
+
+                        result.push(
+                            child
+                        );
+
+                    }
+
+                }
+                catch(e){}
+
+            }
+
+        }
+    );
+
+
+    return result;
+
+}
+
+
+/* =========================================================
+   CREATE LAYER
+========================================================= */
+
+function createLayer(
+    level,
+    features
+){
+
+    return L.geoJSON(
+
+        {
+            type:"FeatureCollection",
+            features:features
+        },
+
+        {
+
+            style:
+            (feature) => {
+
+                return styleRegion(
+                    level,
+                    features.indexOf(
+                        feature
+                    )
+                );
+
+            },
+
+
+            onEachFeature:
+            (feature,layer) => {
+
+                addLabel(
+                    level,
+                    layer,
+                    feature
+                );
+
+
+                layer.on({
+
+                    mouseover:
+                    function(e){
+
+                        e.target.setStyle({
+
+                            weight:
+                            level === "division"
+                            ? 4
+                            : 2.7,
+
+                            color:"#ef304c",
+
+                            fillOpacity:.88
+
+                        });
+
+                        e.target.bringToFront();
+
+                    },
+
+
+                    mouseout:
+                    function(e){
+
+                        e.target.setStyle(
+                            styleRegion(
+                                level,
+                                features.indexOf(
+                                    feature
+                                )
+                            )
+                        );
+
+                    },
+
+
+                    click:
+                    function(){
+
+                        openRegion(
+                            level,
+                            feature
+                        );
+
+                    }
+
+                });
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   OPEN REGION
+========================================================= */
+
+async function openRegion(
+    level,
+    feature
+){
+
+    const next =
+    nextLevel(level);
+
+
+    if(!next){
+
+        currentParent =
+        feature;
+
+        currentLevel =
+        level;
+
+        updateUI(
+            [feature]
+        );
+
+        focusFeature(
+            feature
+        );
+
+        return;
+
+    }
+
+
+    history.push({
+
+        level:
+        currentLevel,
+
+        parent:
+        currentParent
+
+    });
+
+
+    currentLevel =
+    next;
+
+    currentParent =
+    feature;
+
+
+    await render();
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+async function render(){
+
+    Object.keys(
+        layers
+    ).forEach(
+        key => {
+
+            if(layers[key]){
+
+                map.removeLayer(
+                    layers[key]
+                );
+
+                layers[key] =
+                null;
+
+            }
+
+        }
+    );
+
+
+    const data =
+    await loadGeo(
+        currentLevel
+    );
+
+
+    const features =
+    findChildren(
+        currentParent,
+        data
+    );
+
+
+    const layer =
+    createLayer(
+        currentLevel,
+        features
+    );
+
+
+    layers[currentLevel] =
+    layer;
+
+
+    layer.addTo(
+        map
+    );
+
+
+    if(currentParent){
+
+        const parentLayer =
+        L.geoJSON(
+            currentParent
+        );
+
+
+        map.fitBounds(
+            parentLayer.getBounds(),
+            {
+
+                paddingTopLeft:
+                window.innerWidth > 800
+                ? [390,110]
+                : [20,90],
+
+                paddingBottomRight:
+                window.innerWidth > 800
+                ? [50,60]
+                : [20,240],
+
+                maxZoom:
+                currentLevel === "union"
+                ? 12
+                : 10
+
+            }
+        );
+
+    }
+    else{
+
+        map.fitBounds(
+            layer.getBounds(),
+            {
+
+                paddingTopLeft:
+                [390,110],
+
+                paddingBottomRight:
+                [50,50]
+
+            }
+        );
+
+    }
+
+
+    updateUI(
+        features
+    );
+
+
+    setTimeout(
+        refreshLabels,
+        300
+    );
+
+}
+
+
+/* =========================================================
+   REFRESH LABELS
+========================================================= */
+
+function refreshLabels(){
+
+    Object.keys(
+        layers
+    ).forEach(
+        level => {
+
+            const layer =
+            layers[level];
+
+
+            if(!layer)
+                return;
+
+
+            const visible =
+            labelVisible(
+                level
+            );
+
+
+            layer.eachLayer(
+                l => {
+
+                    if(
+                        !l.getTooltip()
+                    )
+                        return;
+
+
+                    /*
+                        City labels stay visible.
+                    */
+
+                    const cls =
+                    l.getTooltip()
+                    .options
+                    .className || "";
+
+
+                    if(
+                        cls.includes(
+                            "label-city"
+                        )
+                    ){
+
+                        l.openTooltip();
+
+                        return;
+
+                    }
+
+
+                    if(visible)
+                        l.openTooltip();
+
+                    else
+                        l.closeTooltip();
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function updateUI(
+    features
+){
+
+    let name =
+    "🇧🇩 পুরো বাংলাদেশ";
+
+    let type =
+    "দেশ";
+
+
+    if(currentParent){
+
+        /*
+            City / Ward friendly name
+        */
+
+        name =
+        smartCityName(
+            currentParent
+        ) ||
+        getAdminName(
+            currentLevel,
+            currentParent
+        );
+
+
+        type =
+        currentLevel === "division"
+        ? "বিভাগ"
+        : currentLevel === "district"
+        ? "জেলা"
+        : currentLevel === "upazila"
+        ? "উপজেলা"
+        : "ইউনিয়ন";
+
+    }
+
+
+    document
+    .getElementById(
+        "currentName"
+    )
+    .textContent =
+    name;
+
+
+    document
+    .getElementById(
+        "currentType"
+    )
+    .textContent =
+    type;
+
+
+    document
+    .getElementById(
+        "count"
+    )
+    .textContent =
+    features.length;
+
+
+    const next =
+    nextLevel(
+        currentLevel
+    );
+
+
+    document
+    .getElementById(
+        "nextCount"
+    )
+    .textContent =
+    next
+    ? next
+    : "শেষ";
+
+
+    document
+    .getElementById(
+        "listTitle"
+    )
+    .textContent =
+    currentParent
+    ? (
+        next
+        ? levelBangla(next) + " সমূহ"
+        : levelBangla(currentLevel)
+      )
+    : "বাংলাদেশের ৮ বিভাগ";
+
+
+    document
+    .getElementById(
+        "resultCount"
+    )
+    .textContent =
+    features.length;
+
+
+    renderList(
+        features
+    );
+
+
+    renderBreadcrumb();
+
+}
+
+
+/* =========================================================
+   LEVEL BANGLA
+========================================================= */
+
+function levelBangla(level){
+
+    return {
+
+        division:"বিভাগ",
+
+        district:"জেলা",
+
+        upazila:"উপজেলা",
+
+        union:"ইউনিয়ন"
+
+    }[level] || "";
+
+}
+
+
+/* =========================================================
+   LIST
+========================================================= */
+
+function renderList(
+    features
+){
+
+    const list =
+    document.getElementById(
+        "list"
+    );
+
+
+    list.innerHTML = "";
+
+
+    features.forEach(
+        (feature,i) => {
+
+            const city =
+            smartCityName(
+                feature
+            );
+
+
+            const name =
+            city ||
+            getAdminName(
+                currentLevel,
+                feature
+            );
+
+
+            if(!name)
+                return;
+
+
+            const item =
+            document.createElement(
+                "button"
+            );
+
+
+            item.className =
+            "list-item";
+
+
+            let secondary = "";
+
+
+            if(city){
+
+                const ward =
+                wardNumber(
+                    feature
+                );
+
+
+                secondary =
+                ward
+                ? "ওয়ার্ড " + ward
+                : "ঢাকা শহরের এলাকা";
+
+            }
+            else{
+
+                const match =
+                matchName(
+                    currentLevel,
+                    feature
+                );
+
+
+                if(
+                    match &&
+                    match.name &&
+                    match.name !== name
+                ){
+
+                    secondary =
+                    match.name;
+
+                }
+
+            }
+
+
+            item.innerHTML = `
+
+                <span class="item-left">
+
+                    <span
+                        class="dot"
+                        style="
+                        background:
+                        ${
+                            COLORS[currentLevel]
+                            [
+                                i %
+                                COLORS[currentLevel].length
+                            ]
+                        };
+                        ">
+                    </span>
+
+
+                    <span class="item-text">
+
+                        <span
+                            class="main-name">
+
+                            ${escapeHTML(name)}
+
+                        </span>
+
+
+                        ${
+                            secondary
+                            ?
+                            `
+                            <span
+                                class="secondary">
+
+                                ${escapeHTML(
+                                    secondary
+                                )}
+
+                            </span>
+                            `
+                            :
+                            ""
+                        }
+
+                    </span>
+
+                </span>
+
+
+                <span class="arrow">
+                    ›
+                </span>
+
+            `;
+
+
+            item.onclick =
+            () => {
+
+                openRegion(
+                    currentLevel,
+                    feature
+                );
+
+            };
+
+
+            list.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BREADCRUMB
+========================================================= */
+
+function renderBreadcrumb(){
+
+    const el =
+    document.getElementById(
+        "breadcrumb"
+    );
+
+
+    el.innerHTML = "";
+
+
+    const home =
+    document.createElement(
+        "button"
+    );
+
+
+    home.className =
+    "crumb";
+
+
+    home.textContent =
+    "🇧🇩 বাংলাদেশ";
+
+
+    home.onclick =
+    goHome;
+
+
+    el.appendChild(
+        home
+    );
+
+
+    history.forEach(
+        (h,index) => {
+
+            if(!h.parent)
+                return;
+
+
+            const arrow =
+            document.createElement(
+                "span"
+            );
+
+
+            arrow.className =
+            "crumb-arrow";
+
+
+            arrow.textContent =
+            "›";
+
+
+            el.appendChild(
+                arrow
+            );
+
+
+            const button =
+            document.createElement(
+                "button"
+            );
+
+
+            button.className =
+            "crumb";
+
+
+            button.textContent =
+            getAdminName(
+                h.level,
+                h.parent
+            );
+
+
+            button.onclick =
+            async () => {
+
+                history =
+                history.slice(
+                    0,
+                    index
+                );
+
+
+                currentLevel =
+                h.level;
+
+                currentParent =
+                h.parent;
+
+
+                await render();
+
+            };
+
+
+            el.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    if(currentParent){
+
+        const arrow =
+        document.createElement(
+            "span"
+        );
+
+
+        arrow.className =
+        "crumb-arrow";
+
+
+        arrow.textContent =
+        "›";
+
+
+        el.appendChild(
+            arrow
+        );
+
+
+        const current =
+        document.createElement(
+            "span"
+        );
+
+
+        current.className =
+        "crumb current";
+
+
+        current.textContent =
+        smartCityName(
+            currentParent
+        ) ||
+        getAdminName(
+            currentLevel,
+            currentParent
+        );
+
+
+        el.appendChild(
+            current
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+function focusFeature(
+    feature
+){
+
+    const layer =
+    L.geoJSON(
+        feature
+    );
+
+
+    map.fitBounds(
+        layer.getBounds(),
+        {
+
+            paddingTopLeft:
+            window.innerWidth > 800
+            ? [390,110]
+            : [20,90],
+
+            paddingBottomRight:
+            window.innerWidth > 800
+            ? [50,60]
+            : [20,240],
+
+            maxZoom:13
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BACK
+========================================================= */
+
+async function goBack(){
+
+    if(!history.length){
+
+        await goHome();
+
+        return;
+
+    }
+
+
+    const previous =
+    history.pop();
+
+
+    currentLevel =
+    previous.level;
+
+    currentParent =
+    previous.parent;
+
+
+    await render();
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+async function goHome(){
+
+    history = [];
+
+    currentLevel =
+    "division";
+
+    currentParent =
+    null;
+
+
+    document
+    .getElementById(
+        "search"
+    )
+    .value = "";
+
+
+    await render();
+
+}
+
+
+/* =========================================================
+   STAY
+========================================================= */
+
+function stayHere(){
+
+    const name =
+    currentParent
+    ? (
+        smartCityName(
+            currentParent
+        ) ||
+        getAdminName(
+            currentLevel,
+            currentParent
+        )
+      )
+    : "পুরো বাংলাদেশ";
+
+
+    alert(
+        "কাজের এলাকা নির্বাচিত:\n\n"
+        + name
+    );
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+document
+.getElementById("search")
+.addEventListener(
+    "input",
+    function(){
+
+        const q =
+        norm(
+            this.value
+        );
+
+
+        if(!q){
+
+            render();
+
+            return;
+
+        }
+
+
+        const results = [];
+
+
+        [
+            "division",
+            "district",
+            "upazila",
+            "union"
+        ]
+        .forEach(
+            level => {
+
+                index[level]
+                .forEach(
+                    item => {
+
+                        const bn =
+                        norm(
+                            item.bn_name
+                        );
+
+                        const en =
+                        norm(
+                            item.name
+                        );
+
+
+                        if(
+                            bn.includes(q) ||
+                            en.includes(q)
+                        ){
+
+                            results.push({
+
+                                level,
+                                item
+
+                            });
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        showSearch(
+            results
+        );
+
+    }
+);
+
+
+/* =========================================================
+   SEARCH RESULTS
+========================================================= */
+
+function showSearch(
+    results
+){
+
+    const list =
+    document.getElementById(
+        "list"
+    );
+
+
+    list.innerHTML = "";
+
+
+    document
+    .getElementById(
+        "listTitle"
+    )
+    .textContent =
+    "সার্চ ফলাফল";
+
+
+    document
+    .getElementById(
+        "resultCount"
+    )
+    .textContent =
+    results.length;
+
+
+    results
+    .slice(0,80)
+    .forEach(
+        result => {
+
+            const button =
+            document.createElement(
+                "button"
+            );
+
+
+            button.className =
+            "list-item";
+
+
+            button.innerHTML = `
+
+                <span class="item-left">
+
+                    <span class="dot"></span>
+
+                    <span class="item-text">
+
+                        <span class="main-name">
+
+                            ${
+                                escapeHTML(
+                                    result.item.bn_name ||
+                                    result.item.name
+                                )
+                            }
+
+                        </span>
+
+                        <span class="secondary">
+
+                            ${
+                                levelBangla(
+                                    result.level
+                                )
+                            }
+
+                        </span>
+
+                    </span>
+
+                </span>
+
+
+                <span class="arrow">
+                    ›
+                </span>
+
+            `;
+
+
+            button.onclick =
+            () => {
+
+                openSearchResult(
+                    result
+                );
+
+            };
+
+
+            list.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   OPEN SEARCH RESULT
+========================================================= */
+
+async function openSearchResult(
+    result
+){
+
+    const data =
+    await loadGeo(
+        result.level
+    );
+
+
+    const feature =
+    data.features.find(
+        feature => {
+
+            const match =
+            matchName(
+                result.level,
+                feature
+            );
+
+
+            if(!match)
+                return false;
+
+
+            return (
+                norm(match.name) ===
+                norm(result.item.name)
+            );
+
+        }
+    );
+
+
+    if(!feature){
+
+        alert(
+            "এই এলাকার সঠিক boundary পাওয়া যায়নি।"
+        );
+
+        return;
+
+    }
+
+
+    history = [];
+
+    currentLevel =
+    result.level;
+
+    currentParent =
+    feature;
+
+
+    await render();
+
+}
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+function escapeHTML(
+    value
+){
+
+    return String(value)
+
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+
+    .replace(
+        /</g,
+        "&lt;"
+    )
+
+    .replace(
+        />/g,
+        "&gt;"
+    )
+
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+   ZOOM
+========================================================= */
+
+map.on(
+    "zoomend",
+    refreshLabels
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+async function start(){
+
+    try{
+
+        await loadNames();
+
+        await render();
+
+
+        document
+        .getElementById(
+            "loading"
+        )
+        .classList
+        .add("hide");
+
+    }
+    catch(error){
+
+        console.error(
+            error
+        );
+
+
+        document
+        .getElementById(
+            "loading"
+        )
+        .innerHTML = `
+
+            <div class="loading-box">
+
+                <h2>
+                    ম্যাপ লোড করা যায়নি
+                </h2>
+
+                <p>
+                    ইন্টারনেট সংযোগ পরীক্ষা করে
+                    আবার চেষ্টা করুন।
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+start();
+
+</script>
+
+</body>
+</html>

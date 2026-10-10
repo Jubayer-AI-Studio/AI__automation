@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Assunnah Works House</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:"Noto Sans Bengali","Segoe UI",Arial,sans-serif;
+    background:#03160d;
+    color:white;
+    overflow:hidden;
+}
+
+.app{
+    width:100vw;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 30%,#087a421c,transparent 45%),
+        linear-gradient(135deg,#02150c,#063c24 55%,#01140b);
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    height:76px;
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    z-index:20;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 28px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #006a38,
+            #008b48,
+            #006a38
+        );
+
+    border-bottom:1px solid #ffffff22;
+
+    box-shadow:0 8px 30px #0007;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo{
+    width:45px;
+    height:45px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#e21b2d;
+
+    border:3px solid white;
+
+    font-size:22px;
+
+    box-shadow:0 0 20px #e21b2d66;
+}
+
+.brandName{
+    font-size:19px;
+    font-weight:900;
+}
+
+.brandSub{
+    font-size:11px;
+    opacity:.7;
+    margin-top:2px;
+}
+
+.headerButtons{
+    display:flex;
+    gap:9px;
+}
+
+.headerBtn{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+
+    background:#ffffff12;
+
+    border:1px solid #ffffff22;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+}
+
+/* ================= MAP AREA ================= */
+
+.mapArea{
+    position:absolute;
+    left:0;
+    right:0;
+    top:76px;
+    bottom:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            #0c5a351c,
+            transparent 60%
+        );
+}
+
+/* subtle grid */
+
+.mapArea::before{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    opacity:.08;
+
+    background-image:
+        linear-gradient(#ffffff 1px,transparent 1px),
+        linear-gradient(90deg,#ffffff 1px,transparent 1px);
+
+    background-size:55px 55px;
+
+    pointer-events:none;
+}
+
+/* ================= MAP ================= */
+
+.map{
+    width:min(900px,88vw);
+    height:min(620px,70vh);
+
+    position:relative;
+
+    transition:
+        transform .7s cubic-bezier(.2,.8,.2,1),
+        opacity .4s;
+}
+
+.map.enter{
+    animation:mapEnter .65s ease;
+}
+
+@keyframes mapEnter{
+
+    0%{
+        transform:scale(.75);
+        opacity:0;
+    }
+
+    60%{
+        transform:scale(1.03);
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+
+}
+
+/* ================= SVG ================= */
+
+svg{
+    width:100%;
+    height:100%;
+    overflow:visible;
+}
+
+.region{
+    fill:#078b48;
+    stroke:#bff5d6;
+    stroke-width:1.5;
+
+    cursor:pointer;
+
+    transition:
+        fill .25s,
+        filter .25s,
+        transform .25s;
+}
+
+.region:hover{
+    fill:#e31d32;
+
+    filter:
+        drop-shadow(0 0 12px #e31d3266);
+
+}
+
+.region.active{
+    fill:#e31d32;
+}
+
+.regionLabel{
+    fill:white;
+
+    font-size:16px;
+
+    font-weight:900;
+
+    text-anchor:middle;
+
+    pointer-events:none;
+
+    paint-order:stroke;
+
+    stroke:#06351f;
+
+    stroke-width:5px;
+
+    stroke-linejoin:round;
+}
+
+.smallLabel{
+    font-size:12px;
+}
+
+/* ================= LOCATION ================= */
+
+.locationCard{
+    position:absolute;
+
+    left:25px;
+    top:25px;
+
+    z-index:10;
+
+    min-width:270px;
+
+    padding:15px 18px;
+
+    border-radius:18px;
+
+    background:#03291ae8;
+
+    backdrop-filter:blur(16px);
+
+    border:1px solid #ffffff1c;
+
+    box-shadow:0 15px 40px #0007;
+}
+
+.locationSmall{
+    font-size:10px;
+
+    color:#9ee8bd;
+
+    margin-bottom:4px;
+}
+
+.locationName{
+    font-size:21px;
+    font-weight:900;
+}
+
+.locationPath{
+    font-size:11px;
+
+    opacity:.6;
+
+    margin-top:4px;
+}
+
+/* ================= BACK ================= */
+
+.back{
+    position:absolute;
+
+    right:25px;
+    top:25px;
+
+    z-index:10;
+
+    padding:12px 17px;
+
+    background:#03291ae8;
+
+    border:1px solid #ffffff1c;
+
+    color:white;
+
+    border-radius:13px;
+
+    cursor:pointer;
+
+    backdrop-filter:blur(15px);
+
+    display:none;
+}
+
+.back.show{
+    display:block;
+}
+
+/* ================= BOTTOM PANEL ================= */
+
+.bottom{
+    position:absolute;
+
+    z-index:15;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    bottom:20px;
+
+    width:min(690px,calc(100% - 30px));
+
+    padding:18px;
+
+    border-radius:23px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #03291af2,
+            #021d12f2
+        );
+
+    border:1px solid #ffffff1a;
+
+    backdrop-filter:blur(18px);
+
+    box-shadow:
+        0 20px 60px #0009;
+}
+
+.bottomTitle{
+    font-size:18px;
+
+    font-weight:900;
+
+    margin-bottom:3px;
+}
+
+.bottomText{
+    font-size:12px;
+
+    opacity:.65;
+
+    margin-bottom:14px;
+}
+
+.buttons{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+}
+
+.action{
+    border:0;
+
+    padding:14px;
+
+    border-radius:15px;
+
+    color:white;
+
+    font-size:14px;
+
+    font-weight:900;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.action:hover{
+    transform:translateY(-2px);
+}
+
+.stay{
+    background:#e31d32;
+
+    box-shadow:0 8px 20px #e31d3230;
+}
+
+.inside{
+    background:#078b48;
+
+    box-shadow:0 8px 20px #078b4830;
+}
+
+/* ================= MINI INFO ================= */
+
+.mapHint{
+    position:absolute;
+
+    top:100px;
+    right:25px;
+
+    z-index:5;
+
+    padding:10px 13px;
+
+    border-radius:12px;
+
+    background:#03291ab8;
+
+    border:1px solid #ffffff12;
+
+    font-size:11px;
+
+    color:#b8eaca;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:700px){
+
+    .header{
+        height:65px;
+
+        padding:0 13px;
+    }
+
+    .brandName{
+        font-size:14px;
+    }
+
+    .brandSub{
+        display:none;
+    }
+
+    .logo{
+        width:38px;
+        height:38px;
+        font-size:18px;
+    }
+
+    .mapArea{
+        top:65px;
+    }
+
+    .map{
+        width:96vw;
+        height:58vh;
+    }
+
+    .locationCard{
+        left:12px;
+        top:15px;
+
+        min-width:210px;
+
+        padding:11px 14px;
+    }
+
+    .locationName{
+        font-size:17px;
+    }
+
+    .back{
+        right:12px;
+        top:15px;
+    }
+
+    .mapHint{
+        display:none;
+    }
+
+    .bottom{
+        bottom:10px;
+
+        width:calc(100% - 18px);
+
+        padding:15px;
+    }
+
+    .buttons{
+        grid-template-columns:1fr;
+    }
+
+}
+
+/* ================= HIDE ================= */
+
+.hidden{
+    display:none;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+<!-- HEADER -->
+
+<header class="header">
+
+    <div class="brand">
+
+        <div class="logo">🇧🇩</div>
+
+        <div>
+            <div class="brandName">
+                Assunnah Works House
+            </div>
+
+            <div class="brandSub">
+                বাংলাদেশের মানুষের কাজের প্ল্যাটফর্ম
+            </div>
+        </div>
+
+    </div>
+
+    <div class="headerButtons">
+
+        <button class="headerBtn">⌕</button>
+
+        <button class="headerBtn">☰</button>
+
+    </div>
+
+</header>
+
+
+<!-- MAP AREA -->
+
+<section class="mapArea">
+
+    <!-- LOCATION -->
+
+    <div class="locationCard">
+
+        <div class="locationSmall">
+            নির্বাচিত এলাকা
+        </div>
+
+        <div id="locationName" class="locationName">
+            বাংলাদেশ
+        </div>
+
+        <div id="locationPath" class="locationPath">
+            পুরো বাংলাদেশ
+        </div>
+
+    </div>
+
+
+    <!-- BACK -->
+
+    <button
+        id="backButton"
+        class="back"
+        onclick="goBack()"
+    >
+        ← পেছনে যান
+    </button>
+
+
+    <div class="mapHint">
+        ম্যাপের এলাকার উপর ক্লিক করুন
+    </div>
+
+
+    <!-- MAP -->
+
+    <div id="map" class="map">
+
+        <!-- SVG WILL BE INSERTED HERE -->
+
+    </div>
+
+
+    <!-- BOTTOM -->
+
+    <div class="bottom">
+
+        <div
+            id="bottomTitle"
+            class="bottomTitle"
+        >
+            পুরো বাংলাদেশ
+        </div>
+
+        <div
+            id="bottomText"
+            class="bottomText"
+        >
+            ম্যাপ থেকে আপনার পছন্দের বিভাগ নির্বাচন করুন।
+        </div>
+
+
+        <div class="buttons">
+
+            <button
+                class="action stay"
+                onclick="stayHere()"
+            >
+                📍 এখানেই থাকুন
+            </button>
+
+            <button
+                class="action inside"
+                onclick="goInside()"
+            >
+                🔎 আরও ভিতরে যান
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   LOCATION SYSTEM
+===================================================== */
+
+const places = {
+
+    bangladesh:{
+        name:"বাংলাদেশ",
+        path:"পুরো বাংলাদেশ",
+        type:"bangladesh"
+    },
+
+    dhaka:{
+        name:"ঢাকা বিভাগ",
+        path:"বাংলাদেশ › ঢাকা বিভাগ",
+        type:"dhaka"
+    },
+
+    chattogram:{
+        name:"চট্টগ্রাম বিভাগ",
+        path:"বাংলাদেশ › চট্টগ্রাম বিভাগ",
+        type:"simple"
+    },
+
+    rajshahi:{
+        name:"রাজশাহী বিভাগ",
+        path:"বাংলাদেশ › রাজশাহী বিভাগ",
+        type:"simple"
+    },
+
+    khulna:{
+        name:"খুলনা বিভাগ",
+        path:"বাংলাদেশ › খুলনা বিভাগ",
+        type:"simple"
+    },
+
+    barishal:{
+        name:"বরিশাল বিভাগ",
+        path:"বাংলাদেশ › বরিশাল বিভাগ",
+        type:"simple"
+    },
+
+    sylhet:{
+        name:"সিলেট বিভাগ",
+        path:"বাংলাদেশ › সিলেট বিভাগ",
+        type:"simple"
+    },
+
+    rangpur:{
+        name:"রংপুর বিভাগ",
+        path:"বাংলাদেশ › রংপুর বিভাগ",
+        type:"simple"
+    },
+
+    mymensingh:{
+        name:"ময়মনসিংহ বিভাগ",
+        path:"বাংলাদেশ › ময়মনসিংহ বিভাগ",
+        type:"simple"
+    },
+
+    dhakaCity:{
+        name:"ঢাকা জেলা / শহর",
+        path:"বাংলাদেশ › ঢাকা বিভাগ › ঢাকা",
+        type:"dhakaCity"
+    },
+
+    gulshan:{
+        name:"গুলশান",
+        path:"বাংলাদেশ › ঢাকা › গুলশান",
+        type:"gulshan"
+    },
+
+    mirpur:{
+        name:"মিরপুর",
+        path:"বাংলাদেশ › ঢাকা › মিরপুর",
+        type:"simple"
+    },
+
+    uttara:{
+        name:"উত্তরা",
+        path:"বাংলাদেশ › ঢাকা › উত্তরা",
+        type:"simple"
+    },
+
+    mohammadpur:{
+        name:"মোহাম্মদপুর",
+        path:"বাংলাদেশ › ঢাকা › মোহাম্মদপুর",
+        type:"simple"
+    },
+
+    badda:{
+        name:"বাড্ডা",
+        path:"বাংলাদেশ › ঢাকা › বাড্ডা",
+        type:"simple"
+    },
+
+    rampura:{
+        name:"রামপুরা",
+        path:"বাংলাদেশ › ঢাকা › রামপুরা",
+        type:"simple"
+    },
+
+    banasree:{
+        name:"বনশ্রী",
+        path:"বাংলাদেশ › ঢাকা › বনশ্রী",
+        type:"simple"
+    },
+
+    gulshan1:{
+        name:"গুলশান-১",
+        path:"বাংলাদেশ › ঢাকা › গুলশান › গুলশান-১",
+        type:"gulshan1"
+    },
+
+    gulshan2:{
+        name:"গুলশান-২",
+        path:"বাংলাদেশ › ঢাকা › গুলশান › গুলশান-২",
+        type:"gulshan2"
+    },
+
+    niketan:{
+        name:"নিকেতন",
+        path:"বাংলাদেশ › ঢাকা › গুলশান › নিকেতন",
+        type:"simple"
+    },
+
+    banani:{
+        name:"বনানী",
+        path:"বাংলাদেশ › ঢাকা › গুলশান › বনানী",
+        type:"simple"
+    }
+
+};
+
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+let current = "bangladesh";
+
+let history = [];
+
+
+/* =====================================================
+   MAP DRAWINGS
+===================================================== */
+
+function bangladeshMap(){
+
+return `
+
+<svg viewBox="0 0 900 650">
+
+<!-- BANGLADESH OUTER -->
+
+<path
+d="
+M300 70
+L390 55
+L490 80
+L570 125
+L640 150
+L700 220
+L745 300
+L730 380
+L690 450
+L625 505
+L580 560
+L500 590
+L425 570
+L350 600
+L290 565
+L250 520
+L210 475
+L225 420
+L190 365
+L210 310
+L245 275
+L230 220
+L260 175
+Z
+"
+fill="#006f3b"
+stroke="#d7ffe7"
+stroke-width="5"
+/>
+
+
+<!-- DHAKA -->
+
+<path
+class="region"
+onclick="openPlace('dhaka')"
+d="
+M355 190
+L420 170
+L475 200
+L480 265
+L445 300
+L385 285
+L340 245
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="410"
+y="235"
+>
+ঢাকা
+</text>
+
+
+<!-- CHITTAGONG -->
+
+<path
+class="region"
+onclick="openPlace('chattogram')"
+d="
+M480 300
+L555 275
+L625 300
+L680 350
+L690 425
+L645 475
+L575 450
+L530 400
+L490 355
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="590"
+y="370"
+>
+চট্টগ্রাম
+</text>
+
+
+<!-- SYLHET -->
+
+<path
+class="region"
+onclick="openPlace('sylhet')"
+d="
+M500 115
+L575 115
+L635 155
+L620 220
+L570 250
+L505 225
+L475 170
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="550"
+y="180"
+>
+সিলেট
+</text>
+
+
+<!-- MYMENSINGH -->
+
+<path
+class="region"
+onclick="openPlace('mymensingh')"
+d="
+M385 90
+L475 95
+L500 145
+L475 200
+L420 170
+L355 190
+L340 135
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="420"
+y="140"
+>
+ময়মনসিংহ
+</text>
+
+
+<!-- RAJSHAHI -->
+
+<path
+class="region"
+onclick="openPlace('rajshahi')"
+d="
+M235 130
+L330 100
+L385 130
+L355 190
+L340 245
+L280 255
+L220 220
+L210 170
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="285"
+y="180"
+>
+রাজশাহী
+</text>
+
+
+<!-- RANGPUR -->
+
+<path
+class="region"
+onclick="openPlace('rangpur')"
+d="
+M280 55
+L390 55
+L385 130
+L330 100
+L235 130
+L220 90
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="305"
+y="92"
+>
+রংপুর
+</text>
+
+
+<!-- KHULNA -->
+
+<path
+class="region"
+onclick="openPlace('khulna')"
+d="
+M210 220
+L280 255
+L340 245
+L385 285
+L350 350
+L310 410
+L250 400
+L210 350
+L190 300
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="270"
+y="325"
+>
+খুলনা
+</text>
+
+
+<!-- BARISHAL -->
+
+<path
+class="region"
+onclick="openPlace('barishal')"
+d="
+M350 350
+L385 285
+L445 300
+L490 355
+L470 430
+L420 470
+L365 445
+L310 410
+Z
+"
+/>
+
+<text
+class="regionLabel"
+x="395"
+y="380"
+>
+বরিশাল
+</text>
+
+</svg>
+
+`;
+
+}
+
+
+/* =====================================================
+   DHAKA MAP
+===================================================== */
+
+function dhakaMap(){
+
+return `
+
+<svg viewBox="0 0 900 650">
+
+<path
+d="
+M130 320
+L190 200
+L300 130
+L430 100
+L570 130
+L700 190
+L770 300
+L730 430
+L630 510
+L500 550
+L350 520
+L220 470
+L150 400
+Z
+"
+fill="#006f3b"
+stroke="#d7ffe7"
+stroke-width="5"
+/>
+
+
+<path
+class="region"
+onclick="openPlace('dhakaCity')"
+d="
+M360 250
+L455 210
+L550 245
+L575 335
+L520 405
+L430 420
+L350 370
+Z"
+/>
+
+<text
+class="regionLabel"
+x="460"
+y="320"
+>
+ঢাকা
+</text>
+
+
+<path
+class="region"
+d="
+M185 255
+L275 205
+L360 250
+L350 370
+L280 410
+L205 365
+Z"
+/>
+
+<text
+class="regionLabel"
+x="270"
+y="310"
+>
+মানিকগঞ্জ
+</text>
+
+
+<path
+class="region"
+d="
+M550 245
+L650 210
+L735 270
+L700 370
+L575 335
+Z"
+/>
+
+<text
+class="regionLabel"
+x="650"
+y="285"
+>
+গাজীপুর
+</text>
+
+
+<path
+class="region"
+d="
+M520 405
+L630 370
+L700 430
+L630 510
+L500 550
+Z"
+/>
+
+<text
+class="regionLabel"
+x="600"
+y="440"
+>
+নারায়ণগঞ্জ
+</text>
+
+
+<path
+class="region"
+d="
+M205 365
+L280 410
+L350 370
+L430 420
+L350 520
+L220 470
+Z"
+/>
+
+<text
+class="regionLabel"
+x="300"
+y="450"
+>
+মুন্সীগঞ্জ
+</text>
+
+</svg>
+
+`;
+
+}
+
+
+/* =====================================================
+   DHAKA CITY MAP
+===================================================== */
+
+function dhakaCityMap(){
+
+return `
+
+<svg viewBox="0 0 900 650">
+
+<path
+d="
+M120 310
+L170 200
+L280 125
+L420 90
+L570 120
+L700 180
+L785 285
+L760 410
+L680 500
+L540 550
+L390 530
+L250 490
+L160 410
+Z
+"
+fill="#006f3b"
+stroke="#d7ffe7"
+stroke-width="5"
+/>
+
+
+<path
+class="region"
+onclick="openPlace('gulshan')"
+d="
+M500 180
+L590 160
+L650 220
+L630 290
+L545 300
+L490 250
+Z"
+/>
+
+<text
+class="regionLabel"
+x="565"
+y="235"
+>
+গুলশান
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('mirpur')"
+d="
+M240 220
+L350 175
+L400 240
+L370 320
+L280 325
+L220 280
+Z"
+/>
+
+<text
+class="regionLabel"
+x="305"
+y="270"
+>
+মিরপুর
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('uttara')"
+d="
+M350 125
+L470 105
+L500 180
+L420 220
+L350 175
+Z"
+/>
+
+<text
+class="regionLabel"
+x="420"
+y="155"
+>
+উত্তরা
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('mohammadpur')"
+d="
+M280 325
+L370 320
+L420 390
+L350 440
+L250 400
+Z"
+/>
+
+<text
+class="regionLabel"
+x="325"
+y="380"
+>
+মোহাম্মদপুর
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('badda')"
+d="
+M630 290
+L720 270
+L760 340
+L700 400
+L620 370
+Z"
+/>
+
+<text
+class="regionLabel"
+x="685"
+y="335"
+>
+বাড্ডা
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('rampura')"
+d="
+M500 300
+L545 300
+L620 370
+L580 440
+L500 405
+Z"
+/>
+
+<text
+class="regionLabel"
+x="550"
+y="360"
+>
+রামপুরা
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('banasree')"
+d="
+M580 440
+L680 400
+L720 470
+L630 500
+Z"
+/>
+
+<text
+class="regionLabel"
+x="640"
+y="450"
+>
+বনশ্রী
+</text>
+
+</svg>
+
+`;
+
+}
+
+
+/* =====================================================
+   GULSHAN MAP
+===================================================== */
+
+function gulshanMap(){
+
+return `
+
+<svg viewBox="0 0 900 650">
+
+<path
+d="
+M190 350
+L220 210
+L340 120
+L490 100
+L650 145
+L740 250
+L720 390
+L620 500
+L470 545
+L310 500
+L220 430
+Z
+"
+fill="#006f3b"
+stroke="#d7ffe7"
+stroke-width="5"
+/>
+
+
+<path
+class="region"
+onclick="openPlace('gulshan1')"
+d="
+M310 230
+L420 180
+L500 225
+L480 320
+L390 340
+L300 300
+Z"
+/>
+
+<text
+class="regionLabel"
+x="395"
+y="265"
+>
+গুলশান-১
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('gulshan2')"
+d="
+M500 225
+L620 185
+L690 260
+L650 340
+L540 325
+L480 320
+Z"
+/>
+
+<text
+class="regionLabel"
+x="585"
+y="270"
+>
+গুলশান-২
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('niketan')"
+d="
+M390 340
+L480 320
+L540 325
+L530 410
+L450 440
+L370 400
+Z"
+/>
+
+<text
+class="regionLabel"
+x="455"
+y="375"
+>
+নিকেতন
+</text>
+
+
+<path
+class="region"
+onclick="openPlace('banani')"
+d="
+M310 300
+L390 340
+L370 400
+L290 380
+L250 330
+Z"
+/>
+
+<text
+class="regionLabel"
+x="310"
+y="350"
+>
+বনানী
+</text>
+
+</svg>
+
+`;
+
+}
+
+
+/* =====================================================
+   SIMPLE AREA MAP
+===================================================== */
+
+function simpleMap(place){
+
+return `
+
+<svg viewBox="0 0 900 650">
+
+<path
+d="
+M190 330
+L240 200
+L360 120
+L510 100
+L670 150
+L760 260
+L730 400
+L630 500
+L480 545
+L320 510
+L210 430
+Z
+"
+fill="#006f3b"
+stroke="#d7ffe7"
+stroke-width="5"
+/>
+
+<path
+class="region active"
+d="
+M310 230
+L430 170
+L570 210
+L630 310
+L580 410
+L450 455
+L320 400
+L270 310
+Z"
+/>
+
+<text
+class="regionLabel"
+x="450"
+y="320"
+>
+${places[place].name}
+</text>
+
+</svg>
+
+`;
+
+}
+
+
+/* =====================================================
+   DRAW MAP
+===================================================== */
+
+function drawMap(place){
+
+    const data=places[place];
+
+    const map=document.getElementById("map");
+
+    map.classList.remove("enter");
+
+    void map.offsetWidth;
+
+    map.classList.add("enter");
+
+
+    if(data.type==="bangladesh"){
+
+        map.innerHTML=bangladeshMap();
+
+    }
+
+    else if(data.type==="dhaka"){
+
+        map.innerHTML=dhakaMap();
+
+    }
+
+    else if(data.type==="dhakaCity"){
+
+        map.innerHTML=dhakaCityMap();
+
+    }
+
+    else if(data.type==="gulshan"){
+
+        map.innerHTML=gulshanMap();
+
+    }
+
+    else{
+
+        map.innerHTML=simpleMap(place);
+
+    }
+
+}
+
+
+/* =====================================================
+   OPEN PLACE
+===================================================== */
+
+function openPlace(id){
+
+    if(!places[id]) return;
+
+    history.push(current);
+
+    current=id;
+
+    updateInterface();
+
+}
+
+
+/* =====================================================
+   UPDATE
+===================================================== */
+
+function updateInterface(){
+
+    const data=places[current];
+
+    document.getElementById("locationName")
+        .innerText=data.name;
+
+    document.getElementById("locationPath")
+        .innerText=data.path;
+
+    document.getElementById("bottomTitle")
+        .innerText=data.name;
+
+
+    if(current==="bangladesh"){
+
+        document.getElementById("bottomText")
+            .innerText=
+            "বাংলাদেশের যেকোনো বিভাগ নির্বাচন করুন।";
+
+    }
+
+    else if(current==="dhaka"){
+
+        document.getElementById("bottomText")
+            .innerText=
+            "ঢাকা বিভাগের একটি জেলা নির্বাচন করুন।";
+
+    }
+
+    else if(current==="dhakaCity"){
+
+        document.getElementById("bottomText")
+            .innerText=
+            "ঢাকার এলাকার মধ্যে প্রবেশ করুন।";
+
+    }
+
+    else if(current==="gulshan"){
+
+        document.getElementById("bottomText")
+            .innerText=
+            "গুলশানের নির্দিষ্ট এলাকা নির্বাচন করুন।";
+
+    }
+
+    else{
+
+        document.getElementById("bottomText")
+            .innerText=
+            "এই এলাকাকে আপনার কাজের এলাকা হিসেবে নির্বাচন করতে পারেন।";
+
+    }
+
+
+    document
+        .getElementById("backButton")
+        .classList.toggle(
+            "show",
+            history.length>0
+        );
+
+
+    drawMap(current);
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack(){
+
+    if(history.length===0) return;
+
+    current=history.pop();
+
+    updateInterface();
+
+}
+
+
+/* =====================================================
+   GO INSIDE
+===================================================== */
+
+function goInside(){
+
+    const next={
+
+        bangladesh:"dhaka",
+
+        dhaka:"dhakaCity",
+
+        dhakaCity:"gulshan",
+
+        gulshan:"gulshan1"
+
+    };
+
+    if(next[current]){
+
+        openPlace(next[current]);
+
+    }
+
+    else{
+
+        stayHere();
+
+    }
+
+}
+
+
+/* =====================================================
+   STAY
+===================================================== */
+
+function stayHere(){
+
+    const data=places[current];
+
+    alert(
+        "📍 এলাকা নির্বাচন হয়েছে\n\n"+
+        data.name+
+        "\n\n"+
+        "এখন এখানে কাজ খুঁজতে অথবা কাজ পোস্ট করতে পারবেন।"
+    );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+drawMap("bangladesh");
+
+</script>
+
+</body>
+</html>

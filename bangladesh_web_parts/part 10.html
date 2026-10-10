@@ -1,0 +1,2469 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Assunnah Works House — Bangladesh Work Map</title>
+
+<!-- Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+:root{
+  --green:#006a4e;
+  --green2:#00a878;
+  --red:#f42a41;
+  --red2:#ff5b6e;
+  --black:#050807;
+  --panel:rgba(8,18,15,.78);
+  --panel2:rgba(13,31,25,.88);
+  --line:rgba(255,255,255,.12);
+  --text:#f5fffb;
+  --muted:#9db4aa;
+  --gold:#d8ff8b;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:
+    "Noto Sans Bengali",
+    "Nirmala UI",
+    system-ui,
+    sans-serif;
+  background:#030605;
+  color:var(--text);
+}
+
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(0,168,120,.18),transparent 32%),
+    radial-gradient(circle at 90% 20%,rgba(244,42,65,.15),transparent 30%),
+    radial-gradient(circle at 50% 100%,rgba(0,106,78,.22),transparent 40%);
+  z-index:1000;
+}
+
+/* ================================
+   APP
+================================ */
+
+.app{
+  position:relative;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:
+    linear-gradient(135deg,#030605,#07130f 50%,#020504);
+}
+
+/* cinematic grid */
+.app:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.08;
+  background-image:
+    linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px);
+  background-size:55px 55px;
+  mask-image:linear-gradient(to bottom,black,transparent);
+  z-index:900;
+}
+
+/* ================================
+   TOP BAR
+================================ */
+
+.topbar{
+  position:absolute;
+  left:20px;
+  right:20px;
+  top:18px;
+  height:72px;
+  z-index:2000;
+
+  display:flex;
+  align-items:center;
+  gap:18px;
+
+  padding:0 18px;
+
+  background:rgba(5,12,10,.72);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:22px;
+
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.42),
+    inset 0 1px rgba(255,255,255,.07);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:270px;
+}
+
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+
+  display:grid;
+  place-items:center;
+
+  font-size:22px;
+  font-weight:900;
+
+  background:
+    linear-gradient(135deg,var(--green),#003f2e);
+
+  border:1px solid rgba(255,255,255,.18);
+
+  box-shadow:
+    0 0 35px rgba(0,168,120,.28);
+}
+
+.brand-text{
+  line-height:1.05;
+}
+
+.brand-title{
+  font-weight:900;
+  letter-spacing:.3px;
+  font-size:16px;
+}
+
+.brand-sub{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+.search{
+  flex:1;
+  height:46px;
+  max-width:600px;
+  margin:auto;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  padding:0 15px;
+
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:15px;
+}
+
+.search-icon{
+  opacity:.6;
+}
+
+.search input{
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:white;
+  font-size:14px;
+}
+
+.search input::placeholder{
+  color:#789087;
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.icon-btn{
+  width:44px;
+  height:44px;
+
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:14px;
+
+  background:rgba(255,255,255,.05);
+  color:white;
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+.icon-btn:hover{
+  background:rgba(0,168,120,.18);
+  transform:translateY(-2px);
+}
+
+/* ================================
+   MAP
+================================ */
+
+#map{
+  position:absolute;
+  inset:0;
+  z-index:1;
+
+  background:
+    radial-gradient(circle at center,#0c211a,#04100c 75%);
+}
+
+/* remove default leaflet background */
+.leaflet-container{
+  background:#06100d;
+  font-family:inherit;
+}
+
+/* controls */
+.leaflet-control-zoom{
+  border:0!important;
+  box-shadow:none!important;
+}
+
+.leaflet-control-zoom a{
+  width:42px!important;
+  height:42px!important;
+  line-height:42px!important;
+
+  background:rgba(6,18,14,.84)!important;
+  color:#dffcf0!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+
+  backdrop-filter:blur(14px);
+}
+
+.leaflet-control-zoom a:first-child{
+  border-radius:13px 13px 0 0!important;
+}
+
+.leaflet-control-zoom a:last-child{
+  border-radius:0 0 13px 13px!important;
+}
+
+/* ================================
+   MAP LABELS
+================================ */
+
+.map-label{
+  pointer-events:none;
+
+  color:white;
+
+  font-weight:900;
+  text-align:center;
+
+  white-space:nowrap;
+
+  text-shadow:
+    0 2px 6px #000,
+    0 0 12px rgba(0,0,0,.95);
+
+  transform:translate(-50%,-50%);
+
+  transition:opacity .2s;
+}
+
+.map-label .bn{
+  display:block;
+  font-size:14px;
+}
+
+.map-label .en{
+  display:block;
+  margin-top:2px;
+  color:#a7c8bc;
+  font-size:8px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+/* ================================
+   SIDE PANEL
+================================ */
+
+.side-panel{
+  position:absolute;
+
+  top:110px;
+  right:20px;
+  bottom:20px;
+
+  width:360px;
+
+  z-index:1900;
+
+  display:flex;
+  flex-direction:column;
+
+  background:rgba(6,15,12,.78);
+  backdrop-filter:blur(25px);
+  -webkit-backdrop-filter:blur(25px);
+
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:25px;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.48),
+    inset 0 1px rgba(255,255,255,.06);
+}
+
+.panel-head{
+  padding:22px 20px 17px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.eyebrow{
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:#78a596;
+}
+
+.current-title{
+  margin-top:7px;
+  font-size:25px;
+  font-weight:950;
+  letter-spacing:-.5px;
+}
+
+.breadcrumb{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:11px;
+}
+
+.crumb{
+  padding:5px 9px;
+  border-radius:8px;
+
+  color:#9fb8af;
+  background:rgba(255,255,255,.045);
+
+  font-size:11px;
+}
+
+.crumb.active{
+  color:white;
+  background:rgba(0,168,120,.16);
+  border:1px solid rgba(0,168,120,.20);
+}
+
+.panel-actions{
+  display:flex;
+  gap:8px;
+  margin-top:16px;
+}
+
+.action{
+  flex:1;
+  height:40px;
+
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:11px;
+
+  cursor:pointer;
+
+  font-family:inherit;
+  font-weight:800;
+}
+
+.action.primary{
+  color:white;
+  background:
+    linear-gradient(135deg,#00845f,#00553f);
+}
+
+.action.secondary{
+  color:#d3e4dd;
+  background:rgba(255,255,255,.05);
+}
+
+.action:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.12);
+}
+
+.children{
+  flex:1;
+  overflow:auto;
+  padding:12px;
+}
+
+.children::-webkit-scrollbar{
+  width:5px;
+}
+
+.children::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.12);
+  border-radius:10px;
+}
+
+.area-card{
+  position:relative;
+
+  width:100%;
+  min-height:72px;
+
+  margin-bottom:8px;
+
+  display:flex;
+  align-items:center;
+  gap:13px;
+
+  padding:12px 13px;
+
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.055),
+      rgba(255,255,255,.018)
+    );
+
+  color:white;
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+.area-card:hover{
+  border-color:rgba(0,200,143,.34);
+  background:rgba(0,168,120,.09);
+  transform:translateX(-3px);
+}
+
+.area-number{
+  width:38px;
+  height:38px;
+
+  flex:none;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:12px;
+
+  color:#c9ffe9;
+  background:rgba(0,168,120,.12);
+  border:1px solid rgba(0,168,120,.18);
+
+  font-size:12px;
+  font-weight:900;
+}
+
+.area-info{
+  flex:1;
+  min-width:0;
+}
+
+.area-name{
+  font-weight:850;
+  font-size:14px;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.area-en{
+  margin-top:4px;
+  color:#718e84;
+  font-size:9px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.area-arrow{
+  color:#638378;
+  font-size:18px;
+}
+
+.panel-footer{
+  padding:13px 17px;
+  border-top:1px solid rgba(255,255,255,.08);
+  color:#688078;
+  font-size:10px;
+  line-height:1.5;
+}
+
+/* ================================
+   LOCATION HUD
+================================ */
+
+.hud{
+  position:absolute;
+  z-index:1700;
+  left:22px;
+  bottom:25px;
+
+  padding:13px 16px;
+
+  background:rgba(4,13,10,.72);
+  backdrop-filter:blur(18px);
+
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:15px;
+
+  min-width:245px;
+
+  box-shadow:0 18px 50px rgba(0,0,0,.3);
+}
+
+.hud-top{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  color:#7ca99a;
+  font-size:9px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+.live-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#00e096;
+  box-shadow:0 0 12px #00e096;
+}
+
+.hud-location{
+  margin-top:5px;
+  font-size:15px;
+  font-weight:900;
+}
+
+.hud-meta{
+  margin-top:3px;
+  color:#718e84;
+  font-size:10px;
+}
+
+/* ================================
+   LOADER
+================================ */
+
+.loader{
+  position:absolute;
+  inset:0;
+  z-index:5000;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#030806;
+}
+
+.loader.hidden{
+  display:none;
+}
+
+.loader-box{
+  width:320px;
+  text-align:center;
+}
+
+.loader-logo{
+  width:70px;
+  height:70px;
+
+  margin:auto;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:23px;
+
+  font-size:34px;
+  font-weight:900;
+
+  background:
+    linear-gradient(135deg,var(--green),#003d2d);
+
+  box-shadow:
+    0 0 60px rgba(0,168,120,.28);
+}
+
+.loader-title{
+  margin-top:18px;
+  font-size:19px;
+  font-weight:900;
+}
+
+.loader-text{
+  margin-top:7px;
+  color:#789087;
+  font-size:11px;
+}
+
+.progress{
+  height:3px;
+  margin-top:20px;
+
+  background:rgba(255,255,255,.08);
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.progress i{
+  display:block;
+  width:45%;
+  height:100%;
+
+  background:
+    linear-gradient(90deg,var(--green),#00d79a,var(--red));
+
+  animation:loading 1.2s infinite ease-in-out;
+}
+
+@keyframes loading{
+  0%{transform:translateX(-110%)}
+  100%{transform:translateX(330%)}
+}
+
+/* ================================
+   ERROR
+================================ */
+
+.error-box{
+  position:absolute;
+  z-index:5001;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+
+  width:min(480px,90vw);
+
+  padding:28px;
+
+  background:rgba(8,17,14,.96);
+  border:1px solid rgba(255,80,100,.2);
+  border-radius:20px;
+
+  text-align:center;
+
+  box-shadow:0 30px 100px rgba(0,0,0,.65);
+}
+
+.error-box h2{
+  margin:0 0 8px;
+}
+
+.error-box p{
+  color:#8ca49c;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.retry{
+  margin-top:12px;
+
+  border:0;
+  border-radius:11px;
+  padding:11px 20px;
+
+  background:#007c5b;
+  color:white;
+
+  cursor:pointer;
+  font-weight:800;
+}
+
+/* ================================
+   MOBILE
+================================ */
+
+@media(max-width:900px){
+
+  .topbar{
+    left:10px;
+    right:10px;
+    top:10px;
+    height:62px;
+    border-radius:18px;
+    padding:0 10px;
+  }
+
+  .brand{
+    min-width:auto;
+  }
+
+  .brand-title{
+    font-size:13px;
+  }
+
+  .brand-sub{
+    display:none;
+  }
+
+  .logo{
+    width:39px;
+    height:39px;
+    border-radius:12px;
+  }
+
+  .search{
+    display:none;
+  }
+
+  .top-actions{
+    margin-left:auto;
+  }
+
+  .side-panel{
+    left:10px;
+    right:10px;
+    top:auto;
+    bottom:10px;
+    width:auto;
+    height:39vh;
+
+    border-radius:23px;
+  }
+
+  .panel-head{
+    padding:15px 16px 12px;
+  }
+
+  .current-title{
+    font-size:20px;
+  }
+
+  .panel-footer{
+    display:none;
+  }
+
+  .hud{
+    left:10px;
+    bottom:calc(39vh + 22px);
+    min-width:190px;
+  }
+
+  .leaflet-control-zoom{
+    display:none;
+  }
+
+  .map-label .bn{
+    font-size:11px;
+  }
+
+  .map-label .en{
+    display:none;
+  }
+}
+
+@media(max-width:480px){
+
+  .side-panel{
+    height:43vh;
+  }
+
+  .hud{
+    bottom:calc(43vh + 20px);
+  }
+
+  .area-card{
+    min-height:62px;
+  }
+
+  .area-number{
+    width:34px;
+    height:34px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+
+    <div class="loader-box">
+
+      <div class="loader-logo">🇧🇩</div>
+
+      <div class="loader-title">
+        Assunnah Works House
+      </div>
+
+      <div class="loader-text" id="loaderText">
+        বাংলাদেশ কর্মসংস্থান মানচিত্র প্রস্তুত হচ্ছে...
+      </div>
+
+      <div class="progress">
+        <i></i>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-box" id="errorBox" style="display:none">
+
+    <h2>Map data load হয়নি</h2>
+
+    <p id="errorText">
+      ইন্টারনেট connection অথবা data source check করুন।
+    </p>
+
+    <button class="retry" onclick="location.reload()">
+      আবার চেষ্টা করুন
+    </button>
+
+  </div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div class="logo">
+        🇧🇩
+      </div>
+
+      <div class="brand-text">
+
+        <div class="brand-title">
+          Assunnah Works House
+        </div>
+
+        <div class="brand-sub">
+          Bangladesh National Work Map
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="search">
+
+      <span class="search-icon">⌕</span>
+
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="বিভাগ, জেলা, উপজেলা বা ইউনিয়ন খুঁজুন..."
+        autocomplete="off"
+      />
+
+    </div>
+
+    <div class="top-actions">
+
+      <button class="icon-btn" id="homeBtn" title="বাংলাদেশ">
+        ⌂
+      </button>
+
+      <button class="icon-btn" id="backBtn" title="পেছনে">
+        ←
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- HUD -->
+  <div class="hud">
+
+    <div class="hud-top">
+      <span class="live-dot"></span>
+      Interactive Work Map
+    </div>
+
+    <div class="hud-location" id="hudLocation">
+      বাংলাদেশ
+    </div>
+
+    <div class="hud-meta" id="hudMeta">
+      ৮ বিভাগ • জাতীয় পর্যায়
+    </div>
+
+  </div>
+
+  <!-- SIDE PANEL -->
+  <aside class="side-panel">
+
+    <div class="panel-head">
+
+      <div class="eyebrow" id="levelText">
+        National Level
+      </div>
+
+      <div class="current-title" id="currentTitle">
+        বাংলাদেশ
+      </div>
+
+      <div class="breadcrumb" id="breadcrumb"></div>
+
+      <div class="panel-actions">
+
+        <button
+          class="action primary"
+          id="stayBtn"
+        >
+          ✓ এখানেই থাকুন
+        </button>
+
+        <button
+          class="action secondary"
+          id="zoomOutBtn"
+        >
+          ↑ বাইরে যান
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="children" id="children"></div>
+
+    <div class="panel-footer">
+      প্রশাসনিক সীমানা শুধু navigation-এর জন্য ব্যবহৃত হচ্ছে।
+      কাজের লোকেশন আলাদাভাবে নির্বাচন করা যাবে।
+    </div>
+
+  </aside>
+
+</div>
+
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+/* ==========================================================
+   ASSUNNAH WORKS HOUSE
+   PROFESSIONAL BANGLADESH ADMINISTRATIVE MAP
+========================================================== */
+
+
+/* ==========================================================
+   DATA SOURCES
+========================================================== */
+
+const DATA_URL =
+  "https://iqbalhasandev.github.io/bangladesh-geo-json/bangladesh-geo.json";
+
+const GEO_URLS = {
+
+  division:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/bgd_admin1.geojson",
+
+  district:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/bgd_admin2.geojson",
+
+  upazila:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/bgd_admin3.geojson",
+
+  union:
+    "https://raw.githubusercontent.com/meetshaks/bangladesh-administrative-boundaries-json/main/geoBoundaries-BGD-ADM4_simplified.geojson"
+
+};
+
+
+/* ==========================================================
+   BANGLA NORMALIZATION
+========================================================== */
+
+const ALIASES = {
+
+  "chattagram":"চট্টগ্রাম",
+  "chattogram":"চট্টগ্রাম",
+  "chittagong":"চট্টগ্রাম",
+
+  "comilla":"কুমিল্লা",
+  "cumilla":"কুমিল্লা",
+
+  "barisal":"বরিশাল",
+  "barishal":"বরিশাল",
+
+  "bogra":"বগুড়া",
+  "bogura":"বগুড়া",
+
+  "dhaka":"ঢাকা",
+  "khulna":"খুলনা",
+  "rajshahi":"রাজশাহী",
+  "sylhet":"সিলেট",
+  "rangpur":"রংপুর",
+  "mymensingh":"ময়মনসিংহ"
+
+};
+
+
+/* ==========================================================
+   APP STATE
+========================================================== */
+
+let tree = [];
+
+let geoCache = {};
+
+let currentLevel = "division";
+
+let currentNode = null;
+
+let navigationStack = [];
+
+let selectedLayer = null;
+
+let mapLabels = [];
+
+let map;
+
+
+/* ==========================================================
+   DOM
+========================================================== */
+
+const $ = id => document.getElementById(id);
+
+const loader = $("loader");
+
+const loaderText = $("loaderText");
+
+const errorBox = $("errorBox");
+
+const errorText = $("errorText");
+
+const childrenBox = $("children");
+
+const currentTitle = $("currentTitle");
+
+const levelText = $("levelText");
+
+const breadcrumb = $("breadcrumb");
+
+const hudLocation = $("hudLocation");
+
+const hudMeta = $("hudMeta");
+
+const searchInput = $("searchInput");
+
+
+/* ==========================================================
+   MAP INIT
+========================================================== */
+
+map = L.map("map", {
+
+  zoomControl:true,
+
+  attributionControl:false,
+
+  preferCanvas:true,
+
+  zoomSnap:.25,
+
+  zoomDelta:.5,
+
+  minZoom:5,
+
+  maxZoom:14
+
+});
+
+
+/* Bangladesh approximate initial view */
+
+map.setView([23.685,90.3563],6.2);
+
+
+/* ==========================================================
+   UTILS
+========================================================== */
+
+function normalize(value){
+
+  if(value === undefined || value === null)
+    return "";
+
+  let s = String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[._\-\/]/g," ")
+    .replace(/\s+/g," ");
+
+  return s;
+
+}
+
+
+function cleanName(value){
+
+  if(!value)
+    return "";
+
+  const n = normalize(value);
+
+  if(ALIASES[n])
+    return ALIASES[n];
+
+  return value;
+
+}
+
+
+function findBn(node){
+
+  if(!node)
+    return "";
+
+  return (
+    node.bn_name ||
+    node.bnName ||
+    node.name_bn ||
+    node.bangla ||
+    cleanName(node.name)
+  );
+
+}
+
+
+function getEn(node){
+
+  if(!node)
+    return "";
+
+  return (
+    node.name ||
+    node.en_name ||
+    node.enName ||
+    ""
+  );
+
+}
+
+
+function getChildren(node, level){
+
+  if(!node)
+    return [];
+
+  if(level === "division")
+    return tree;
+
+  if(level === "district")
+    return node.districts || [];
+
+  if(level === "upazila")
+    return node.upazilas || [];
+
+  if(level === "union")
+    return node.unions || [];
+
+  return [];
+
+}
+
+
+/* ==========================================================
+   TREE SEARCH
+========================================================== */
+
+function allRecords(){
+
+  const result = [];
+
+  tree.forEach(div => {
+
+    result.push({
+      level:"division",
+      node:div,
+      parent:null
+    });
+
+    (div.districts || []).forEach(dist => {
+
+      result.push({
+        level:"district",
+        node:dist,
+        parent:div
+      });
+
+      (dist.upazilas || []).forEach(up => {
+
+        result.push({
+          level:"upazila",
+          node:up,
+          parent:dist
+        });
+
+        (up.unions || []).forEach(un => {
+
+          result.push({
+            level:"union",
+            node:un,
+            parent:up
+          });
+
+        });
+
+      });
+
+    });
+
+  });
+
+  return result;
+
+}
+
+
+function searchRecords(query){
+
+  const q = normalize(query);
+
+  if(!q)
+    return [];
+
+  return allRecords()
+    .filter(item => {
+
+      const bn = normalize(findBn(item.node));
+
+      const en = normalize(getEn(item.node));
+
+      return bn.includes(q) || en.includes(q);
+
+    })
+    .slice(0,20);
+
+}
+
+
+/* ==========================================================
+   LOAD JSON
+========================================================== */
+
+async function loadData(){
+
+  try{
+
+    loaderText.textContent =
+      "বাংলাদেশের প্রশাসনিক hierarchy লোড হচ্ছে...";
+
+    const response = await fetch(DATA_URL, {
+      cache:"no-store"
+    });
+
+    if(!response.ok)
+      throw new Error("Hierarchy request failed");
+
+    tree = await response.json();
+
+    if(!Array.isArray(tree) || !tree.length)
+      throw new Error("Invalid hierarchy data");
+
+    loaderText.textContent =
+      "Map boundary প্রস্তুত হচ্ছে...";
+
+    await loadGeo("division");
+
+    loader.classList.add("hidden");
+
+    renderRoot();
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    loader.classList.add("hidden");
+
+    errorBox.style.display = "block";
+
+    errorText.textContent =
+      "Administrative map data load করা যায়নি। Internet connection check করে আবার চেষ্টা করুন।";
+
+  }
+
+}
+
+
+/* ==========================================================
+   GEOJSON LOADER
+========================================================== */
+
+async function loadGeo(level){
+
+  if(geoCache[level])
+    return geoCache[level];
+
+  const response = await fetch(GEO_URLS[level], {
+    cache:"force-cache"
+  });
+
+  if(!response.ok)
+    throw new Error("GeoJSON failed: " + level);
+
+  const data = await response.json();
+
+  geoCache[level] = data;
+
+  return data;
+
+}
+
+
+/* ==========================================================
+   GEOJSON PROPERTY EXTRACTION
+========================================================== */
+
+function featureProperties(feature){
+
+  return feature && feature.properties
+    ? feature.properties
+    : {};
+
+}
+
+
+function possibleNames(feature){
+
+  const p = featureProperties(feature);
+
+  const values = [];
+
+  Object.keys(p).forEach(key => {
+
+    const value = p[key];
+
+    if(
+      typeof value === "string" &&
+      value.length > 1 &&
+      value.length < 100
+    ){
+      values.push(value);
+    }
+
+  });
+
+  return values;
+
+}
+
+
+function matchFeature(feature, node){
+
+  const targetEn = normalize(getEn(node));
+
+  const targetBn = normalize(findBn(node));
+
+  const names = possibleNames(feature);
+
+  return names.some(name => {
+
+    const n = normalize(name);
+
+    if(n === targetEn)
+      return true;
+
+    if(n === targetBn)
+      return true;
+
+    if(ALIASES[n] &&
+       normalize(ALIASES[n]) === targetBn)
+      return true;
+
+    if(ALIASES[targetEn] &&
+       normalize(ALIASES[targetEn]) === n)
+      return true;
+
+    return false;
+
+  });
+
+}
+
+
+/* ==========================================================
+   CLEAR MAP
+========================================================== */
+
+function clearMap(){
+
+  if(selectedLayer){
+
+    map.removeLayer(selectedLayer);
+
+    selectedLayer = null;
+
+  }
+
+  mapLabels.forEach(label => {
+
+    if(map.hasLayer(label))
+      map.removeLayer(label);
+
+  });
+
+  mapLabels = [];
+
+}
+
+
+/* ==========================================================
+   POLYGON STYLE
+========================================================== */
+
+function styleFeature(level, active=false){
+
+  const styles = {
+
+    division:{
+      color:"#5effc4",
+      weight:1.5,
+      fillColor:"#006a4e",
+      fillOpacity:.35
+    },
+
+    district:{
+      color:"#7fffd4",
+      weight:1.35,
+      fillColor:"#007c5b",
+      fillOpacity:.28
+    },
+
+    upazila:{
+      color:"#a0ffe0",
+      weight:1.1,
+      fillColor:"#00966d",
+      fillOpacity:.23
+    },
+
+    union:{
+      color:"#c1ffe9",
+      weight:.8,
+      fillColor:"#00a878",
+      fillOpacity:.16
+    }
+
+  };
+
+  const s = styles[level];
+
+  if(active){
+
+    return {
+
+      ...s,
+
+      color:"#ffffff",
+      weight:2.5,
+      fillColor:"#00a878",
+      fillOpacity:.52
+
+    };
+
+  }
+
+  return s;
+
+}
+
+
+/* ==========================================================
+   DRAW CURRENT LEVEL
+========================================================== */
+
+async function drawLevel(level, nodes){
+
+  clearMap();
+
+  const geo = await loadGeo(level);
+
+  const matched = [];
+
+  geo.features.forEach(feature => {
+
+    const node = nodes.find(n => matchFeature(feature,n));
+
+    if(node){
+
+      matched.push({
+        feature,
+        node
+      });
+
+    }
+
+  });
+
+
+  /* -----------------------------------------------
+     If no polygon matched, don't fake anything.
+  ------------------------------------------------ */
+
+  if(!matched.length){
+
+    console.warn(
+      "No matching polygons:",
+      level,
+      nodes
+    );
+
+    return;
+
+  }
+
+
+  /* -----------------------------------------------
+     GeoJSON layer
+  ------------------------------------------------ */
+
+  selectedLayer = L.geoJSON(
+
+    {
+      type:"FeatureCollection",
+
+      features:matched.map(x => x.feature)
+
+    },
+
+    {
+
+      style:() => styleFeature(level),
+
+      onEachFeature:(feature,layer)=>{
+
+        const item =
+          matched.find(x => x.feature === feature);
+
+        if(!item)
+          return;
+
+        const node = item.node;
+
+        layer.bindTooltip(
+          `
+          <div style="
+            font-family:inherit;
+            font-weight:900;
+            text-align:center;
+          ">
+            ${findBn(node)}
+            <div style="
+              font-size:9px;
+              color:#719087;
+              margin-top:2px;
+              letter-spacing:1px;
+            ">
+              ${getEn(node)}
+            </div>
+          </div>
+          `,
+          {
+            sticky:true,
+            direction:"center",
+            opacity:.96
+          }
+        );
+
+        layer.on({
+
+          mouseover:e=>{
+
+            e.target.setStyle({
+              weight:2.4,
+              color:"#ffffff",
+              fillColor:"#00c48b",
+              fillOpacity:.50
+            });
+
+            e.target.bringToFront();
+
+          },
+
+          mouseout:e=>{
+
+            selectedLayer.resetStyle(e.target);
+
+          },
+
+          click:()=>{
+
+            openNode(
+              node,
+              level
+            );
+
+          }
+
+        });
+
+      }
+
+    }
+
+  ).addTo(map);
+
+
+  /* -----------------------------------------------
+     Fit map
+  ------------------------------------------------ */
+
+  const bounds = selectedLayer.getBounds();
+
+  if(bounds.isValid()){
+
+    map.fitBounds(
+      bounds.pad(.08),
+      {
+        animate:true,
+        duration:.8,
+        maxZoom:
+          level === "union"
+            ? 12
+            : level === "upazila"
+              ? 10
+              : level === "district"
+                ? 8
+                : 6.5
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------------
+     Labels
+  ------------------------------------------------ */
+
+  matched.forEach(item => {
+
+    addLabel(item.feature, item.node, level);
+
+  });
+
+}
+
+
+/* ==========================================================
+   LABEL
+========================================================== */
+
+function addLabel(feature,node,level){
+
+  try{
+
+    const layer =
+      L.geoJSON(feature);
+
+    const bounds =
+      layer.getBounds();
+
+    if(!bounds.isValid())
+      return;
+
+    const center =
+      bounds.getCenter();
+
+    const html = `
+      <div class="map-label">
+        <span class="bn">
+          ${findBn(node)}
+        </span>
+        <span class="en">
+          ${getEn(node)}
+        </span>
+      </div>
+    `;
+
+    const label = L.marker(
+      center,
+      {
+        icon:L.divIcon({
+          className:"",
+          html,
+          iconSize:[0,0],
+          iconAnchor:[0,0]
+        }),
+        interactive:false
+      }
+    ).addTo(map);
+
+    mapLabels.push(label);
+
+  }
+  catch(e){}
+
+}
+
+
+/* ==========================================================
+   RENDER ROOT
+========================================================== */
+
+async function renderRoot(){
+
+  currentLevel = "division";
+
+  currentNode = null;
+
+  navigationStack = [];
+
+  updatePanel(
+    "division",
+    null,
+    tree
+  );
+
+  await drawLevel(
+    "division",
+    tree
+  );
+
+}
+
+
+/* ==========================================================
+   OPEN NODE
+========================================================== */
+
+async function openNode(node, level){
+
+  const nextLevel =
+    level === "division"
+      ? "district"
+      : level === "district"
+        ? "upazila"
+        : level === "upazila"
+          ? "union"
+          : null;
+
+
+  /* Union = stopping point */
+
+  if(!nextLevel){
+
+    currentNode = node;
+
+    updatePanel(
+      "union",
+      node,
+      []
+    );
+
+    return;
+
+  }
+
+
+  navigationStack.push({
+    level:currentLevel,
+    node:currentNode
+  });
+
+  currentLevel = nextLevel;
+
+  currentNode = node;
+
+  const children =
+    getChildren(node,nextLevel);
+
+  updatePanel(
+    nextLevel,
+    node,
+    children
+  );
+
+  await drawLevel(
+    nextLevel,
+    children
+  );
+
+}
+
+
+/* ==========================================================
+   UPDATE PANEL
+========================================================== */
+
+function levelName(level){
+
+  const names = {
+
+    division:"Division Level",
+
+    district:"District Level",
+
+    upazila:"Upazila Level",
+
+    union:"Union Level"
+
+  };
+
+  return names[level] || "National Level";
+
+}
+
+
+function updatePanel(level,node,children){
+
+  levelText.textContent =
+    node
+      ? levelName(level)
+      : "National Level";
+
+
+  currentTitle.textContent =
+    node
+      ? findBn(node)
+      : "বাংলাদেশ";
+
+
+  hudLocation.textContent =
+    node
+      ? findBn(node)
+      : "বাংলাদেশ";
+
+
+  hudMeta.textContent =
+    node
+      ? `${levelName(level)} • ${children.length}টি এলাকা`
+      : `৮ বিভাগ • জাতীয় পর্যায়`;
+
+
+  /* breadcrumb */
+
+  breadcrumb.innerHTML = "";
+
+  const root = document.createElement("div");
+
+  root.className = "crumb";
+
+  root.textContent = "বাংলাদেশ";
+
+  root.onclick = () => renderRoot();
+
+  root.style.cursor = "pointer";
+
+  breadcrumb.appendChild(root);
+
+
+  if(node){
+
+    const path = getPath(node);
+
+    path.forEach((item,i)=>{
+
+      const c =
+        document.createElement("div");
+
+      c.className =
+        "crumb" +
+        (i === path.length-1
+          ? " active"
+          : "");
+
+      c.textContent =
+        findBn(item);
+
+      breadcrumb.appendChild(c);
+
+    });
+
+  }
+
+
+  /* children */
+
+  childrenBox.innerHTML = "";
+
+
+  if(!children.length){
+
+    const empty =
+      document.createElement("div");
+
+    empty.style.padding = "30px 15px";
+
+    empty.style.textAlign = "center";
+
+    empty.style.color = "#718b82";
+
+    empty.innerHTML = `
+      <div style="font-size:28px;margin-bottom:8px">
+        ✓
+      </div>
+      <div style="font-weight:800;color:#d5e6df">
+        এই জায়গাতেই থাকতে পারেন
+      </div>
+      <div style="font-size:11px;margin-top:5px">
+        এখান থেকে কাজের লোকেশন নির্বাচন করা যাবে।
+      </div>
+    `;
+
+    childrenBox.appendChild(empty);
+
+    return;
+
+  }
+
+
+  children.forEach((child,index)=>{
+
+    const card =
+      document.createElement("div");
+
+    card.className = "area-card";
+
+
+    const number =
+      document.createElement("div");
+
+    number.className = "area-number";
+
+    number.textContent =
+      String(index+1).padStart(2,"0");
+
+
+    const info =
+      document.createElement("div");
+
+    info.className = "area-info";
+
+    info.innerHTML = `
+      <div class="area-name">
+        ${findBn(child)}
+      </div>
+
+      <div class="area-en">
+        ${getEn(child)}
+      </div>
+    `;
+
+
+    const arrow =
+      document.createElement("div");
+
+    arrow.className = "area-arrow";
+
+    arrow.textContent = "›";
+
+
+    card.appendChild(number);
+
+    card.appendChild(info);
+
+    card.appendChild(arrow);
+
+
+    card.onclick = () => {
+
+      openNode(
+        child,
+        level
+      );
+
+    };
+
+
+    childrenBox.appendChild(card);
+
+  });
+
+}
+
+
+/* ==========================================================
+   GET PATH
+========================================================== */
+
+function getPath(target){
+
+  const path = [];
+
+
+  for(const div of tree){
+
+    if(div === target){
+
+      path.push(div);
+
+      return path;
+
+    }
+
+
+    for(const dist of div.districts || []){
+
+      if(dist === target){
+
+        path.push(div,dist);
+
+        return path;
+
+      }
+
+
+      for(const up of dist.upazilas || []){
+
+        if(up === target){
+
+          path.push(
+            div,
+            dist,
+            up
+          );
+
+          return path;
+
+        }
+
+
+        for(const un of up.unions || []){
+
+          if(un === target){
+
+            path.push(
+              div,
+              dist,
+              up,
+              un
+            );
+
+            return path;
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  return path;
+
+}
+
+
+/* ==========================================================
+   BACK
+========================================================== */
+
+async function goBack(){
+
+  if(!navigationStack.length){
+
+    renderRoot();
+
+    return;
+
+  }
+
+  const previous =
+    navigationStack.pop();
+
+  currentLevel =
+    previous.level;
+
+  currentNode =
+    previous.node;
+
+
+  const children =
+    getChildren(
+      currentNode,
+      currentLevel
+    );
+
+
+  if(currentLevel === "division"){
+
+    updatePanel(
+      "division",
+      null,
+      tree
+    );
+
+    await drawLevel(
+      "division",
+      tree
+    );
+
+    return;
+
+  }
+
+
+  updatePanel(
+    currentLevel,
+    currentNode,
+    children
+  );
+
+  await drawLevel(
+    currentLevel,
+    children
+  );
+
+}
+
+
+/* ==========================================================
+   OUTSIDE / ZOOM UP
+========================================================== */
+
+$("zoomOutBtn").onclick = goBack;
+
+$("backBtn").onclick = goBack;
+
+$("homeBtn").onclick = renderRoot;
+
+
+/* ==========================================================
+   STAY HERE
+========================================================== */
+
+$("stayBtn").onclick = () => {
+
+  const name =
+    currentNode
+      ? findBn(currentNode)
+      : "বাংলাদেশ";
+
+
+  alert(
+    `আপনার কাজের লোকেশন হিসেবে "${name}" নির্বাচন করা হয়েছে।`
+  );
+
+};
+
+
+/* ==========================================================
+   SEARCH
+========================================================== */
+
+searchInput.addEventListener(
+  "input",
+  e => {
+
+    const q =
+      e.target.value.trim();
+
+    if(q.length < 2)
+      return;
+
+
+    const results =
+      searchRecords(q);
+
+
+    showSearchResults(results);
+
+  }
+);
+
+
+function showSearchResults(results){
+
+  childrenBox.innerHTML = "";
+
+
+  if(!results.length){
+
+    childrenBox.innerHTML = `
+      <div style="
+        text-align:center;
+        padding:35px 15px;
+        color:#728b83;
+      ">
+        কোনো জায়গা পাওয়া যায়নি।
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  results.forEach((item,index)=>{
+
+    const card =
+      document.createElement("div");
+
+    card.className = "area-card";
+
+
+    const number =
+      document.createElement("div");
+
+    number.className =
+      "area-number";
+
+    number.textContent =
+      String(index+1).padStart(2,"0");
+
+
+    const info =
+      document.createElement("div");
+
+    info.className =
+      "area-info";
+
+    info.innerHTML = `
+      <div class="area-name">
+        ${findBn(item.node)}
+      </div>
+
+      <div class="area-en">
+        ${levelName(item.level)}
+      </div>
+    `;
+
+
+    const arrow =
+      document.createElement("div");
+
+    arrow.className =
+      "area-arrow";
+
+    arrow.textContent = "›";
+
+
+    card.append(
+      number,
+      info,
+      arrow
+    );
+
+
+    card.onclick = async () => {
+
+      searchInput.value = "";
+
+      await jumpToResult(item);
+
+    };
+
+
+    childrenBox.appendChild(card);
+
+  });
+
+}
+
+
+async function jumpToResult(item){
+
+  const path =
+    getPath(item.node);
+
+
+  if(!path.length)
+    return;
+
+
+  navigationStack = [];
+
+
+  /* Build state according to result */
+
+  if(item.level === "division"){
+
+    currentLevel = "division";
+    currentNode = null;
+
+    updatePanel(
+      "division",
+      null,
+      tree
+    );
+
+    await drawLevel(
+      "division",
+      tree
+    );
+
+    return;
+
+  }
+
+
+  if(item.level === "district"){
+
+    const div = path[0];
+
+    navigationStack.push({
+      level:"division",
+      node:null
+    });
+
+    currentLevel = "district";
+    currentNode = item.node;
+
+    updatePanel(
+      "district",
+      item.node,
+      item.node.upazilas || []
+    );
+
+    await drawLevel(
+      "district",
+      div.districts || []
+    );
+
+    return;
+
+  }
+
+
+  if(item.level === "upazila"){
+
+    const div = path[0];
+    const dist = path[1];
+
+    navigationStack.push({
+      level:"division",
+      node:null
+    });
+
+    navigationStack.push({
+      level:"district",
+      node:div
+    });
+
+    currentLevel = "upazila";
+    currentNode = item.node;
+
+    updatePanel(
+      "upazila",
+      item.node,
+      item.node.unions || []
+    );
+
+    await drawLevel(
+      "upazila",
+      dist.upazilas || []
+    );
+
+    return;
+
+  }
+
+
+  if(item.level === "union"){
+
+    const div = path[0];
+    const dist = path[1];
+    const up = path[2];
+
+    navigationStack.push({
+      level:"division",
+      node:null
+    });
+
+    navigationStack.push({
+      level:"district",
+      node:div
+    });
+
+    navigationStack.push({
+      level:"upazila",
+      node:dist
+    });
+
+    currentLevel = "union";
+    currentNode = item.node;
+
+    updatePanel(
+      "union",
+      item.node,
+      []
+    );
+
+    await drawLevel(
+      "union",
+      up.unions || []
+    );
+
+  }
+
+}
+
+
+/* ==========================================================
+   KEYBOARD SHORTCUTS
+========================================================== */
+
+document.addEventListener(
+  "keydown",
+  e => {
+
+    if(e.key === "Escape"){
+
+      searchInput.value = "";
+
+      if(currentLevel !== "division")
+        goBack();
+
+    }
+
+    if(
+      e.key === "/" &&
+      document.activeElement !== searchInput
+    ){
+
+      e.preventDefault();
+
+      searchInput.focus();
+
+    }
+
+  }
+);
+
+
+/* ==========================================================
+   START
+========================================================== */
+
+loadData();
+
+</script>
+
+</body>
+</html>
