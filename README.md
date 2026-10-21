@@ -40,7 +40,7 @@ A modular automation engine combining large language model intelligence (Google 
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/monisharani333022-eng/AI__automation.git
+git clone https://github.com/Jubayer-AI-Studio/AI__automation.git
 cd AI__automation
 
 # 2. Install dependencies
@@ -57,8 +57,8 @@ Run_All_In_One_Desktop_AI.bat
 
 ## 👤 Author
 
-* **Developer:** [Jubayer Ahmad](https://github.com/monisharani333022-eng)
-* **Email:** [monisharani333022@gmail.com](mailto:monisharani333022@gmail.com)
+* **Developer:** [Jubayer Ahmad](https://github.com/Jubayer-AI-Studio)
+* **Email:** [jubayerahmadaistudio@gmail.com](mailto:jubayerahmadaistudio@gmail.com)
 * **Location:** Dhaka, Bangladesh 🇧🇩
 
 ---
